@@ -8,7 +8,7 @@ namespace EcommerceApp.Models
         [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(150)]
+        [Required, MaxLength(150), RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo letras y espacios permitidos.")]
         public string Name { get; set; } = string.Empty;
 
         // Tipo de vehículo: mini van, 4x4, colectivo...
@@ -16,11 +16,13 @@ namespace EcommerceApp.Models
         public string? Type { get; set; }
 
         // Cantidad de asientos.
+        [Range(1, 100, ErrorMessage = "La capacidad debe ser entre 1 y 100.")]
         public int Capacity { get; set; }
 
         [MaxLength(500)]
         public string? Description { get; set; }
 
+        [Range(0, double.MaxValue, ErrorMessage = "No puede ser negativo.")]
         public decimal? PricePerKm { get; set; }
 
         public bool IsActive { get; set; } = true;

@@ -9,6 +9,9 @@
         <h1>Reservas</h1>
         <p>@Model.Count reserva(s) @(ViewBag.StatusFilter != null ? $"con estado \"{ViewBag.StatusFilter}\"" : "en total").</p>
     </div>
+    <a asp-action="ReservationCreate" class="btn-admin btn-admin-primary" style="margin-top:1rem;">
+        Nueva reserva
+    </a>
 </div>
 
 <div class="admin-card">
@@ -46,6 +49,7 @@
                         <th>Precio unitario</th>
                         <th>Total</th>
                         <th>Estado</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,6 +75,14 @@
                                             <option value="@s" selected="@(r.Status == s)">@s</option>
                                         }
                                     </select>
+                                </form>
+                            </td>
+                            <td>
+                                <a asp-action="ReservationEdit" asp-route-userid="@r.UserId" asp-route-serviceid="@r.ServiceId" class="btn btn-sm btn-outline-primary" style="margin-right:0.3rem;">Editar</a>
+                                <form asp-action="ReservationDelete" method="post" style="display:inline;">
+                                    <input type="hidden" name="userId" value="@r.UserId" />
+                                    <input type="hidden" name="serviceId" value="@r.ServiceId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar esta reserva permanentemente?')">Eliminar</button>
                                 </form>
                             </td>
                         </tr>

@@ -8,7 +8,7 @@ namespace EcommerceApp.Models
         [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(150)]
+        [Required, MaxLength(150), RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo letras y espacios permitidos.")]
         public string Name { get; set; } = string.Empty;
 
         // Especialidad: senderismo, trekking, alta montaña...

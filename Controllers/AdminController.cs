@@ -1,4 +1,4 @@
-using EcommerceApp.Data;
+﻿using EcommerceApp.Data;
 using EcommerceApp.Models;
 using EcommerceApp.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceApp.Controllers
 {
-    // Panel de administración: solo usuarios con rol Admin.
-    // CRUD de productos, rutas/servicios, guías, transporte y gestión de reservas.
+    // Panel de administraci├│n: solo usuarios con rol Admin.
+    // CRUD de productos, rutas/servicios, gu├¡as, transporte y gesti├│n de reservas.
     [Authorize(Roles = "Admin")]
     public class AdminController(ApplicationDbContext context, IImageStorageService imageStorage) : Controller
     {
@@ -18,7 +18,7 @@ namespace EcommerceApp.Controllers
         private const long MaxVideoBytes = 100 * 1024 * 1024;   // 100 MB
 
         // ---------------------------------------------------------------
-        // SUBIDA DE IMÁGENES / VIDEO (Supabase Storage)
+        // SUBIDA DE IM├üGENES / VIDEO (Supabase Storage)
         // ---------------------------------------------------------------
         // Se llama por AJAX desde los formularios de Productos, Rutas y Branding.
         // "folder" agrupa los archivos dentro del bucket: products, services, branding...
@@ -29,7 +29,7 @@ namespace EcommerceApp.Controllers
         {
             if (files == null || files.Count == 0)
             {
-                return Json(new { success = false, error = "No se recibió ningún archivo." });
+                return Json(new { success = false, error = "No se recibi├│ ning├║n archivo." });
             }
 
             var urls = new List<string>();
@@ -49,7 +49,7 @@ namespace EcommerceApp.Controllers
                 if (file.Length > limit)
                 {
                     var limitLabel = isVideo ? "100 MB" : "5 MB";
-                    return Json(new { success = false, error = $"\"{file.FileName}\" supera el tamaño máximo de {limitLabel}." });
+                    return Json(new { success = false, error = $"\"{file.FileName}\" supera el tama├▒o m├íximo de {limitLabel}." });
                 }
 
                 try
@@ -66,7 +66,7 @@ namespace EcommerceApp.Controllers
 
             if (urls.Count == 0)
             {
-                return Json(new { success = false, error = "No se pudo subir ningún archivo." });
+                return Json(new { success = false, error = "No se pudo subir ning├║n archivo." });
             }
 
             return Json(new { success = true, urls, url = urls[0] });
@@ -76,11 +76,11 @@ namespace EcommerceApp.Controllers
         // BRANDING (logo, video de fondo, imagen de login...)
         // ---------------------------------------------------------------
         // No se guarda en base de datos: solo sube el archivo a Supabase y te
-        // muestra la URL pública para que la pegues donde corresponda en el código.
+        // muestra la URL p├║blica para que la pegues donde corresponda en el c├│digo.
         public IActionResult Branding()
         {
             ViewData["Title"] = "Branding";
-            ViewData["Subtitle"] = "Logo, video de fondo y otras imágenes de marca";
+            ViewData["Subtitle"] = "Logo, video de fondo y otras im├ígenes de marca";
             return View();
         }
 
@@ -134,7 +134,7 @@ namespace EcommerceApp.Controllers
         public async Task<IActionResult> Products(string? q)
         {
             ViewData["Title"] = "Productos";
-            ViewData["Subtitle"] = "Catálogo de la tienda";
+            ViewData["Subtitle"] = "Cat├ílogo de la tienda";
 
             var query = context.Products.AsNoTracking().AsQueryable();
             if (!string.IsNullOrWhiteSpace(q))
@@ -258,7 +258,7 @@ namespace EcommerceApp.Controllers
         public async Task<IActionResult> Services(string? q)
         {
             ViewData["Title"] = "Rutas / Servicios";
-            ViewData["Subtitle"] = "Catálogo de senderismo y aventura";
+            ViewData["Subtitle"] = "Cat├ílogo de senderismo y aventura";
 
             var query = context.Services.AsNoTracking().Include(s => s.Guide).Include(s => s.Transport).AsQueryable();
             if (!string.IsNullOrWhiteSpace(q))
@@ -402,13 +402,13 @@ namespace EcommerceApp.Controllers
         }
 
         // ---------------------------------------------------------------
-        // GUÍAS
+        // GU├ìAS
         // ---------------------------------------------------------------
 
         public async Task<IActionResult> Guides(string? q)
         {
-            ViewData["Title"] = "Guías";
-            ViewData["Subtitle"] = "Equipo de guías de montaña";
+            ViewData["Title"] = "Gu├¡as";
+            ViewData["Subtitle"] = "Equipo de gu├¡as de monta├▒a";
 
             var query = context.Guides.AsNoTracking().AsQueryable();
             if (!string.IsNullOrWhiteSpace(q))
@@ -419,7 +419,7 @@ namespace EcommerceApp.Controllers
             ViewBag.Query = q;
             var guides = await query.OrderBy(g => g.Name).ToListAsync();
 
-            // Cantidad de rutas asignadas por guía, para mostrar en la tabla.
+            // Cantidad de rutas asignadas por gu├¡a, para mostrar en la tabla.
             var counts = await context.Services
                 .Where(s => s.GuideId != null)
                 .GroupBy(s => s.GuideId)
@@ -432,8 +432,8 @@ namespace EcommerceApp.Controllers
 
         public IActionResult GuideCreate()
         {
-            ViewData["Title"] = "Nuevo guía";
-            ViewData["Subtitle"] = "Guías";
+            ViewData["Title"] = "Nuevo gu├¡a";
+            ViewData["Subtitle"] = "Gu├¡as";
             return View(new Guide());
         }
 
@@ -441,20 +441,20 @@ namespace EcommerceApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GuideCreate(Guide guide)
         {
-            ViewData["Title"] = "Nuevo guía";
-            ViewData["Subtitle"] = "Guías";
+            ViewData["Title"] = "Nuevo gu├¡a";
+            ViewData["Subtitle"] = "Gu├¡as";
             if (!ModelState.IsValid) return View(guide);
 
             context.Guides.Add(guide);
             await context.SaveChangesAsync();
-            TempData["Success"] = $"Guía \"{guide.Name}\" agregado.";
+            TempData["Success"] = $"Gu├¡a \"{guide.Name}\" agregado.";
             return RedirectToAction(nameof(Guides));
         }
 
         public async Task<IActionResult> GuideEdit(int id)
         {
-            ViewData["Title"] = "Editar guía";
-            ViewData["Subtitle"] = "Guías";
+            ViewData["Title"] = "Editar gu├¡a";
+            ViewData["Subtitle"] = "Gu├¡as";
             var guide = await context.Guides.FindAsync(id);
             if (guide == null) return NotFound();
             return View(guide);
@@ -464,15 +464,15 @@ namespace EcommerceApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GuideEdit(int id, Guide guide)
         {
-            ViewData["Title"] = "Editar guía";
-            ViewData["Subtitle"] = "Guías";
+            ViewData["Title"] = "Editar gu├¡a";
+            ViewData["Subtitle"] = "Gu├¡as";
             if (id != guide.Id) return NotFound();
             if (!ModelState.IsValid) return View(guide);
 
             guide.UpdatedAt = DateTime.UtcNow;
             context.Guides.Update(guide);
             await context.SaveChangesAsync();
-            TempData["Success"] = $"Guía \"{guide.Name}\" actualizado.";
+            TempData["Success"] = $"Gu├¡a \"{guide.Name}\" actualizado.";
             return RedirectToAction(nameof(Guides));
         }
 
@@ -490,13 +490,13 @@ namespace EcommerceApp.Controllers
                     guide.IsActive = false;
                     guide.UpdatedAt = DateTime.UtcNow;
                     await context.SaveChangesAsync();
-                    TempData["Success"] = $"\"{guide.Name}\" tiene rutas asignadas, así que se marcó como inactivo en vez de eliminarse.";
+                    TempData["Success"] = $"\"{guide.Name}\" tiene rutas asignadas, as├¡ que se marc├│ como inactivo en vez de eliminarse.";
                 }
                 else
                 {
                     context.Guides.Remove(guide);
                     await context.SaveChangesAsync();
-                    TempData["Success"] = $"Guía \"{guide.Name}\" eliminado.";
+                    TempData["Success"] = $"Gu├¡a \"{guide.Name}\" eliminado.";
                 }
             }
             return RedirectToAction(nameof(Guides));
@@ -509,7 +509,7 @@ namespace EcommerceApp.Controllers
         public async Task<IActionResult> Transports(string? q)
         {
             ViewData["Title"] = "Transporte";
-            ViewData["Subtitle"] = "Vehículos disponibles para traslados";
+            ViewData["Subtitle"] = "Veh├¡culos disponibles para traslados";
 
             var query = context.Transports.AsNoTracking().AsQueryable();
             if (!string.IsNullOrWhiteSpace(q))
@@ -589,7 +589,7 @@ namespace EcommerceApp.Controllers
                     transport.IsActive = false;
                     transport.UpdatedAt = DateTime.UtcNow;
                     await context.SaveChangesAsync();
-                    TempData["Success"] = $"\"{transport.Name}\" está asignado a rutas, así que se marcó como inactivo en vez de eliminarse.";
+                    TempData["Success"] = $"\"{transport.Name}\" est├í asignado a rutas, as├¡ que se marc├│ como inactivo en vez de eliminarse.";
                 }
                 else
                 {
@@ -639,6 +639,135 @@ namespace EcommerceApp.Controllers
             return RedirectToAction(nameof(Reservations));
         }
 
+        // Muestra el formulario para crear una nueva reserva.
+        [HttpGet]
+        public async Task<IActionResult> ReservationCreate()
+        {
+            ViewData["Title"] = "Nueva reserva";
+            ViewData["Subtitle"] = "Reservas";
+            ViewBag.Usuarios = await context.Users.AsNoTracking()
+                .Select(u => new { u.Id, Email = u.Email ?? u.UserName ?? "", u.FullName })
+                .OrderBy(u => u.Email)
+                .ToListAsync();
+            ViewBag.Servicios = await context.Services.AsNoTracking()
+                .Where(s => s.Status == "Active")
+                .OrderBy(s => s.Name)
+                .ToListAsync();
+            return View();
+        }
+
+        // Crea una nueva reserva con los datos del formulario.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReservationCreate(Reservation reservation)
+        {
+            ViewData["Title"] = "Nueva reserva";
+            ViewData["Subtitle"] = "Reservas";
+            if (!ModelState.IsValid)
+            {
+                await LoadReservationLookupsAsync();
+                return View(reservation);
+            }
+
+            // Verificar que no exista otra reserva para el mismo usuario-servicio (clave compuesta).
+            var exists = await context.Reservations.AnyAsync(r => r.UserId == reservation.UserId && r.ServiceId == reservation.ServiceId);
+            if (exists)
+            {
+                ModelState.AddModelError(string.Empty, "Ya existe una reserva para este usuario con este servicio. Use edición para modificarla.");
+                await LoadReservationLookupsAsync();
+                return View(reservation);
+            }
+
+            // Obtener precio unitario del servicio y calcular total.
+            var service = await context.Services.AsNoTracking().FirstOrDefaultAsync(s => s.Id == reservation.ServiceId);
+            if (service != null)
+            {
+                reservation.UnitPrice = service.Price;
+            }
+            reservation.TotalPrice = reservation.UnitPrice * reservation.PeopleCount;
+            reservation.BookingDate = DateTime.UtcNow;
+
+            context.Reservations.Add(reservation);
+            await context.SaveChangesAsync();
+            TempData["Success"] = $"Reserva creada correctamente para {reservation.UserId} en la ruta {reservation.ServiceId}.";
+            return RedirectToAction(nameof(Reservations));
+        }
+
+        // Muestra el formulario para editar una reserva existente.
+        [HttpGet]
+        public async Task<IActionResult> ReservationEdit(string userId, int serviceId)
+        {
+            ViewData["Title"] = "Editar reserva";
+            ViewData["Subtitle"] = "Reservas";
+            var reservation = await context.Reservations.FindAsync(userId, serviceId);
+            if (reservation == null) return NotFound();
+            await LoadReservationLookupsAsync();
+            return View(reservation);
+        }
+
+        // Guarda los cambios de una reserva existente.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReservationEdit(string userId, int serviceId, Reservation reservation)
+        {
+            ViewData["Title"] = "Editar reserva";
+            ViewData["Subtitle"] = "Reservas";
+            if (reservation.UserId != userId || reservation.ServiceId != serviceId)
+                return NotFound();
+
+            if (!ModelState.IsValid)
+            {
+                await LoadReservationLookupsAsync();
+                return View(reservation);
+            }
+
+            var existing = await context.Reservations.FindAsync(userId, serviceId);
+            if (existing == null) return NotFound();
+
+            existing.PeopleCount = reservation.PeopleCount;
+            existing.UnitPrice = reservation.UnitPrice;
+            existing.TotalPrice = reservation.UnitPrice * reservation.PeopleCount;
+            existing.Status = reservation.Status;
+            existing.BookingDate = reservation.BookingDate;
+
+            context.Reservations.Update(existing);
+            await context.SaveChangesAsync();
+            TempData["Success"] = "Reserva actualizada correctamente.";
+            return RedirectToAction(nameof(Reservations));
+        }
+
+        // Elimina permanentemente una reserva.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReservationDelete(string userId, int serviceId)
+        {
+            var reservation = await context.Reservations.FindAsync(userId, serviceId);
+            if (reservation != null)
+            {
+                context.Reservations.Remove(reservation);
+                await context.SaveChangesAsync();
+                TempData["Success"] = "Reserva eliminada permanentemente.";
+            }
+            else
+            {
+                TempData["Success"] = "Reserva no encontrada.";
+            }
+            return RedirectToAction(nameof(Reservations));
+        }
+
+        // Carga las listas de usuarios y servicios activos para los formularios de reservas.
+        private async Task LoadReservationLookupsAsync()
+        {
+            ViewBag.Usuarios = await context.Users.AsNoTracking()
+                .Select(u => new { u.Id, Email = u.Email ?? u.UserName ?? "", u.FullName })
+                .OrderBy(u => u.Email)
+                .ToListAsync();
+            ViewBag.Servicios = await context.Services.AsNoTracking()
+                .Where(s => s.Status == "Active")
+                .OrderBy(s => s.Name)
+                .ToListAsync();
+        }
+
         // ---------------------------------------------------------------
         // HELPERS DE SUBIDA DIRECTA A SUPABASE
         // ---------------------------------------------------------------
@@ -650,11 +779,11 @@ namespace EcommerceApp.Controllers
 
             if (!AllowedImageTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
                 throw new InvalidOperationException(
-                    $"El archivo \"{file.FileName}\" no es una imagen válida. Usa JPG, PNG, WEBP o GIF.");
+                    $"El archivo \"{file.FileName}\" no es una imagen v├ílida. Usa JPG, PNG, WEBP o GIF.");
 
             if (file.Length > MaxImageBytes)
                 throw new InvalidOperationException(
-                    $"La imagen \"{file.FileName}\" supera el máximo permitido de 5 MB.");
+                    $"La imagen \"{file.FileName}\" supera el m├íximo permitido de 5 MB.");
 
             await using var stream = file.OpenReadStream();
 

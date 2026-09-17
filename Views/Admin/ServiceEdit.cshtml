@@ -75,22 +75,6 @@
                     <label asp-for="EndPoint">Punto final</label>
                     <input asp-for="EndPoint" class="form-control" />
                 </div>
-                <div class="form-field">
-                    <label asp-for="StartLatitude">Latitud de inicio</label>
-                    <input asp-for="StartLatitude" class="form-control" type="number" step="0.000001" />
-                </div>
-                <div class="form-field">
-                    <label asp-for="StartLongitude">Longitud de inicio</label>
-                    <input asp-for="StartLongitude" class="form-control" type="number" step="0.000001" />
-                </div>
-                <div class="form-field">
-                    <label asp-for="EndLatitude">Latitud final</label>
-                    <input asp-for="EndLatitude" class="form-control" type="number" step="0.000001" />
-                </div>
-                <div class="form-field">
-                    <label asp-for="EndLongitude">Longitud final</label>
-                    <input asp-for="EndLongitude" class="form-control" type="number" step="0.000001" />
-                </div>
             </div>
         </div>
 
@@ -134,13 +118,9 @@
             <h3>Precio y estado</h3>
             <div class="form-grid form-grid-3">
                 <div class="form-field">
-                    <label asp-for="Price">Precio (Bs.)</label>
+                    <label asp-for="Price">Precio por persona (Bs.)</label>
                     <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.01" />
                     <span asp-validation-for="Price" class="text-danger"></span>
-                </div>
-                <div class="form-field">
-                    <label asp-for="PriceDescription">Descripción del precio</label>
-                    <input asp-for="PriceDescription" class="form-control" placeholder='Ej: "Bs. 150 / persona"' />
                 </div>
                 <div class="form-field">
                     <label asp-for="Status">Estado</label>

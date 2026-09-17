@@ -7,13 +7,13 @@ namespace EcommerceApp.Models
         [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(100)]
+        [Required, MaxLength(100), RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo letras y espacios permitidos.")]
         public string Name { get; set; } = string.Empty;
 
         [Required, MaxLength(500)]
         public string Description { get; set; } = string.Empty;
 
-        [Required, Range(0.01, 999999.99)]
+        [Required, Range(0.01, 999999.99, ErrorMessage = "El precio debe ser mayor a 0.")]
         public decimal Price { get; set; }
 
         // Precio de oferta opcional: si existe, se muestra tachado el precio normal.
@@ -23,7 +23,7 @@ namespace EcommerceApp.Models
         // Destacado/en promoción: estos productos salen primero en la portada de la tienda.
         public bool IsFeatured { get; set; }
 
-        [Required, Range(0, int.MaxValue)]
+        [Required, Range(0, int.MaxValue, ErrorMessage = "El stock no puede ser negativo.")]
         public int Stock { get; set; }
 
         // Imagen principal del producto

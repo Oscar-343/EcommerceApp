@@ -13,7 +13,7 @@ namespace EcommerceApp.Models
         // Fecha en la que se hizo la reserva.
         public DateTime BookingDate { get; set; } = DateTime.UtcNow;
 
-        [Range(1, 50)]
+        [Range(1, 50, ErrorMessage = "Debe ser entre 1 y 50 personas.")]
         public int PeopleCount { get; set; } = 1;
 
         public decimal UnitPrice { get; set; }
@@ -22,7 +22,7 @@ namespace EcommerceApp.Models
         public decimal TotalPrice { get; set; }
 
         // Estado: Pendiente, Recorrido, Acabado, Cancelado.
-        [MaxLength(20)]
+        [MaxLength(20), RegularExpression(@"^(Pendiente|Recorrido|Acabado|Cancelado)$", ErrorMessage = "Estado no válido.")]
         public string Status { get; set; } = "Pendiente";
 
         // Navegación (sin colecciones en los extremos para mantenerlo simple).

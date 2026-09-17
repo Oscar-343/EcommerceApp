@@ -40,7 +40,7 @@ namespace EcommerceApp.Models
 
         // === DIFICULTAD ===
         // easy, moderate, difficult, extreme
-        [MaxLength(20)]
+        [MaxLength(20), RegularExpression(@"^(easy|moderate|difficult|extreme)?$", ErrorMessage = "Dificultad no válida.")]
         public string? Difficulty { get; set; }
 
         // Descripción/explicación de la dificultad
@@ -48,6 +48,7 @@ namespace EcommerceApp.Models
         public string? DifficultyDescription { get; set; }
 
         // === DISTANCIA Y DURACIÓN ===
+        [Range(1, 1000, ErrorMessage = "La distancia debe estar entre 1 y 1000 km.")]
         public double? DistanceKm { get; set; }
 
         // Duración en horas (número)
@@ -61,7 +62,7 @@ namespace EcommerceApp.Models
         public int MaxGroupSize { get; set; } = 12;
 
         // === PRECIO ===
-        [Required, Range(0.01, 999999.99)]
+        [Required, Range(0.01, 999999.99, ErrorMessage = "El precio debe ser mayor a 0.")]
         public decimal Price { get; set; }
 
         [MaxLength(100)]

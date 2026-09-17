@@ -1,0 +1,106 @@
+@model EcommerceApp.Models.Reservation
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Editar reserva";
+    ViewData["Subtitle"] = "Reservas";
+    var usersList = ViewBag.Usuarios;
+    var servicesList = ViewBag.Servicios;
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Editar reserva</h1>
+        <p>Modificá los datos de la reserva.</p>
+    </div>
+</div>
+
+<div class="admin-card">
+    <form asp-action="ReservationEdit" method="post" class="admin-form">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        
+        <input type="hidden" asp-for="UserId" />
+        <input type="hidden" asp-for="ServiceId" />
+        
+        <div class="admin-form-section">
+            <h3>Datos del usuario</h3>
+            <div class="form-grid">
+                <div class="form-field form-span-2">
+                    <label asp-for="UserId">Usuario</label>
+                    <select asp-for="UserId" class="form-select" style="min-width:200px;">
+                        <option value="">Seleccionar usuario</option>
+                        @if (usersList != null)
+                        {
+                            foreach (var user in usersList)
+                            {
+                                <option value="@user.Id" selected="@(Model.UserId == user.Id)">@user.FullName (@user.Email)</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="admin-form-section">
+            <h3>Datos de la reserva</h3>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label asp-for="ServiceId">Servicio / Ruta</label>
+                    <select asp-for="ServiceId" class="form-select" style="min-width:200px;">
+                        <option value="">Seleccionar servicio</option>
+                        @if (servicesList != null)
+                        {
+                            foreach (var service in servicesList)
+                            {
+                                <option value="@service.Id" selected="@(Model.ServiceId == service.Id)">@service.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                
+                <div class="form-field">
+                    <label asp-for="PeopleCount">Cantidad de personas</label>
+                    <input asp-for="PeopleCount" class="form-control" type="number" min="1" />
+                    <span asp-validation-for="PeopleCount" class="text-danger"></span>
+                </div>
+                
+                <div class="form-field">
+                    <label asp-for="BookingDate">Fecha de reserva</label>
+                    <input asp-for="BookingDate" class="form-control" type="datetime-local" />
+                    <span asp-validation-for="BookingDate" class="text-danger"></span>
+                </div>
+                
+                <div class="form-field">
+                    <label asp-for="UnitPrice">Precio unitario (Bs.)</label>
+                    <input asp-for="UnitPrice" class="form-control" type="number" step="0.01" min="0.01" />
+                    <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                </div>
+                
+                <div class="form-field">
+                    <label asp-for="Status">Estado</label>
+                    <select asp-for="Status" class="form-select">
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Recorrido">Recorrido</option>
+                        <option value="Acabado">Acabado</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="admin-form-section">
+            <h3>Resumen</h3>
+            <p class="text-muted">
+                <strong>Total:</strong> @(Model.PeopleCount * Model.UnitPrice) Bs.
+            </p>
+        </div>
+        
+        <div class="admin-form-footer">
+            <a asp-action="Reservations" class="btn-admin btn-admin-outline">Cancelar</a>
+            <button type="submit" class="btn-admin btn-admin-primary">Guardar cambios</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
