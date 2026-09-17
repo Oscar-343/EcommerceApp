@@ -1,0 +1,667 @@
+﻿@model EcommerceApp.Models.Product
+@{
+    ViewData["Title"] = Model.Name + " - Equipamiento Outdoor";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/productos.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+    /* === ESTILOS ESPECÍFICOS PARA DETALLE === */
+    .producto-detalle {
+        background-color: #0D1210;
+        color: #F2F4F2;
+        min-height: 100vh;
+        padding: 3rem 0;
+    }
+
+    .producto-detalle__container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .producto-detalle__breadcrumb {
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        color: #A9B2AD;
+    }
+
+    .producto-detalle__breadcrumb a {
+        color: #7FA58C;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .producto-detalle__breadcrumb a:hover {
+        color: #4F8063;
+    }
+
+    .producto-detalle__content {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 4rem;
+    }
+
+    /* === GALERÍA === */
+    .producto-galeria {
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+    }
+
+    .producto-galeria__main {
+        position: relative;
+        width: 100%;
+        height: 600px;
+        background-color: #171E1B;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        border: 1px solid #303936;
+    }
+
+    .producto-galeria__main img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .producto-galeria__main img:hover {
+        transform: scale(1.05);
+    }
+
+    .producto-galeria__thumbs {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .producto-galeria__thumb {
+        height: 100px;
+        background-color: #171E1B;
+        border-radius: 4px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .producto-galeria__thumb:hover,
+    .producto-galeria__thumb.active {
+        border-color: #2F5D46;
+    }
+
+    .producto-galeria__thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* === INFORMACIÓN === */
+    .producto-info__brand {
+        font-size: 0.9rem;
+        color: #7FA58C;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.5rem;
+    }
+
+    .producto-info__title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .producto-info__category {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background-color: #171E1B;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        color: #A9B2AD;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1.5rem;
+    }
+
+    .producto-info__badges {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .producto-info__badge {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-radius: 4px;
+        color: #F2F4F2;
+    }
+
+    .producto-info__badge--new {
+        background-color: #2F5D46;
+    }
+
+    .producto-info__badge--bestseller {
+        background-color: #D4AF37;
+        color: #000;
+    }
+
+    .producto-info__badge--offer {
+        background-color: #DC3545;
+    }
+
+    .producto-info__price {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #303936;
+    }
+
+    .producto-info__price-current {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #F2F4F2;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .producto-info__price-original {
+        font-size: 1.25rem;
+        color: #A9B2AD;
+        text-decoration: line-through;
+        margin-right: 1rem;
+    }
+
+    .producto-info__price-discount {
+        display: inline-block;
+        padding: 0.4rem 0.75rem;
+        background-color: #DC3545;
+        color: #F2F4F2;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .producto-info__description {
+        margin-bottom: 2rem;
+        line-height: 1.7;
+        color: #A9B2AD;
+    }
+
+    .producto-info__stock {
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+    }
+
+    .producto-info__stock--available {
+        color: #7FA58C;
+    }
+
+    .producto-info__stock--low {
+        color: #FFC107;
+    }
+
+    .producto-info__stock--out {
+        color: #DC3545;
+    }
+
+    .producto-info__quantity {
+        margin-bottom: 2rem;
+    }
+
+    .producto-info__quantity-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+        color: #A9B2AD;
+    }
+
+    .producto-info__quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: fit-content;
+    }
+
+    .producto-info__quantity-btn {
+        width: 40px;
+        height: 40px;
+        background-color: #171E1B;
+        border: 1px solid #303936;
+        color: #F2F4F2;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .producto-info__quantity-btn:hover {
+        background-color: #2F5D46;
+        border-color: #2F5D46;
+    }
+
+    .producto-info__quantity-input {
+        width: 80px;
+        height: 40px;
+        text-align: center;
+        background-color: #171E1B;
+        border: 1px solid #303936;
+        color: #F2F4F2;
+        border-radius: 4px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .producto-info__quantity-input:focus {
+        outline: none;
+        border-color: #2F5D46;
+    }
+
+    .producto-info__actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .producto-info__btn {
+        flex: 1;
+        padding: 1.25rem 2rem;
+        border: none;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .producto-info__btn--primary {
+        background-color: #2F5D46;
+        color: #F2F4F2;
+    }
+
+    .producto-info__btn--primary:hover {
+        background-color: #4F8063;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(47, 93, 70, 0.3);
+    }
+
+    .producto-info__btn--secondary {
+        background-color: transparent;
+        border: 2px solid #303936;
+        color: #F2F4F2;
+    }
+
+    .producto-info__btn--secondary:hover {
+        border-color: #F2F4F2;
+        background-color: #171E1B;
+    }
+
+    .producto-info__favorite {
+        width: 56px;
+        height: 56px;
+        background-color: transparent;
+        border: 2px solid #303936;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1.5rem;
+        color: #A9B2AD;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .producto-info__favorite:hover {
+        border-color: #DC3545;
+        color: #DC3545;
+    }
+
+    .producto-info__favorite.active {
+        background-color: #DC3545;
+        border-color: #DC3545;
+        color: #F2F4F2;
+    }
+
+    .producto-info__back {
+        margin-top: 2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #7FA58C;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .producto-info__back:hover {
+        color: #4F8063;
+    }
+
+    /* === RESPONSIVE === */
+    @@media (max-width: 992px) {
+        .producto-detalle__content {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .producto-galeria {
+            position: relative;
+            top: 0;
+        }
+
+        .producto-galeria__main {
+            height: 400px;
+        }
+
+        .producto-info__title {
+            font-size: 2rem;
+        }
+
+        .producto-info__price-current {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .producto-detalle {
+            padding: 1.5rem 0;
+        }
+
+        .producto-detalle__container {
+            padding: 0 1rem;
+        }
+
+        .producto-galeria__main {
+            height: 300px;
+        }
+
+        .producto-info__title {
+            font-size: 1.5rem;
+        }
+
+        .producto-info__actions {
+            flex-direction: column;
+        }
+
+        .producto-info__btn {
+            width: 100%;
+        }
+
+        .producto-info__favorite {
+            width: 100%;
+        }
+    }
+</style>
+</head>
+<!-- === NAVBAR CINEMATOGRÁFICA (idéntica a Home / Servicios) === -->
+    <nav id="mainNav" class="navbar-cinematic">
+        <div class="nav-container">
+            <a class="nav-logo" asp-controller="Home" asp-action="Index">
+                <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg" alt="Tren al Sur">
+            </a>
+
+            <ul class="nav-menu">
+                <li><a class="nav-link" asp-controller="Home" asp-action="Index">INICIO</a></li>
+                <li><a class="nav-link" asp-controller="Services" asp-action="Index">RUTAS</a></li>
+                <li><a class="nav-link active" asp-controller="Products" asp-action="Index">PRODUCTOS</a></li>
+                <li><a class="nav-link" href="#nosotros">NOSOTROS</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
+                <a href="#favorites" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
+                <a asp-controller="Products" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
+                <div class="nav-user">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a href="#profile" class="nav-action-icon" title="Perfil"><i class="far fa-user"></i></a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="nav-action-icon" title="Iniciar sesión"><i class="far fa-user"></i></a>
+                    }
+                </div>
+            </div>
+
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+<div class="producto-detalle">
+    <div class="producto-detalle__container">
+        <!-- Breadcrumb -->
+        <nav class="producto-detalle__breadcrumb">
+            <a asp-controller="Products" asp-action="Index">Productos</a>
+            @if (!string.IsNullOrEmpty(Model.Category))
+            {
+                <span> / </span>
+                <a asp-controller="Products" asp-action="Index" asp-route-category="@Model.Category">@Model.Category</a>
+            }
+            <span> / @Model.Name</span>
+        </nav>
+
+        <div class="producto-detalle__content">
+            <!-- === GALERÍA === -->
+            <div class="producto-galeria">
+                <div class="producto-galeria__main">
+                    <img id="mainImage" 
+                         src="@(Model.ImageUrl ?? "https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=800&h=800&fit=crop")" 
+                         alt="@Model.Name" />
+                </div>
+
+                <div class="producto-galeria__thumbs">
+                    <div class="producto-galeria__thumb active" onclick="cambiarImagen('@(Model.ImageUrl ?? "https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=800&h=800&fit=crop")', this)">
+                        <img src="@(Model.ImageUrl ?? "https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=800&h=800&fit=crop")" alt="@Model.Name" />
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.SecondaryImageUrl))
+                    {
+                        <div class="producto-galeria__thumb" onclick="cambiarImagen('@Model.SecondaryImageUrl', this)">
+                            <img src="@Model.SecondaryImageUrl" alt="@Model.Name en uso" />
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- === INFORMACIÓN === -->
+            <div class="producto-info">
+                @if (!string.IsNullOrEmpty(Model.Brand))
+                {
+                    <p class="producto-info__brand">@Model.Brand</p>
+                }
+
+                <h1 class="producto-info__title">@Model.Name</h1>
+
+                @if (!string.IsNullOrEmpty(Model.Category))
+                {
+                    <span class="producto-info__category">@Model.Category</span>
+                }
+
+                <!-- Badges -->
+                <div class="producto-info__badges">
+                    @if (Model.IsNew)
+                    {
+                        <span class="producto-info__badge producto-info__badge--new">NUEVO</span>
+                    }
+                    @if (Model.IsBestSeller)
+                    {
+                        <span class="producto-info__badge producto-info__badge--bestseller">MÁS VENDIDO</span>
+                    }
+                </div>
+
+                <!-- Precio -->
+                <div class="producto-info__price">
+                    @if (Model.PromotionalPrice.HasValue && Model.PromotionalPrice < Model.Price)
+                    {
+                        var discount = Math.Round((1 - (Model.PromotionalPrice.Value / Model.Price)) * 100);
+                        <span class="producto-info__price-current">@Model.PromotionalPrice.Value.ToString("C")</span>
+                        <span class="producto-info__price-original">@Model.Price.ToString("C")</span>
+                        <span class="producto-info__price-discount">AHORRÁS @(discount)%</span>
+                    }
+                    else
+                    {
+                        <span class="producto-info__price-current">@Model.Price.ToString("C")</span>
+                    }
+                </div>
+
+                <!-- Descripción -->
+                <div class="producto-info__description">
+                    <p>@Model.Description</p>
+                </div>
+
+                <!-- Stock -->
+                <div class="producto-info__stock @(Model.Stock > 10 ? "producto-info__stock--available" : Model.Stock > 0 ? "producto-info__stock--low" : "producto-info__stock--out")">
+                    @if (Model.Stock > 10)
+                    {
+                        <span>✓ En stock (@Model.Stock unidades disponibles)</span>
+                    }
+                    else if (Model.Stock > 0)
+                    {
+                        <span>⚠ Últimas @Model.Stock unidades disponibles</span>
+                    }
+                    else
+                    {
+                        <span>✗ Sin stock</span>
+                    }
+                </div>
+
+                <!-- Cantidad -->
+                @if (Model.Stock > 0)
+                {
+                    <div class="producto-info__quantity">
+                        <label class="producto-info__quantity-label">Cantidad</label>
+                        <div class="producto-info__quantity-control">
+                            <button class="producto-info__quantity-btn" onclick="cambiarCantidad(-1)">−</button>
+                            <input type="number" id="cantidad" class="producto-info__quantity-input" value="1" min="1" max="@Model.Stock" />
+                            <button class="producto-info__quantity-btn" onclick="cambiarCantidad(1)">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Acciones -->
+                    <div class="producto-info__actions">
+                        <button class="producto-info__btn producto-info__btn--primary" onclick="agregarAlCarrito(@Model.Id)">
+                            <span>🛒</span> AGREGAR AL CARRITO
+                        </button>
+                        <button class="producto-info__btn producto-info__btn--secondary" onclick="comprarAhora(@Model.Id)">
+                            COMPRAR AHORA
+                        </button>
+                        <button class="producto-info__favorite" id="favoriteBtn" onclick="toggleFavorito(@Model.Id)">
+                            ♡
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="producto-info__actions">
+                        <button class="producto-info__btn producto-info__btn--secondary" disabled>
+                            PRODUCTO AGOTADO
+                        </button>
+                    </div>
+                }
+
+                <!-- Volver -->
+                <a asp-controller="Products" asp-action="Index" class="producto-info__back">
+                    ← Volver al catálogo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    //Cambiar imagen principal
+    function cambiarImagen(src, thumb) {
+        document.getElementById('mainImage').src = src;
+        
+        // Actualizar thumbnails activos
+        document.querySelectorAll('.producto-galeria__thumb').forEach(t => t.classList.remove('active'));
+        if (thumb) {
+            thumb.classList.add('active');
+        }
+    }
+
+    // Control de cantidad
+    function cambiarCantidad(delta) {
+        const input = document.getElementById('cantidad');
+        const newValue = parseInt(input.value) + delta;
+        const max = parseInt(input.max);
+        
+        if (newValue >= 1 && newValue <= max) {
+            input.value = newValue;
+        }
+    }
+
+    // Agregar al carrito
+    function agregarAlCarrito(productId) {
+        const cantidad = document.getElementById('cantidad').value;
+        
+        // TODO: Implementar lógica del carrito
+        console.log('Agregando al carrito:', productId, 'Cantidad:', cantidad);
+        
+        // Feedback visual
+        const btn = event.target.closest('button');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<span>✓</span> AGREGADO AL CARRITO';
+        btn.style.backgroundColor = '#4F8063';
+        
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.backgroundColor = '';
+        }, 2000);
+    }
+
+    // Comprar ahora
+    function comprarAhora(productId) {
+        const cantidad = document.getElementById('cantidad').value;
+        
+        // TODO: Implementar lógica de compra directa
+        console.log('Comprando ahora:', productId, 'Cantidad:', cantidad);
+        
+        alert('Funcionalidad de compra en desarrollo');
+    }
+
+    // Toggle favorito
+    function toggleFavorito(productId) {
+        const btn = document.getElementById('favoriteBtn');
+        btn.classList.toggle('active');
+        btn.innerHTML = btn.classList.contains('active') ? '♥' : '♡';
+        
+        // TODO: Implementar lógica de favoritos
+        console.log('Favorito toggled:', productId);
+    }
+</script>
+    <script>
+        document.getElementById('mainNav')?.classList; // ya existe
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('mainNav');
+            if (nav) nav.classList.toggle('scrolled', window.pageYOffset > 50);
+        }, { passive: true });
+    </script>
+</html>

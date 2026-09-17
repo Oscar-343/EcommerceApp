@@ -1,0 +1,271 @@
+@model EcommerceApp.Models.Service
+@{
+    Layout = "_AdminLayout";
+    var guides = ViewBag.Guides as List<EcommerceApp.Models.Guide> ?? new();
+    var transports = ViewBag.Transports as List<EcommerceApp.Models.Transport> ?? new();
+}
+
+<div class="admin-breadcrumb"><a asp-action="Services">Rutas / Servicios</a> / Editar</div>
+<div class="admin-page-header">
+    <div>
+        <h1>Editar ruta</h1>
+        <p>Actualizá los datos de esta ruta.</p>
+    </div>
+</div>
+
+<div class="admin-card">
+    <form asp-action="ServiceEdit" method="post" class="admin-form" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CreatedAt" />
+
+        <div class="admin-form-section">
+            <h3>Información básica</h3>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label asp-for="Name">Nombre de la ruta</label>
+                    <input asp-for="Name" class="form-control" placeholder="Ej: Cerro Tunari" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Category">Categoría</label>
+                    <select asp-for="Category" class="form-select">
+                        <option value="">Seleccionar categoría...</option>
+                        @foreach (var cat in RouteCategories.All)
+                        {
+                            <option value="@cat">@cat</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Category" class="text-danger"></span>
+                </div>
+                <div class="form-field form-span-2">
+                    <label asp-for="ShortDescription">Descripción corta</label>
+                    <input asp-for="ShortDescription" class="form-control" placeholder="Frase breve para las tarjetas de listado" />
+                </div>
+                <div class="form-field form-span-2">
+                    <label asp-for="Description">Descripción completa</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Descripción detallada de la ruta..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Ubicación</h3>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label asp-for="Region">Región</label>
+                    <select asp-for="Region" class="form-select">
+                        <option value="">Seleccionar región...</option>
+                        @foreach (var region in RouteRegions.All)
+                        {
+                            <option value="@region">@region</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Location">Ubicación específica</label>
+                    <input asp-for="Location" class="form-control" placeholder="Ej: Parque Nacional Tunari" />
+                </div>
+                <div class="form-field">
+                    <label asp-for="StartPoint">Punto de inicio</label>
+                    <input asp-for="StartPoint" class="form-control" />
+                </div>
+                <div class="form-field">
+                    <label asp-for="EndPoint">Punto final</label>
+                    <input asp-for="EndPoint" class="form-control" />
+                </div>
+                <div class="form-field">
+                    <label asp-for="StartLatitude">Latitud de inicio</label>
+                    <input asp-for="StartLatitude" class="form-control" type="number" step="0.000001" />
+                </div>
+                <div class="form-field">
+                    <label asp-for="StartLongitude">Longitud de inicio</label>
+                    <input asp-for="StartLongitude" class="form-control" type="number" step="0.000001" />
+                </div>
+                <div class="form-field">
+                    <label asp-for="EndLatitude">Latitud final</label>
+                    <input asp-for="EndLatitude" class="form-control" type="number" step="0.000001" />
+                </div>
+                <div class="form-field">
+                    <label asp-for="EndLongitude">Longitud final</label>
+                    <input asp-for="EndLongitude" class="form-control" type="number" step="0.000001" />
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Dificultad y duración</h3>
+            <div class="form-grid form-grid-3">
+                <div class="form-field">
+                    <label asp-for="Difficulty">Dificultad</label>
+                    <select asp-for="Difficulty" class="form-select">
+                        <option value="">Seleccionar...</option>
+                        @foreach (var kv in RouteDifficulty.Labels)
+                        {
+                            <option value="@kv.Key">@kv.Value</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label asp-for="DistanceKm">Distancia (km)</label>
+                    <input asp-for="DistanceKm" class="form-control" type="number" step="0.1" min="0" />
+                </div>
+                <div class="form-field">
+                    <label asp-for="DurationHours">Duración (horas)</label>
+                    <input asp-for="DurationHours" class="form-control" type="number" step="0.5" min="0" />
+                </div>
+                <div class="form-field">
+                    <label asp-for="Duration">Duración (texto)</label>
+                    <input asp-for="Duration" class="form-control" placeholder='Ej: "6 horas", "2 días"' />
+                </div>
+                <div class="form-field">
+                    <label asp-for="MaxGroupSize">Tamaño máx. de grupo</label>
+                    <input asp-for="MaxGroupSize" class="form-control" type="number" min="1" />
+                </div>
+                <div class="form-field form-span-2">
+                    <label asp-for="DifficultyDescription">Explicación de la dificultad</label>
+                    <input asp-for="DifficultyDescription" class="form-control" placeholder="Ej: Requiere buena condición física, sin experiencia previa necesaria" />
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Precio y estado</h3>
+            <div class="form-grid form-grid-3">
+                <div class="form-field">
+                    <label asp-for="Price">Precio (Bs.)</label>
+                    <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.01" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="PriceDescription">Descripción del precio</label>
+                    <input asp-for="PriceDescription" class="form-control" placeholder='Ej: "Bs. 150 / persona"' />
+                </div>
+                <div class="form-field">
+                    <label asp-for="Status">Estado</label>
+                    <select asp-for="Status" class="form-select">
+                        <option value="Active">Activa</option>
+                        <option value="Inactive">Inactiva</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-switch-field" style="margin-top:1rem; max-width:320px;">
+                <input asp-for="IsFeatured" class="form-check-input" />
+                <label asp-for="IsFeatured">Destacada en la portada</label>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Guía y transporte asignados</h3>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label asp-for="GuideId">Guía principal</label>
+                    <select asp-for="GuideId" class="form-select">
+                        <option value="">Sin asignar</option>
+                        @foreach (var guide in guides)
+                        {
+                            <option value="@guide.Id">@guide.Name @(guide.Specialty != null ? $"— {guide.Specialty}" : "")</option>
+                        }
+                    </select>
+                    @if (!guides.Any())
+                    {
+                        <span class="hint">No hay guías activos. <a asp-action="GuideCreate" style="color:var(--sand);">Creá uno primero</a>.</span>
+                    }
+                </div>
+                <div class="form-field">
+                    <label asp-for="TransportId">Transporte</label>
+                    <select asp-for="TransportId" class="form-select">
+                        <option value="">Sin asignar</option>
+                        @foreach (var transport in transports)
+                        {
+                            <option value="@transport.Id">@transport.Name @(transport.Type != null ? $"— {transport.Type}" : "")</option>
+                        }
+                    </select>
+                    @if (!transports.Any())
+                    {
+                        <span class="hint">No hay transportes activos. <a asp-action="TransportCreate" style="color:var(--sand);">Creá uno primero</a>.</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Imágenes <span class="section-note">JPG · PNG · WEBP · GIF · máx. 5 MB</span></h3>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label asp-for="ImageUrl">Imagen principal</label>
+                    <input asp-for="ImageUrl" class="form-control" placeholder="https://..." id="mainImg" />
+                    <div style="display:flex; align-items:center; gap:0.6rem; margin-top:0.4rem;">
+                        <input type="file" name="imageFile" id="mainImgFile" accept="image/png,image/jpeg,image/webp,image/gif" class="form-control" style="padding:0.35rem;" />
+                        <span id="mainImgFileStatus" class="hint"></span>
+                    </div>
+                    <span class="hint">Elegí una imagen de tu equipo o pegá una URL. El archivo se subirá a Supabase al guardar.</span>
+                    <div class="img-preview-box" id="mainImgPreview"><span>Vista previa</span></div>
+                </div>
+                <div class="form-field">
+                    <label asp-for="SecondaryImageUrl">Imagen secundaria</label>
+                    <input asp-for="SecondaryImageUrl" class="form-control" placeholder="https://..." id="secImg" />
+                    <div style="display:flex; align-items:center; gap:0.6rem; margin-top:0.4rem;">
+                        <input type="file" name="secondaryImageFile" id="secImgFile" accept="image/png,image/jpeg,image/webp,image/gif" class="form-control" style="padding:0.35rem;" />
+                        <span id="secImgFileStatus" class="hint"></span>
+                    </div>
+                    <div class="img-preview-box" id="secImgPreview"><span>Vista previa</span></div>
+                </div>
+                <div class="form-field form-span-2">
+                    <label asp-for="GalleryImages">Galería (URLs separadas por "|")</label>
+                    <input asp-for="GalleryImages" class="form-control" id="galleryImg" placeholder="https://img1.jpg|https://img2.jpg" />
+                    <div style="display:flex; align-items:center; gap:0.6rem; margin-top:0.4rem;">
+                        <input type="file" name="galleryFiles" id="galleryImgFile" accept="image/png,image/jpeg,image/webp,image/gif" multiple class="form-control" style="padding:0.35rem;" />
+                        <span id="galleryImgFileStatus" class="hint"></span>
+                    </div>
+                    <span class="hint">Podés seleccionar varias imágenes a la vez. Se subirán a Supabase y se agregarán a la galería al guardar.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Qué incluye</h3>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label asp-for="Includes">Incluye (separado por "|")</label>
+                    <textarea asp-for="Includes" class="form-control" rows="3" placeholder="Guía certificado|Transporte|Seguro de viaje"></textarea>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Excludes">No incluye (separado por "|")</label>
+                    <textarea asp-for="Excludes" class="form-control" rows="3" placeholder="Comidas|Equipo personal"></textarea>
+                </div>
+                <div class="form-field form-span-2">
+                    <label asp-for="Recommendations">Recomendaciones antes de salir (separado por "|")</label>
+                    <textarea asp-for="Recommendations" class="form-control" rows="3" placeholder="Llevar agua|Usar bloqueador solar|Ropa de abrigo"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-footer">
+            <a asp-action="Services" class="btn-admin btn-admin-outline">Cancelar</a>
+            <button type="submit" class="btn-admin btn-admin-primary">Guardar cambios</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function wirePreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const box = document.getElementById(previewId);
+            const update = () => {
+                if (input.value) {
+                    box.innerHTML = '<img src="' + input.value + '" onerror="this.parentElement.innerHTML=\'<span>No se pudo cargar la imagen</span>\'" />';
+                } else {
+                    box.innerHTML = '<span>Vista previa</span>';
+                }
+            };
+            input.addEventListener('input', update);
+            update();
+        }
+        wirePreview('mainImg', 'mainImgPreview');
+        wirePreview('secImg', 'secImgPreview');
+    </script>
+}

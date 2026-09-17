@@ -1,0 +1,87 @@
+@model EcommerceApp.Models.Product
+
+<div class="producto-card">
+    <!-- Imagen del producto -->
+    <div class="producto-card__image-container">
+        <img src="@(Model.ImageUrl ?? "https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=400&h=400&fit=crop")" 
+             alt="@Model.Name" 
+             class="producto-card__image producto-card__image--primary"
+             loading="lazy" />
+        
+        @if (!string.IsNullOrEmpty(Model.SecondaryImageUrl))
+        {
+            <img src="@Model.SecondaryImageUrl" 
+                 alt="@Model.Name en uso" 
+                 class="producto-card__image producto-card__image--secondary"
+                 loading="lazy" />
+        }
+
+        <!-- Badges -->
+        <div class="producto-card__badges">
+            @if (Model.IsNew)
+            {
+                <span class="producto-card__badge producto-card__badge--new">NUEVO</span>
+            }
+            @if (Model.IsBestSeller)
+            {
+                <span class="producto-card__badge producto-card__badge--bestseller">MÁS VENDIDO</span>
+            }
+            @if (Model.PromotionalPrice.HasValue && Model.PromotionalPrice < Model.Price)
+            {
+                var discount = Math.Round((1 - (Model.PromotionalPrice.Value / Model.Price)) * 100);
+                <span class="producto-card__badge producto-card__badge--offer">-@(discount)%</span>
+            }
+        </div>
+
+        <!-- Favorito -->
+        <button class="producto-card__favorite" 
+                data-product-id="@Model.Id" 
+                aria-label="Agregar a favoritos">
+            ♡
+        </button>
+    </div>
+
+    <!-- Información del producto -->
+    <div class="producto-card__info">
+        @if (!string.IsNullOrEmpty(Model.Category))
+        {
+            <p class="producto-card__category">@Model.Category</p>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Brand))
+        {
+            <p class="producto-card__brand">@Model.Brand</p>
+        }
+
+        <h3 class="producto-card__name">@Model.Name</h3>
+
+        <div class="producto-card__price">
+            @if (Model.PromotionalPrice.HasValue && Model.PromotionalPrice < Model.Price)
+            {
+                <span class="producto-card__price-current">@Model.PromotionalPrice.Value.ToString("C")</span>
+                <span class="producto-card__price-original">@Model.Price.ToString("C")</span>
+            }
+            else
+            {
+                <span class="producto-card__price-current">@Model.Price.ToString("C")</span>
+            }
+        </div>
+
+        <!-- Acciones -->
+        <div class="producto-card__actions">
+            <a asp-controller="Products" 
+               asp-action="Details" 
+               asp-route-id="@Model.Id" 
+               class="producto-card__btn producto-card__btn--secondary">
+                VER
+            </a>
+            <button class="producto-card__btn producto-card__btn--primary" 
+                    data-product-id="@Model.Id"
+                    onclick="agregarAlCarrito(@Model.Id)">
+                🛒 AGREGAR
+            </button>
+        </div>
+    </div>
+</div>
+
+

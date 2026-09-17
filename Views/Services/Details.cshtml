@@ -1,0 +1,395 @@
+@model EcommerceApp.Models.ServicioDetalleViewModel
+@{
+    ViewData["Title"] = Model.Service.Name + " - Ruta de Senderismo";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/servicios-detalle-new.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* CSS inline mínimo para estructura base — igual que Home, evita columnas blancas */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            background-color: #0B100E;
+            color: #F1F3F1;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- === NAVBAR CINEMATOGRÁFICA (idéntica a Home) === -->
+    <nav id="mainNav" class="navbar-cinematic">
+        <div class="nav-container">
+            <a class="nav-logo" asp-controller="Home" asp-action="Index">
+                <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg" alt="Tren al Sur">
+            </a>
+
+            <ul class="nav-menu">
+                <li><a class="nav-link" asp-controller="Home" asp-action="Index">INICIO</a></li>
+                <li><a class="nav-link active" asp-controller="Services" asp-action="Index">RUTAS</a></li>
+                <li><a class="nav-link" asp-controller="Products" asp-action="Index">PRODUCTOS</a></li>
+                <li><a class="nav-link" href="#nosotros">NOSOTROS</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
+                <a href="#favorites" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
+                <a asp-controller="Products" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
+                <div class="nav-user">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a href="#profile" class="nav-action-icon" title="Perfil"><i class="far fa-user"></i></a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="nav-action-icon" title="Iniciar sesión"><i class="far fa-user"></i></a>
+                    }
+                </div>
+            </div>
+
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+<div class="ruta-detalle">
+
+    <!-- === HERO DEL DETALLE === -->
+    <section class="ruta-hero">
+        <div class="ruta-hero__image">
+            <img src="@(Model.Service.SecondaryImageUrl ?? Model.Service.ImageUrl ?? "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=900&fit=crop")" 
+                 alt="@Model.Service.Name" />
+            <div class="ruta-hero__overlay"></div>
+        </div>
+
+        <div class="ruta-hero__content">
+            <a href="@Url.Action("Index", "Services")" class="ruta-hero__back">← Volver</a>
+            
+            <h1 class="ruta-hero__title">@Model.Service.Name</h1>
+            
+            <div class="ruta-hero__meta">
+                @if (!string.IsNullOrEmpty(Model.Service.Location))
+                {
+                    <span class="ruta-hero__meta-item">📍 @Model.Service.Location</span>
+                }
+                @if (!string.IsNullOrEmpty(Model.Service.Category))
+                {
+                    <span class="ruta-hero__meta-item">🏔 @Model.Service.Category</span>
+                }
+                <span class="ruta-hero__meta-item">
+                    @Model.DifficultyEmoji @Model.DifficultyLabel
+                </span>
+                @if (Model.Service.DurationHours.HasValue)
+                {
+                    <span class="ruta-hero__meta-item">⏱ @Model.Service.DurationHours h</span>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- === GALERÍA DE IMÁGENES === -->
+    @if (Model.GalleryImagesList.Any())
+    {
+        <section class="ruta-gallery">
+            <div class="ruta-gallery__container">
+                @{
+                    var mainImage = Model.GalleryImagesList.FirstOrDefault();
+                    var otherImages = Model.GalleryImagesList.Skip(1).Take(5).ToList();
+                }
+
+                <div class="ruta-gallery__main">
+                    <img src="@mainImage" alt="Galería principal" />
+                </div>
+
+                @if (otherImages.Any())
+                {
+                    <div class="ruta-gallery__grid">
+                        @foreach (var image in otherImages)
+                        {
+                            <div class="ruta-gallery__item">
+                                <img src="@image" alt="Galería" />
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    <!-- === CONTENEDOR PRINCIPAL === -->
+    <div class="ruta-container">
+
+        <!-- === INFORMACIÓN GENERAL === -->
+        <section class="ruta-info-grid">
+            <div class="ruta-info-card">
+                <div class="ruta-info-card__label">DIFICULTAD</div>
+                <div class="ruta-info-card__value">@Model.DifficultyEmoji @Model.DifficultyLabel</div>
+                @if (!string.IsNullOrEmpty(Model.Service.DifficultyDescription))
+                {
+                    <p class="ruta-info-card__description">@Model.Service.DifficultyDescription</p>
+                }
+            </div>
+
+            @if (Model.Service.DurationHours.HasValue)
+            {
+                <div class="ruta-info-card">
+                    <div class="ruta-info-card__label">DURACIÓN</div>
+                    <div class="ruta-info-card__value">@Model.Service.DurationHours h</div>
+                </div>
+            }
+
+            @if (Model.Service.DistanceKm.HasValue)
+            {
+                <div class="ruta-info-card">
+                    <div class="ruta-info-card__label">DISTANCIA</div>
+                    <div class="ruta-info-card__value">@Model.Service.DistanceKm km</div>
+                </div>
+            }
+
+            <div class="ruta-info-card">
+                <div class="ruta-info-card__label">GRUPO MÁXIMO</div>
+                <div class="ruta-info-card__value">@Model.Service.MaxGroupSize personas</div>
+            </div>
+        </section>
+
+        <!-- === DESCRIPCIÓN === -->
+        <section class="ruta-section">
+            <h2 class="ruta-section__title">SOBRE ESTA RUTA</h2>
+            <p class="ruta-section__text">@Model.Service.Description</p>
+        </section>
+
+        <!-- === MAPA DEL RECORRIDO === -->
+        @if ((Model.Service.StartLatitude.HasValue && Model.Service.StartLongitude.HasValue) ||
+             (Model.Service.EndLatitude.HasValue && Model.Service.EndLongitude.HasValue) ||
+             (!string.IsNullOrEmpty(Model.Service.StartPoint)) ||
+             (!string.IsNullOrEmpty(Model.Service.EndPoint)))
+        {
+            <section class="ruta-section">
+                <h2 class="ruta-section__title">RECORRIDO</h2>
+                
+                <div class="ruta-map-section">
+                    <!-- Mapa placeholder para integración futura (Leaflet, Google Maps, etc.) -->
+                    <div class="ruta-map" id="rutaMap">
+                        <!-- Comentado: integración futura de mapa
+                        <div id="map" class="ruta-map__canvas"></div>
+                        -->
+                        <div class="ruta-map__placeholder">
+                            <p>Mapa interactivo del recorrido</p>
+                            <small>Preparado para integración de Google Maps o Leaflet</small>
+                        </div>
+                    </div>
+
+                    <div class="ruta-map-info">
+                        @if (!string.IsNullOrEmpty(Model.Service.StartPoint))
+                        {
+                            <div class="ruta-map-info__item">
+                                <span class="ruta-map-info__label">🟢 PUNTO DE PARTIDA</span>
+                                <p>@Model.Service.StartPoint</p>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Service.EndPoint))
+                        {
+                            <div class="ruta-map-info__item">
+                                <span class="ruta-map-info__label">🔴 DESTINO</span>
+                                <p>@Model.Service.EndPoint</p>
+                            </div>
+                        }
+
+                        @if (Model.Service.DistanceKm.HasValue)
+                        {
+                            <div class="ruta-map-info__item">
+                                <span class="ruta-map-info__label">📏 DISTANCIA</span>
+                                <p>@Model.Service.DistanceKm km</p>
+                            </div>
+                        }
+
+                        @if (Model.Service.DurationHours.HasValue)
+                        {
+                            <div class="ruta-map-info__item">
+                                <span class="ruta-map-info__label">⏱ DURACIÓN</span>
+                                <p>@Model.Service.DurationHours horas</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </section>
+        }
+
+        <!-- === GUÍA === -->
+        @if (Model.HasGuide && Model.Guide != null)
+        {
+            <section class="ruta-section">
+                <h2 class="ruta-section__title">GUÍA PRINCIPAL</h2>
+                
+                <div class="ruta-guide">
+                    <div class="ruta-guide__info">
+                        <h3 class="ruta-guide__name">@Model.Guide.Name</h3>
+                        @if (!string.IsNullOrEmpty(Model.Guide.Specialty))
+                        {
+                            <p class="ruta-guide__specialty">@Model.Guide.Specialty</p>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Guide.Bio))
+                        {
+                            <p class="ruta-guide__bio">@Model.Guide.Bio</p>
+                        }
+                    </div>
+                </div>
+            </section>
+        }
+
+        <!-- === TRANSPORTE === -->
+        @if (Model.HasTransport && Model.Transport != null)
+        {
+            <section class="ruta-section">
+                <h2 class="ruta-section__title">TRANSPORTE</h2>
+                
+                <div class="ruta-transport">
+                    <h3 class="ruta-transport__name">@Model.Transport.Name</h3>
+                    @if (!string.IsNullOrEmpty(Model.Transport.Type))
+                    {
+                        <p class="ruta-transport__type">@Model.Transport.Type</p>
+                    }
+                    <p class="ruta-transport__capacity">
+                        👥 Capacidad: @Model.Transport.Capacity personas
+                    </p>
+                    @if (!string.IsNullOrEmpty(Model.Transport.Description))
+                    {
+                        <p class="ruta-transport__description">@Model.Transport.Description</p>
+                    }
+                </div>
+            </section>
+        }
+        else
+        {
+            <section class="ruta-section">
+                <h2 class="ruta-section__title">TRANSPORTE</h2>
+                <p class="ruta-section__text">🚶 Transporte no requerido</p>
+            </section>
+        }
+
+        <!-- === QUÉ INCLUYE / NO INCLUYE === -->
+        @if (Model.IncludesList.Any() || Model.ExcludesList.Any())
+        {
+            <section class="ruta-section">
+                <h2 class="ruta-section__title">QUÉ INCLUYE</h2>
+                
+                <div class="ruta-includes-grid">
+                    @if (Model.IncludesList.Any())
+                    {
+                        <div class="ruta-includes-block">
+                            <h3 class="ruta-includes-block__title">INCLUYE</h3>
+                            <ul class="ruta-includes-list">
+                                @foreach (var item in Model.IncludesList)
+                                {
+                                    <li class="ruta-includes-list__item">✓ @item</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    @if (Model.ExcludesList.Any())
+                    {
+                        <div class="ruta-includes-block">
+                            <h3 class="ruta-includes-block__title">NO INCLUYE</h3>
+                            <ul class="ruta-includes-list">
+                                @foreach (var item in Model.ExcludesList)
+                                {
+                                    <li class="ruta-includes-list__item">✕ @item</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+
+        <!-- === ANTES DE SALIR (RECOMENDACIONES) === -->
+        @if (Model.RecommendationsList.Any())
+        {
+            <section class="ruta-section">
+                <h2 class="ruta-section__title">ANTES DE SALIR</h2>
+                
+                <div class="ruta-recommendations">
+                    @foreach (var rec in Model.RecommendationsList)
+                    {
+                        <div class="ruta-recommendation-item">
+                            <p>• @rec</p>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+
+        <!-- === EQUIPAMIENTO RECOMENDADO === -->
+        @if (Model.RecommendedProducts.Any())
+        {
+            <section class="ruta-section">
+                <h2 class="ruta-section__title">EQUIPAMIENTO RECOMENDADO</h2>
+                <p class="ruta-section__subtitle">Para esta ruta recomendamos</p>
+                
+                <div class="ruta-products-grid">
+                    @foreach (var product in Model.RecommendedProducts)
+                    {
+                        <div class="ruta-product-card">
+                            <div class="ruta-product-card__image">
+                                <img src="@(product.ImageUrl ?? "https://via.placeholder.com/200")" 
+                                     alt="@product.Name" />
+                            </div>
+                            <div class="ruta-product-card__content">
+                                <h4 class="ruta-product-card__name">@product.Name</h4>
+                                <p class="ruta-product-card__category">@product.Category</p>
+                                <div class="ruta-product-card__price">
+                                    Bs. @product.Price
+                                </div>
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" 
+                                   class="ruta-product-card__link">
+                                    Ver producto →
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+
+        <!-- === RESERVA === -->
+        <section class="ruta-section ruta-section--cta">
+            <div class="ruta-cta-block">
+                <div class="ruta-cta-info">
+                    <h2 class="ruta-cta-title">¿Listo para esta aventura?</h2>
+                    <p class="ruta-cta-subtitle">
+                        Desde <strong>Bs. @Model.Service.Price / persona</strong>
+                    </p>
+                </div>
+                
+                <button class="ruta-cta-button" onclick="alert('Sistema de reservas en desarrollo')">
+                    RESERVAR RUTA
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+</div>
+
+<script src="~/js/servicios-detalle-new.js" asp-append-version="true"></script>
+</body>
+</html>

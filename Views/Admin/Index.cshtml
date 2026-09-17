@@ -1,0 +1,131 @@
+@{
+    Layout = "_AdminLayout";
+    var recent = ViewBag.RecentReservations as List<EcommerceApp.Models.Reservation> ?? new();
+}
+
+<div class="stat-grid">
+    <a asp-action="Products" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 8l-8-5-8 5v8l8 5 8-5V8z"/><path d="M4 8l8 5 8-5"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value">@ViewBag.ProductCount</div>
+        <div class="stat-card-label">Productos en catálogo</div>
+    </a>
+
+    <a asp-action="Services" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value">@ViewBag.ServiceCount</div>
+        <div class="stat-card-label">Rutas / servicios</div>
+    </a>
+
+    <a asp-action="Guides" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value">@ViewBag.GuideCount</div>
+        <div class="stat-card-label">Guías activos</div>
+    </a>
+
+    <a asp-action="Transports" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="8" rx="2"/><circle cx="7.5" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value">@ViewBag.TransportCount</div>
+        <div class="stat-card-label">Vehículos activos</div>
+    </a>
+
+    <a asp-action="Reservations" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value">@ViewBag.ReservationCount</div>
+        <div class="stat-card-label">Reservas totales</div>
+    </a>
+
+    <a asp-action="Products" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon" style="background: rgba(244,67,54,0.16); color:#f4897e;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.5 18a1.8 1.8 0 001.5 2.7h16a1.8 1.8 0 001.5-2.7L13.7 3.9a1.8 1.8 0 00-3.4 0z"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value">@ViewBag.LowStockCount</div>
+        <div class="stat-card-label">Productos con poco stock</div>
+    </a>
+</div>
+
+<div class="quick-actions">
+    <a asp-action="ProductCreate" class="btn-admin btn-admin-primary">+ Nuevo producto</a>
+    <a asp-action="ServiceCreate" class="btn-admin btn-admin-primary">+ Nueva ruta</a>
+    <a asp-action="GuideCreate" class="btn-admin btn-admin-outline">+ Nuevo guía</a>
+    <a asp-action="TransportCreate" class="btn-admin btn-admin-outline">+ Nuevo transporte</a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Últimas reservas</h2>
+        <a asp-action="Reservations" class="btn-admin btn-admin-outline btn-admin-sm">Ver todas</a>
+    </div>
+
+    @if (recent.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/></svg>
+            <h3>Todavía no hay reservas</h3>
+            <p>Cuando los usuarios reserven una ruta, van a aparecer acá.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Ruta</th>
+                        <th>Fecha</th>
+                        <th>Personas</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in recent)
+                    {
+                        <tr>
+                            <td>@(r.User?.FullName ?? r.User?.Email ?? r.UserId)</td>
+                            <td>@(r.Service?.Name ?? "—")</td>
+                            <td class="cell-muted">@r.BookingDate.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                            <td>@r.PeopleCount</td>
+                            <td>@r.TotalPrice.ToString("C")</td>
+                            <td>
+                                @{
+                                    var pill = r.Status switch
+                                    {
+                                        "Pendiente" => "pill-yellow",
+                                        "Recorrido" => "pill-blue",
+                                        "Acabado" => "pill-green",
+                                        "Cancelado" => "pill-red",
+                                        _ => "pill-gray"
+                                    };
+                                }
+                                <span class="pill @pill">@r.Status</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

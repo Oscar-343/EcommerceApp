@@ -1,0 +1,65 @@
+@model EcommerceApp.Models.Transport
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-breadcrumb"><a asp-action="Transports">Transporte</a> / Editar</div>
+<div class="admin-page-header">
+    <div>
+        <h1>Editar transporte</h1>
+        <p>Actualizá los datos de este vehículo.</p>
+    </div>
+</div>
+
+<div class="admin-card" style="max-width:720px;">
+    <form asp-action="TransportEdit" method="post" class="admin-form">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CreatedAt" />
+
+        <div class="admin-form-section">
+            <div class="form-grid">
+                <div class="form-field">
+                    <label asp-for="Name">Nombre</label>
+                    <input asp-for="Name" class="form-control" placeholder="Ej: Van Toyota Hiace" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Type">Tipo de vehículo</label>
+                    <input asp-for="Type" class="form-control" list="transport-types" placeholder="mini van, 4x4, colectivo..." />
+                    <datalist id="transport-types">
+                        <option>Mini van</option>
+                        <option>4x4</option>
+                        <option>Colectivo</option>
+                        <option>Bus turístico</option>
+                    </datalist>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Capacity">Capacidad (asientos)</label>
+                    <input asp-for="Capacity" class="form-control" type="number" min="1" />
+                </div>
+                <div class="form-field">
+                    <label asp-for="PricePerKm">Precio por km (Bs.)</label>
+                    <input asp-for="PricePerKm" class="form-control" type="number" step="0.01" min="0" />
+                </div>
+                <div class="form-field form-span-2">
+                    <label asp-for="Description">Descripción</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Detalles del vehículo, comodidades, etc."></textarea>
+                </div>
+            </div>
+            <div class="form-switch-field" style="margin-top:1rem; max-width:260px;">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive">Transporte activo</label>
+            </div>
+        </div>
+
+        <div class="admin-form-footer">
+            <a asp-action="Transports" class="btn-admin btn-admin-outline">Cancelar</a>
+            <button type="submit" class="btn-admin btn-admin-primary">Guardar cambios</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

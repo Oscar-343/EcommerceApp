@@ -1,0 +1,135 @@
+@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    string SectionOf(string action) => action switch
+    {
+        "Index" => "dashboard",
+        var a when a.StartsWith("Product") => "products",
+        var a when a.StartsWith("Service") => "services",
+        var a when a.StartsWith("Guide") => "guides",
+        var a when a.StartsWith("Transport") => "transports",
+        var a when a.StartsWith("Reservation") => "reservations",
+        _ => ""
+    };
+    var activeSection = SectionOf(currentAction);
+    string NavClass(string section) => "admin-nav-link" + (activeSection == section ? " active" : "");
+
+    var userName = User.Identity?.Name ?? "Admin";
+    var namePart = userName.Contains("@") ? userName.Split('@')[0] : userName;
+    var nameChunks = namePart.Split(new[] { ' ', '.', '_', '-' }, StringSplitOptions.RemoveEmptyEntries);
+    var initials = string.Concat(nameChunks.Take(2).Select(s => char.ToUpper(s[0])));
+    if (string.IsNullOrWhiteSpace(initials)) { initials = "A"; }
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Panel admin - Tren al Sur</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/tren-al-sur.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+</head>
+<body class="admin-body">
+    <div class="admin-shell">
+        <aside class="admin-sidebar" id="adminSidebar">
+            <a class="admin-brand" asp-controller="Admin" asp-action="Index">
+                <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg" alt="Logo" />
+                <span class="admin-brand-text">
+                    <strong>Tren al Sur</strong>
+                    <span>Panel admin</span>
+                </span>
+            </a>
+
+            <nav class="admin-nav">
+                <div class="admin-nav-label">General</div>
+                <a class="@NavClass("dashboard")" asp-action="Index">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+                    Resumen
+                </a>
+
+                <div class="admin-nav-label">Catálogo</div>
+                <a class="@NavClass("products")" asp-action="Products">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 8l-8-5-8 5v8l8 5 8-5V8z"/><path d="M4 8l8 5 8-5"/><path d="M12 13v8"/></svg>
+                    Productos
+                </a>
+                <a class="@NavClass("services")" asp-action="Services">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+                    Rutas / Servicios
+                </a>
+
+                <div class="admin-nav-label">Operación</div>
+                <a class="@NavClass("guides")" asp-action="Guides">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+                    Guías
+                </a>
+                <a class="@NavClass("transports")" asp-action="Transports">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="8" rx="2"/><circle cx="7.5" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/><path d="M3 12h18"/></svg>
+                    Transporte
+                </a>
+                <a class="@NavClass("reservations")" asp-action="Reservations">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>
+                    Reservas
+                    @if ((int?)ViewBag.PendingReservations > 0)
+                    {
+                        <span class="admin-nav-badge">@ViewBag.PendingReservations</span>
+                    }
+                </a>
+            </nav>
+
+            <div class="admin-sidebar-footer">
+                <a asp-controller="Home" asp-action="Index">← Ver sitio público</a>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="btn btn-link p-0" style="color:var(--text-secondary); font-size:0.82rem; text-decoration:none;">Cerrar sesión</button>
+                </form>
+            </div>
+        </aside>
+
+        <div class="admin-main">
+            <div class="admin-topbar">
+                <div style="display:flex; align-items:center; gap:0.8rem;">
+                    <button class="admin-toggle" id="adminSidebarToggle" type="button" aria-label="Abrir menú">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                    <div>
+                        <p class="admin-topbar-title">@(ViewData["Title"] ?? "Panel de administración")</p>
+                        @if (ViewData["Subtitle"] != null)
+                        {
+                            <p class="admin-topbar-subtitle">@ViewData["Subtitle"]</p>
+                        }
+                    </div>
+                </div>
+                <div class="admin-user">
+                    <div class="admin-user-avatar">@initials</div>
+                    <div>
+                        <div class="admin-user-name">@userName</div>
+                        <div class="admin-user-role">Administrador</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-content">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="admin-toast">✓ @TempData["Success"]</div>
+                }
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/admin-upload.js" asp-append-version="true"></script>
+    <script>
+        document.getElementById('adminSidebarToggle')?.addEventListener('click', function () {
+            document.getElementById('adminSidebar')?.classList.toggle('is-open');
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

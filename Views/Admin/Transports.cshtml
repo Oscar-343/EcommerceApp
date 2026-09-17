@@ -1,0 +1,82 @@
+@model List<EcommerceApp.Models.Transport>
+@{
+    Layout = "_AdminLayout";
+    var routeCounts = ViewBag.RouteCounts as Dictionary<int, int> ?? new();
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Transporte</h1>
+        <p>@Model.Count vehículo(s) registrados para traslados.</p>
+    </div>
+    <a asp-action="TransportCreate" class="btn-admin btn-admin-primary">+ Nuevo transporte</a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Flota disponible</h2>
+        <form method="get" asp-action="Transports">
+            <input type="text" name="q" value="@ViewBag.Query" class="admin-search" placeholder="Buscar por nombre o tipo..." />
+        </form>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="8" width="18" height="8" rx="2"/><circle cx="7.5" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/></svg>
+            <h3>Todavía no hay transportes</h3>
+            <p>Agregá vehículos para poder asignarlos a las rutas. <a asp-action="TransportCreate" style="color:var(--sand);">Creá uno nuevo</a>.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Capacidad</th>
+                        <th>Precio / km</th>
+                        <th>Rutas asignadas</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var transport in Model)
+                    {
+                        <tr>
+                            <td><strong>@transport.Name</strong></td>
+                            <td class="cell-muted">@(transport.Type ?? "—")</td>
+                            <td>@transport.Capacity pax</td>
+                            <td class="cell-muted">@(transport.PricePerKm.HasValue ? transport.PricePerKm.Value.ToString("C") : "—")</td>
+                            <td>
+                                <span class="pill pill-blue">@(routeCounts.ContainsKey(transport.Id) ? routeCounts[transport.Id] : 0)</span>
+                            </td>
+                            <td>
+                                @if (transport.IsActive)
+                                {
+                                    <span class="pill pill-green">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="pill pill-gray">Inactivo</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="row-actions">
+                                    <a asp-action="TransportEdit" asp-route-id="@transport.Id" class="btn-admin btn-admin-outline btn-admin-sm">Editar</a>
+                                    <form asp-action="TransportDelete" asp-route-id="@transport.Id" method="post"
+                                          onsubmit="return confirm('¿Eliminar el transporte \'@transport.Name.Replace("'", "\\'")\'?');">
+                                        <button type="submit" class="btn-admin btn-admin-danger btn-admin-sm">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

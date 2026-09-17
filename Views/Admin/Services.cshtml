@@ -1,0 +1,109 @@
+@model List<EcommerceApp.Models.Service>
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Rutas / Servicios</h1>
+        <p>@Model.Count ruta(s) de senderismo y aventura publicadas.</p>
+    </div>
+    <a asp-action="ServiceCreate" class="btn-admin btn-admin-primary">+ Nueva ruta</a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Catálogo de rutas</h2>
+        <form method="get" asp-action="Services">
+            <input type="text" name="q" value="@ViewBag.Query" class="admin-search" placeholder="Buscar por nombre o región..." />
+        </form>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+            <h3>Sin resultados</h3>
+            <p>No hay rutas que coincidan con la búsqueda. <a asp-action="ServiceCreate" style="color:var(--sand);">Creá una nueva</a>.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Nombre</th>
+                        <th>Región</th>
+                        <th>Dificultad</th>
+                        <th>Precio</th>
+                        <th>Guía</th>
+                        <th>Transporte</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var service in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(service.ImageUrl))
+                                {
+                                    <img src="@service.ImageUrl" class="cell-thumb" alt="" onerror="this.style.visibility='hidden'" />
+                                }
+                                else
+                                {
+                                    <div class="cell-thumb"></div>
+                                }
+                            </td>
+                            <td>
+                                <strong>@service.Name</strong>
+                                <div class="cell-muted" style="font-size:0.76rem;">@service.Category</div>
+                            </td>
+                            <td class="cell-muted">@(service.Region ?? "—")</td>
+                            <td>
+                                @{
+                                    var diffPill = service.Difficulty switch
+                                    {
+                                        "easy" => "pill-green",
+                                        "moderate" => "pill-yellow",
+                                        "difficult" => "pill-red",
+                                        "extreme" => "pill-gray",
+                                        _ => "pill-gray"
+                                    };
+                                    var diffLabel = service.Difficulty != null && RouteDifficulty.Labels.ContainsKey(service.Difficulty)
+                                        ? RouteDifficulty.Labels[service.Difficulty] : "—";
+                                }
+                                <span class="pill @diffPill">@diffLabel</span>
+                            </td>
+                            <td>@service.Price.ToString("C")</td>
+                            <td class="cell-muted">@(service.Guide?.Name ?? "Sin asignar")</td>
+                            <td class="cell-muted">@(service.Transport?.Name ?? "Sin asignar")</td>
+                            <td>
+                                @if (service.Status == "Active")
+                                {
+                                    <span class="pill pill-green">Activa</span>
+                                }
+                                else
+                                {
+                                    <span class="pill pill-gray">@(service.Status ?? "Inactiva")</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="row-actions">
+                                    <a asp-action="ServiceEdit" asp-route-id="@service.Id" class="btn-admin btn-admin-outline btn-admin-sm">Editar</a>
+                                    <form asp-action="ServiceDelete" asp-route-id="@service.Id" method="post"
+                                          onsubmit="return confirm('¿Eliminar la ruta \'@service.Name.Replace("'", "\\'")\'? Esta acción no se puede deshacer.');">
+                                        <button type="submit" class="btn-admin btn-admin-danger btn-admin-sm">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

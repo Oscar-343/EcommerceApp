@@ -1,0 +1,138 @@
+@model EcommerceApp.Models.Product
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-breadcrumb"><a asp-action="Products">Productos</a> / Nuevo</div>
+<div class="admin-page-header">
+    <div>
+        <h1>Nuevo producto</h1>
+        <p>Completá los datos para agregarlo al catálogo de la tienda.</p>
+    </div>
+</div>
+
+<div class="admin-card">
+    <form asp-action="ProductCreate" method="post" class="admin-form" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="admin-form-section">
+            <h3>Información básica</h3>
+            <div class="form-grid">
+                <div class="form-field form-span-2">
+                    <label asp-for="Name">Nombre del producto</label>
+                    <input asp-for="Name" class="form-control" placeholder="Ej: Mochila de trekking 40L" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-field form-span-2">
+                    <label asp-for="Description">Descripción</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Detalles, materiales, usos recomendados..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Category">Categoría</label>
+                    <select asp-for="Category" class="form-select">
+                        <option value="">Seleccionar categoría...</option>
+                        @foreach (var category in ProductCategories.All)
+                        {
+                            <option value="@category">@category</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Brand">Marca</label>
+                    <input asp-for="Brand" class="form-control" placeholder="Ej: The North Face" />
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Precio e inventario</h3>
+            <div class="form-grid form-grid-3">
+                <div class="form-field">
+                    <label asp-for="Price">Precio (Bs.)</label>
+                    <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.01" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="PromotionalPrice">Precio de oferta</label>
+                    <input asp-for="PromotionalPrice" class="form-control" type="number" step="0.01" min="0.01" placeholder="Dejalo vacío si no está en oferta" />
+                    <span asp-validation-for="PromotionalPrice" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Stock">Stock</label>
+                    <input asp-for="Stock" class="form-control" type="number" min="0" />
+                    <span asp-validation-for="Stock" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Imágenes <span class="section-note">JPG · PNG · WEBP · GIF · máx. 5 MB</span></h3>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label asp-for="ImageUrl">Imagen principal</label>
+                    <input asp-for="ImageUrl" class="form-control" placeholder="https://... o /images/..." id="mainImg" />
+                    <div style="display:flex; align-items:center; gap:0.6rem; margin-top:0.4rem;">
+                        <input type="file" name="imageFile" id="mainImgFile" accept="image/png,image/jpeg,image/webp,image/gif" class="form-control" style="padding:0.35rem;" />
+                        <span id="mainImgFileStatus" class="hint"></span>
+                    </div>
+                    <span class="hint">Elegí una imagen de tu equipo o pegá una URL. El archivo se subirá a Supabase al guardar.</span>
+                    <div class="img-preview-box" id="mainImgPreview"><span>Vista previa</span></div>
+                </div>
+                <div class="form-field">
+                    <label asp-for="SecondaryImageUrl">URL de imagen secundaria</label>
+                    <input asp-for="SecondaryImageUrl" class="form-control" placeholder="Producto en uso / contexto" id="secImg" />
+                    <div style="display:flex; align-items:center; gap:0.6rem; margin-top:0.4rem;">
+                        <input type="file" name="secondaryImageFile" id="secImgFile" accept="image/png,image/jpeg,image/webp,image/gif" class="form-control" style="padding:0.35rem;" />
+                        <span id="secImgFileStatus" class="hint"></span>
+                    </div>
+                    <div class="img-preview-box" id="secImgPreview"><span>Vista previa</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Etiquetas</h3>
+            <div class="form-grid form-grid-3">
+                <div class="form-switch-field">
+                    <input asp-for="IsFeatured" class="form-check-input" />
+                    <label asp-for="IsFeatured">Destacado (portada)</label>
+                </div>
+                <div class="form-switch-field">
+                    <input asp-for="IsNew" class="form-check-input" />
+                    <label asp-for="IsNew">Producto nuevo</label>
+                </div>
+                <div class="form-switch-field">
+                    <input asp-for="IsBestSeller" class="form-check-input" />
+                    <label asp-for="IsBestSeller">Más vendido</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-footer">
+            <a asp-action="Products" class="btn-admin btn-admin-outline">Cancelar</a>
+            <button type="submit" class="btn-admin btn-admin-primary">Guardar producto</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function wirePreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const box = document.getElementById(previewId);
+            const update = () => {
+                if (input.value) {
+                    box.innerHTML = '<img src="' + input.value + '" onerror="this.parentElement.innerHTML=\'<span>No se pudo cargar la imagen</span>\'" />';
+                } else {
+                    box.innerHTML = '<span>Vista previa</span>';
+                }
+            };
+            input.addEventListener('input', update);
+            update();
+        }
+        wirePreview('mainImg', 'mainImgPreview');
+        wirePreview('secImg', 'secImgPreview');
+    </script>
+}

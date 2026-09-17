@@ -1,0 +1,28 @@
+@model EcommerceApp.Models.ExternalRegisterViewModel
+<h2>Completar registro</h2>
+<p class="text-muted">
+    Tu cuenta se creará con el correo de <strong>Google/GitHub</strong>. Solo falta completar tu nombre.
+</p>
+<form asp-action="ExternalRegister" method="post">
+    <input type="hidden" asp-for="ReturnUrl" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group mb-2">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="FullName"></label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Address"></label>
+        <input asp-for="Address" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Completar registro</button>
+    <a asp-action="Login" class="btn btn-link">Cancelar</a>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

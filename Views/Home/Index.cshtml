@@ -1,0 +1,384 @@
+﻿@model EcommerceApp.Models.HomeViewModel
+@{
+    ViewData["Title"] = "Tren al Sur - Plataforma de Aventuras Outdoor";
+    Layout = null; // Controlamos todo el HTML manualmente
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/home-new.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS inline mínimo para estructura base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            background-color: #0B100E;
+            color: #F1F3F1;
+            font-family: 'Open Sans', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <!-- === NAVBAR CINEMATOGRÁFICA === -->
+    <nav id="mainNav" class="navbar-cinematic">
+        <div class="nav-container">
+            <a class="nav-logo" asp-controller="Home" asp-action="Index">
+                <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg"alt="Logo Tren al Sur">
+            </a>            
+            <ul class="nav-menu">
+                <li><a class="nav-link active" asp-controller="Home" asp-action="Index">INICIO</a></li>
+                <li><a class="nav-link" asp-controller="Services" asp-action="Index">RUTAS</a></li>
+                <li><a class="nav-link" asp-controller="Products" asp-action="Index">PRODUCTOS</a></li>
+                <li><a class="nav-link" href="#nosotros">NOSOTROS</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
+                <a href="#favorites" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
+                <a asp-controller="Products" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
+                <div class="nav-user">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a href="#profile" class="nav-action-icon" title="Perfil"><i class="far fa-user"></i></a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="nav-action-icon" title="Iniciar sesión"><i class="far fa-user"></i></a>
+                    }
+                </div>
+            </div>
+            
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+<!-- === HERO FULLSCREEN CON VIDEO === -->
+<section class="hero-fullscreen">
+
+    <div class="hero-video-container">
+        <video class="hero-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture> <source src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/Video%20Project.mp4" type="video/mp4"> </video>
+
+        <div class="hero-overlay"></div>
+
+    </div>
+
+    <div class="hero-content">
+
+        <h1 class="hero-title">
+            TU PRÓXIMA AVENTURA COMIENZA AQUÍ
+        </h1>
+
+        <p class="hero-subtitle">
+            Descubre nuevos caminos, conecta con la naturaleza
+            y prepárate para salir de la rutina.
+        </p>
+
+        <div class="hero-actions">
+
+            <a asp-controller="Services"
+               asp-action="Index"
+               class="hero-btn hero-btn-primary">
+                EXPLORAR RUTAS
+            </a>
+            <a asp-controller="Products"asp-action="Index" class="hero-btn hero-btn-secondary">EQUIPARME</a>
+        </div>
+    </div>
+    <div class="hero-scroll-indicator">
+        <div class="scroll-icon"></div>
+    </div>
+
+</section>
+
+    <!-- === DESCUBRE TU PRÓXIMO CAMINO === -->
+
+
+    <!-- === EXPLORA A TU MANERA === -->
+    <section class="section-explore-way">
+        <div class="container-fluid">
+            <div class="section-header">
+                <h2 class="section-title">EXPLORA A TU MANERA</h2>
+                <p class="section-subtitle">
+                    Elige el tipo de aventura que buscas y descubre rutas personalizadas.
+                </p>
+            </div>
+
+            <div class="categories-grid-outdoor">
+                @{
+                    var categoryImages = new Dictionary<string, string>
+                    {
+                        { "Senderismo", "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop" },
+                        { "Montañismo", "https://images.unsplash.com/photo-1506629082847-11b7fb5f2e5c?w=800&h=600&fit=crop" },
+                        { "Bosque", "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop" },
+                        { "Trekking", "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=600&fit=crop" },
+                        { "Escalada", "https://images.unsplash.com/photo-1505228395891-9a51e7e86e81?w=800&h=600&fit=crop" },
+                        { "Alta montaña", "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=600&fit=crop" },
+                        { "Miradores naturales", "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&h=600&fit=crop" },
+                        { "Volcanes", "https://images.unsplash.com/photo-1505259785-1c0925491c8a?w=800&h=600&fit=crop" },
+                        { "Caminatas de naturaleza", "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop" },
+                        { "Trekking con camping", "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&h=600&fit=crop" }
+                    };
+                }
+
+                @foreach (var category in Model.OutdoorCategories)
+                {
+                    var imageSrc = categoryImages.ContainsKey(category)
+                        ? categoryImages[category]
+                        : "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&h=600&fit=crop";
+
+                    <a asp-controller="Services" asp-action="Index" asp-route-category="@category" class="category-explore-card">
+                        <!-- IMAGEN DE CATEGORÍA: Fotografía real -->
+                        <img src="@imageSrc" alt="@category" class="category-image" loading="lazy">
+                        <div class="category-overlay">
+                            <h3 class="category-name">@category</h3>
+                            <span class="category-explore-text">EXPLORAR →</span>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- === ENCUENTRA TU PRÓXIMO CAMINO (MAPA) === -->
+    <section class="section-map-discovery">
+        <div class="container-fluid">
+            <div class="section-header">
+                <h2 class="section-title">ENCUENTRA TU PRÓXIMO CAMINO</h2>
+                <p class="section-subtitle">
+                    Localiza rutas en todo el mundo y descubre nuevas aventuras.
+                </p>
+            </div>
+
+            <div class="map-discovery-container">
+                <!-- MAPA DE RUTAS: Sección preparada para integración con Leaflet/Google Maps -->
+                <div class="map-visual" id="routeMap">
+                    <div class="map-placeholder-visual">
+                        <div class="map-marker marker-1" style="top: 30%; left: 25%;" data-route-id="1">
+                            <div class="marker-dot"></div>
+                            <div class="marker-tooltip">
+                                <strong>Parque Nacional Tunari</strong><br>
+                                Cochabamba<br>
+                                🟡 Moderada · 4h
+                            </div>
+                        </div>
+                        <div class="map-marker marker-2" style="top: 50%; left: 50%;" data-route-id="2">
+                            <div class="marker-dot"></div>
+                            <div class="marker-tooltip">
+                                <strong>Choro Trek</strong><br>
+                                La Paz<br>
+                                🔴 Difícil · 3 días
+                            </div>
+                        </div>
+                        <div class="map-marker marker-3" style="top: 20%; left: 70%;" data-route-id="3">
+                            <div class="marker-dot"></div>
+                            <div class="marker-tooltip">
+                                <strong>Machu Picchu</strong><br>
+                                Perú<br>
+                                🔴 Difícil · 4 días
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- === EQUÍPATE PARA TU PRÓXIMA AVENTURA === -->
+    <section class="section-equip-now">
+        <div class="container-fluid">
+            <div class="section-header">
+                <h2 class="section-title">EQUÍPATE PARA TU PRÓXIMA AVENTURA</h2>
+                <p class="section-subtitle">
+                    Encuentra el equipamiento que necesitas para prepararte correctamente.
+                </p>
+            </div>
+
+            <div class="products-curated">
+                @if (Model.FeaturedProducts.Any())
+                {
+                    @foreach (var product in Model.FeaturedProducts.Take(4))
+                    {
+                        <!-- PRODUCTO CURADO: Imagen de producto real -->
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="product-curated-card">
+                            <div class="product-image-wrapper">
+                                <img src="@(product.ImageUrl ?? "https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=600&h=600&fit=crop")"
+                                     alt="@product.Name"
+                                     class="product-curated-image"
+                                     loading="lazy">
+                                @if (product.IsNew)
+                                {
+                                    <span class="product-badge new">NUEVO</span>
+                                }
+                                @if (product.PromotionalPrice.HasValue && product.PromotionalPrice < product.Price)
+                                {
+                                    <span class="product-badge discount">OFERTA</span>
+                                }
+                            </div>
+                            <div class="product-curated-info">
+                                <p class="product-curated-category">@product.Category</p>
+                                <h3 class="product-curated-name">@product.Name</h3>
+                                @if (!string.IsNullOrEmpty(product.Brand))
+                                {
+                                    <p class="product-curated-brand">@product.Brand</p>
+                                }
+                                <div class="product-curated-price">
+                                    @if (product.PromotionalPrice.HasValue && product.PromotionalPrice < product.Price)
+                                    {
+                                        <span class="price-original">Bs. @product.Price.ToString("0")</span>
+                                        <span class="price-current">Bs. @product.PromotionalPrice.Value.ToString("0")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="price-current">Bs. @product.Price.ToString("0")</span>
+                                    }
+                                </div>
+                            </div>
+                        </a>
+                    }
+                }
+            </div>
+
+            <div class="section-cta">
+                <a asp-controller="Products" asp-action="Index" class="btn-view-all">VER TODOS LOS PRODUCTOS</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- === COMPARTE EL CAMINO (COMUNIDAD) === -->
+    <section class="section-community-share">
+        <div class="container-fluid">
+            <div class="section-header">
+                <h2 class="section-title">COMPARTE EL CAMINO</h2>
+                <p class="section-subtitle">
+                    Las mejores aventuras también se recuerdan a través de quienes las viven.
+                </p>
+            </div>
+
+            <div class="community-mosaic">
+                <!-- MOSAICO EDITORIAL: Fotografías de comunidad -->
+                <div class="mosaic-grid">
+                    <div class="mosaic-item large">
+                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop" alt="Comunidad trekking" loading="lazy">
+                        <div class="mosaic-caption">
+                            <span class="mosaic-user">montañista_boliviano</span>
+                            <span class="mosaic-route">Parque Nacional Tunari</span>
+                            <span class="mosaic-location">📍 Cochabamba</span>
+                        </div>
+                    </div>
+                    <div class="mosaic-item">
+                        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=600&fit=crop" alt="Senderismo en bosque" loading="lazy">
+                        <div class="mosaic-caption">
+                            <span class="mosaic-user">trekking_aventura</span>
+                            <span class="mosaic-route">Sendero Bosque</span>
+                            <span class="mosaic-location">📍 Tiquipaya</span>
+                        </div>
+                    </div>
+                    <div class="mosaic-item">
+                        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=600&fit=crop" alt="Montañismo" loading="lazy">
+                        <div class="mosaic-caption">
+                            <span class="mosaic-user">explorador_andino</span>
+                            <span class="mosaic-route">Ascenso Montaña</span>
+                            <span class="mosaic-location">📍 Andes</span>
+                        </div>
+                    </div>
+                    <div class="mosaic-item tall">
+                        <img src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=600&h=800&fit=crop" alt="Campamento" loading="lazy">
+                        <div class="mosaic-caption">
+                            <span class="mosaic-user">camping_life</span>
+                            <span class="mosaic-route">Noche en la montaña</span>
+                            <span class="mosaic-location">📍 Valle</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- === SECCIÓN EMOCIONAL === -->
+    <section class="section-emotional-impact">
+        <!-- IMAGEN EMOCIONAL: Persona caminando hacia montaña -->
+        <div class="emotional-bg" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&h=900&fit=crop');">
+            <div class="emotional-overlay"></div>
+            <div class="emotional-content">
+                <h2 class="emotional-title">NO TODOS LOS CAMINOS APARECEN EN UN MAPA.</h2>
+                <p class="emotional-subtitle">Algunos se encuentran caminando.</p>
+                <a asp-controller="Services" asp-action="Index" class="emotional-cta">DESCUBRE TU PRÓXIMA RUTA →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- === CTA FINAL === -->
+    <section class="section-final-cta">
+        <div class="container-fluid">
+            <div class="final-cta-container">
+                <h2 class="final-cta-title">¿LISTO PARA SALIR DE LA RUTINA?</h2>
+                <p class="final-cta-text">
+                    Encuentra un nuevo camino y empieza tu próxima aventura con nosotros.
+                </p>
+                <a asp-controller="Services" asp-action="Index" class="final-cta-btn">EXPLORAR RUTAS</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- === FOOTER === -->
+    <footer class="footer-cinematic">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4 class="footer-title">NAVEGACIÓN</h4>
+                    <a asp-controller="Home" asp-action="Index" class="footer-link">Inicio</a>
+                    <a asp-controller="Services" asp-action="Index" class="footer-link">Rutas</a>
+                    <a asp-controller="Products" asp-action="Index" class="footer-link">Productos</a>
+                    <a href="#servicios" class="footer-link">Servicios</a>
+                    <a href="#nosotros" class="footer-link">Nosotros</a>
+                </div>
+                <div class="footer-column">
+                    <h4 class="footer-title">AYUDA</h4>
+                    <a href="#contacto" class="footer-link">Contacto</a>
+                    <a href="#faq" class="footer-link">Preguntas Frecuentes</a>
+                    <a href="#terminos" class="footer-link">Términos y Condiciones</a>
+                    <a href="#privacidad" class="footer-link">Política de Privacidad</a>
+                </div>
+                <div class="footer-column">
+                    <h4 class="footer-title">CONTACTO</h4>
+                    <p class="footer-contact"><i class="fas fa-envelope"></i> info@trenalsur.com</p>
+                    <p class="footer-contact"><i class="fas fa-phone"></i> +591 123 456 789</p>
+                    <p class="footer-contact"><i class="fas fa-map-marker-alt"></i> Cochabamba, Bolivia</p>
+                </div>
+                <div class="footer-column">
+                    <h4 class="footer-title">SÍGUENOS</h4>
+                    <div class="footer-socials">
+                        <a href="#facebook" class="social-icon" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#instagram" class="social-icon" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#youtube" class="social-icon" title="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="#twitter" class="social-icon" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 Tren al Sur. Todos los derechos reservados. | 
+                <a href="#privacidad" class="footer-legal">Privacidad</a> | 
+                <a href="#terminos" class="footer-legal">Términos</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/js/home-new.js" asp-append-version="true"></script>
+</body>
+</html>

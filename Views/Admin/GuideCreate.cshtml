@@ -1,0 +1,58 @@
+@model EcommerceApp.Models.Guide
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-breadcrumb"><a asp-action="Guides">Guías</a> / Nuevo</div>
+<div class="admin-page-header">
+    <div>
+        <h1>Nuevo guía</h1>
+        <p>Agregá un guía al equipo para poder asignarlo a rutas.</p>
+    </div>
+</div>
+
+<div class="admin-card" style="max-width:720px;">
+    <form asp-action="GuideCreate" method="post" class="admin-form">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="admin-form-section">
+            <div class="form-grid">
+                <div class="form-field form-span-2">
+                    <label asp-for="Name">Nombre completo</label>
+                    <input asp-for="Name" class="form-control" placeholder="Ej: Carlos Mamani" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-field form-span-2">
+                    <label asp-for="Specialty">Especialidad</label>
+                    <input asp-for="Specialty" class="form-control" placeholder="Ej: Senderismo, alta montaña" />
+                </div>
+                <div class="form-field form-span-2">
+                    <label asp-for="Bio">Biografía / experiencia</label>
+                    <textarea asp-for="Bio" class="form-control" rows="3" placeholder="Años de experiencia, certificaciones, rutas destacadas..."></textarea>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Phone">Teléfono</label>
+                    <input asp-for="Phone" class="form-control" placeholder="+591 ..." />
+                </div>
+                <div class="form-field">
+                    <label asp-for="Email">Email</label>
+                    <input asp-for="Email" class="form-control" type="email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-switch-field" style="margin-top:1rem; max-width:260px;">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive">Guía activo</label>
+            </div>
+        </div>
+
+        <div class="admin-form-footer">
+            <a asp-action="Guides" class="btn-admin btn-admin-outline">Cancelar</a>
+            <button type="submit" class="btn-admin btn-admin-primary">Guardar guía</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

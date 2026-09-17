@@ -1,0 +1,82 @@
+@model List<EcommerceApp.Models.Reservation>
+@{
+    Layout = "_AdminLayout";
+    var statuses = new[] { "Pendiente", "Recorrido", "Acabado", "Cancelado" };
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Reservas</h1>
+        <p>@Model.Count reserva(s) @(ViewBag.StatusFilter != null ? $"con estado \"{ViewBag.StatusFilter}\"" : "en total").</p>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Listado de reservas</h2>
+        <form method="get" asp-action="Reservations" style="display:flex; gap:0.5rem;">
+            <select name="status" class="admin-search" onchange="this.form.submit()">
+                <option value="">Todos los estados</option>
+                @foreach (var s in statuses)
+                {
+                    <option value="@s" selected="@(ViewBag.StatusFilter == s)">@s</option>
+                }
+            </select>
+        </form>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/></svg>
+            <h3>No hay reservas</h3>
+            <p>Todavía no se registraron reservas con este filtro.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Ruta</th>
+                        <th>Fecha de reserva</th>
+                        <th>Personas</th>
+                        <th>Precio unitario</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@(r.User?.FullName ?? "Usuario")</strong>
+                                <div class="cell-muted" style="font-size:0.76rem;">@(r.User?.Email ?? r.UserId)</div>
+                            </td>
+                            <td>@(r.Service?.Name ?? "Ruta eliminada")</td>
+                            <td class="cell-muted">@r.BookingDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@r.PeopleCount</td>
+                            <td class="cell-muted">@r.UnitPrice.ToString("C")</td>
+                            <td><strong>@r.TotalPrice.ToString("C")</strong></td>
+                            <td>
+                                <form asp-action="ReservationUpdateStatus" method="post" style="display:flex; gap:0.4rem; align-items:center;">
+                                    <input type="hidden" name="userId" value="@r.UserId" />
+                                    <input type="hidden" name="serviceId" value="@r.ServiceId" />
+                                    <select name="status" class="form-select" style="min-width:130px; padding:0.3rem 0.6rem; font-size:0.78rem;" onchange="this.form.submit()">
+                                        @foreach (var s in statuses)
+                                        {
+                                            <option value="@s" selected="@(r.Status == s)">@s</option>
+                                        }
+                                    </select>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

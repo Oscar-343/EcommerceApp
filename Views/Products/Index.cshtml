@@ -1,0 +1,300 @@
+﻿@model EcommerceApp.Models.ProductosViewModel
+@{
+    ViewData["Title"] = "Productos - Equipamiento Outdoor";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/productos.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- === NAVBAR CINEMATOGRÁFICA (idéntica a Home / Servicios) === -->
+    <nav id="mainNav" class="navbar-cinematic">
+        <div class="nav-container">
+            <a class="nav-logo" asp-controller="Home" asp-action="Index">
+                <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg" alt="Tren al Sur">
+            </a>
+
+            <ul class="nav-menu">
+                <li><a class="nav-link" asp-controller="Home" asp-action="Index">INICIO</a></li>
+                <li><a class="nav-link" asp-controller="Services" asp-action="Index">RUTAS</a></li>
+                <li><a class="nav-link active" asp-controller="Products" asp-action="Index">PRODUCTOS</a></li>
+                <li><a class="nav-link" href="#nosotros">NOSOTROS</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
+                <a href="#favorites" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
+                <a asp-controller="Products" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
+                <div class="nav-user">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a href="#profile" class="nav-action-icon" title="Perfil"><i class="far fa-user"></i></a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="nav-action-icon" title="Iniciar sesión"><i class="far fa-user"></i></a>
+                    }
+                </div>
+            </div>
+
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="productos-page">
+        <!-- === HERO DE PRODUCTOS === -->
+        <section class="productos-hero" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=900&fit=crop');">
+            <div class="productos-hero__content">
+                <h1 class="productos-hero__title">EQUÍPATE PARA EXPLORAR</h1>
+                <p class="productos-hero__subtitle">El equipo adecuado convierte una ruta en una experiencia.</p>
+                <p class="productos-hero__text">
+                    Encuentra equipamiento pensado para acompañarte desde el primer sendero hasta las rutas más exigentes.
+                </p>
+                <a href="#catalogo" class="productos-hero__cta">EXPLORAR EQUIPAMIENTO</a>
+            </div>
+            
+        </section>
+
+        <!-- === SECCIÓN: TODO COMIENZA CON EL EQUIPO === -->
+        <section class="productos-intro">
+            <div class="productos-container">
+                <div class="productos-intro__header">
+                    <h2 class="productos-intro__title">TODO COMIENZA CON EL EQUIPO</h2>
+                    <p class="productos-intro__text">
+                        Prepara tu próxima aventura con equipamiento pensado para moverte, explorar y disfrutar del camino.
+                    </p>
+                </div>
+
+                <div class="productos-intro__blocks">
+                    <!-- BLOQUE 1: EQUÍPATE -->
+                    <div class="productos-intro__block productos-animate" style="background-image: url('https://images.unsplash.com/photo-1478098711619-69891b0ec21a?w=800&h=600&fit=crop');">
+                        <img src="https://images.unsplash.com/photo-1478098711619-69891b0ec21a?w=800&h=600&fit=crop" alt="Equipamiento" class="productos-intro__block-image" loading="lazy" />
+                        <div class="productos-intro__block-overlay">
+                            <h3 class="productos-intro__block-title">EQUÍPATE</h3>
+                            <p class="productos-intro__block-text">Encuentra el equipo que necesitas para tu próxima ruta.</p>
+                            <a href="#catalogo" class="productos-intro__block-btn">VER EQUIPAMIENTO</a>
+                        </div>
+                    </div>
+
+                    <!-- BLOQUE 2: PREPÁRATE PARA LA RUTA -->
+                    <div class="productos-intro__block productos-animate" style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop');">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop" alt="Prepararse para la ruta" class="productos-intro__block-image" loading="lazy" />
+                        <div class="productos-intro__block-overlay">
+                            <h3 class="productos-intro__block-title">PREPÁRATE PARA LA RUTA</h3>
+                            <p class="productos-intro__block-text">Elige tu equipo según el tipo de aventura que tienes en mente.</p>
+                            <a asp-controller="Services" asp-action="Index" class="productos-intro__block-btn">VER RUTAS</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- === CATEGORÍAS === -->
+        <section class="productos-categories">
+            <div class="productos-container">
+                <div class="productos-categories__header">
+                    <h2 class="productos-categories__title">ENCUENTRA TU EQUIPO</h2>
+                    <p class="productos-categories__subtitle">Todo lo necesario para moverte por la montaña.</p>
+                </div>
+
+                <div class="productos-categories__grid">
+                    @{
+                        var categories = Model.AvailableCategories ?? new List<string>();
+                        var categoryImages = new Dictionary<string, string>
+                        {
+                            { "Tiendas de campaña", "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=400&h=300&fit=crop" },
+                            { "Calzado de trekking", "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop" },
+                            { "Mochilas", "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop" },
+                            { "Bastones de trekking", "https://images.unsplash.com/photo-1505228395891-9a51e7e86e81?w=400&h=300&fit=crop" },
+                            { "Ropa outdoor", "https://images.unsplash.com/photo-1533392839391-6db7ba1f2068?w=400&h=300&fit=crop" },
+                            { "Camping", "https://images.unsplash.com/photo-1571863533956-461c92f1704a?w=400&h=300&fit=crop" },
+                            { "Hidratación", "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&h=300&fit=crop" },
+                            { "Iluminación", "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop" },
+                            { "Accesorios", "https://images.unsplash.com/photo-1606611282519-d91603135d4e?w=400&h=300&fit=crop" },
+                            { "Seguridad y orientación", "https://images.unsplash.com/photo-1577401132019-40a53b4fd6f0?w=400&h=300&fit=crop" }
+                        };
+
+                        var featuredCategories = new[] { "Tiendas de campaña", "Mochilas", "Calzado de trekking", "Bastones de trekking" };
+
+                        foreach (var category in categories)
+                        {
+                            var imageSrc = categoryImages.ContainsKey(category)
+                                ? categoryImages[category]
+                                : "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=400&h=300&fit=crop";
+
+                            var isFeatured = featuredCategories.Contains(category);
+
+                            <a asp-action="Index" asp-route-category="@category"
+                               class="productos-category @(isFeatured ? "productos-category--featured" : "") productos-animate"
+                               style="background-image: url('@imageSrc');">
+                                <img src="@imageSrc" alt="@category" class="productos-category__image" loading="lazy" />
+                                <div class="productos-category__overlay">
+                                    <h3 class="productos-category__name">@category</h3>
+                                    <span class="productos-category__explore">EXPLORAR →</span>
+                                </div>
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+        </section>
+
+        <!-- === CATÁLOGO === -->
+        <section class="productos-catalog" id="catalogo">
+            <div class="productos-container">
+                <div class="productos-catalog__header">
+                    <h2 class="productos-catalog__title">EQUIPAMIENTO DESTACADO</h2>
+                    <p class="productos-catalog__count">@(Model.TotalProducts) productos disponibles</p>
+                </div>
+
+                <div class="productos-catalog__container">
+                    <!-- === FILTROS === -->
+                    <aside class="productos-filters" id="filtros">
+                        <h3 class="productos-filters__title">FILTRAR</h3>
+
+                        <form method="get" asp-action="Index" id="filtros-form">
+                            <div class="productos-filters__group">
+                                <label class="productos-filters__label">Buscar</label>
+                                <input type="text" name="search" class="productos-filters__search"
+                                       placeholder="¿Qué buscas?" value="@Model.SearchTerm" />
+                            </div>
+
+                            <div class="productos-filters__group">
+                                <label class="productos-filters__label">Ordenar por</label>
+                                <select name="orderBy" class="productos-filters__select" onchange="document.getElementById('filtros-form').submit();">
+                                    <option value="featured" selected="@(Model.OrderBy == "featured")">Destacados</option>
+                                    <option value="newest" selected="@(Model.OrderBy == "newest")">Más recientes</option>
+                                    <option value="price-asc" selected="@(Model.OrderBy == "price-asc")">Precio: Menor a Mayor</option>
+                                    <option value="price-desc" selected="@(Model.OrderBy == "price-desc")">Precio: Mayor a Menor</option>
+                                </select>
+                            </div>
+
+                            @if (Model.AvailableCategories?.Any() == true)
+                            {
+                                <div class="productos-filters__group">
+                                    <label class="productos-filters__label">Categoría</label>
+                                    <select name="category" class="productos-filters__select" onchange="document.getElementById('filtros-form').submit();">
+                                        <option value="">Todas las categorías</option>
+                                        @foreach (var cat in Model.AvailableCategories)
+                                        {
+                                            <option value="@cat" selected="@(Model.ActiveCategory == cat)">@cat</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+
+                            <div class="productos-filters__group">
+                                <label class="productos-filters__label">Rango de precio</label>
+                                <div class="productos-filters__range">
+                                    <input type="number" name="minPrice" class="productos-filters__range-input"
+                                           placeholder="Min" value="@Model.MinPrice" min="0" />
+                                    <span style="color: var(--productos-text-secondary);">-</span>
+                                    <input type="number" name="maxPrice" class="productos-filters__range-input"
+                                           placeholder="Max" value="@Model.MaxPrice" min="0" />
+                                </div>
+                            </div>
+
+                            @if (Model.AvailableBrands?.Any() == true)
+                            {
+                                <div class="productos-filters__group">
+                                    <label class="productos-filters__label">Marca</label>
+                                    <select name="brand" class="productos-filters__select" onchange="document.getElementById('filtros-form').submit();">
+                                        <option value="">Todas las marcas</option>
+                                        @foreach (var b in Model.AvailableBrands)
+                                        {
+                                            <option value="@b" selected="@(Model.SelectedBrand == b)">@b</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+
+                            <button type="submit" class="productos-filters__btn">APLICAR FILTROS</button>
+                            <a asp-action="Index" class="productos-filters__btn productos-filters__btn--secondary">LIMPIAR FILTROS</a>
+                        </form>
+                    </aside>
+
+                    <!-- === CATÁLOGO === -->
+                    <main>
+                        <button class="productos-filters-toggle" id="filtros-toggle">☰ FILTRAR EQUIPAMIENTO</button>
+                        <div class="productos-filters-overlay" id="filtros-overlay"></div>
+
+                        <div class="productos-grid" id="productos-grid">
+                            @if (Model.Products?.Any() == true)
+                            {
+                                @foreach (var product in Model.Products)
+                                {
+                                    <div class="productos-animate">
+                                        @await Html.PartialAsync("_ProductoCard", product)
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="productos-empty" style="grid-column: 1 / -1;">
+                                    <div class="productos-empty__icon">🔍</div>
+                                    <p class="productos-empty__text">No encontramos productos que coincidan con tu búsqueda.</p>
+                                    <p class="productos-empty__text" style="font-size: 0.95rem;">Intenta cambiar los filtros o la búsqueda.</p>
+                                </div>
+                            }
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const filtrosToggle = document.getElementById('filtros-toggle');
+            const filtros = document.getElementById('filtros');
+            const overlay = document.getElementById('filtros-overlay');
+
+            if (filtrosToggle) {
+                filtrosToggle.addEventListener('click', function () {
+                    filtros.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                });
+
+                overlay.addEventListener('click', function () {
+                    filtros.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+
+            const links = filtros.querySelectorAll('a');
+            links.forEach(link => {
+                link.addEventListener('click', function () {
+                    filtros.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            });
+
+            // Navbar cinematográfica + menú móvil (igual que Home/Servicios)
+            const navbar = document.getElementById('mainNav');
+            window.addEventListener('scroll', () => {
+                if (navbar) navbar.classList.toggle('scrolled', window.pageYOffset > 50);
+            }, { passive: true });
+
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.querySelector('.nav-menu');
+            if (navToggle && navMenu) {
+                navToggle.addEventListener('click', () => {
+                    navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+                });
+            }
+        });
+    </script>
+    <script src="~/js/productos.js" asp-append-version="true"></script>
+</body>
+</html>

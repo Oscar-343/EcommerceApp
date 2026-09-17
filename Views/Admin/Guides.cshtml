@@ -1,0 +1,84 @@
+@model List<EcommerceApp.Models.Guide>
+@{
+    Layout = "_AdminLayout";
+    var routeCounts = ViewBag.RouteCounts as Dictionary<int, int> ?? new();
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Guías</h1>
+        <p>@Model.Count guía(s) registrados en el equipo.</p>
+    </div>
+    <a asp-action="GuideCreate" class="btn-admin btn-admin-primary">+ Nuevo guía</a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Equipo de guías</h2>
+        <form method="get" asp-action="Guides">
+            <input type="text" name="q" value="@ViewBag.Query" class="admin-search" placeholder="Buscar por nombre o especialidad..." />
+        </form>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+            <h3>Todavía no hay guías</h3>
+            <p>Agregá guías para poder asignarlos a las rutas. <a asp-action="GuideCreate" style="color:var(--sand);">Creá uno nuevo</a>.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Especialidad</th>
+                        <th>Contacto</th>
+                        <th>Rutas asignadas</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var guide in Model)
+                    {
+                        <tr>
+                            <td><strong>@guide.Name</strong></td>
+                            <td class="cell-muted">@(guide.Specialty ?? "—")</td>
+                            <td class="cell-muted">
+                                @if (!string.IsNullOrWhiteSpace(guide.Phone)) { <div>@guide.Phone</div> }
+                                @if (!string.IsNullOrWhiteSpace(guide.Email)) { <div>@guide.Email</div> }
+                                @if (string.IsNullOrWhiteSpace(guide.Phone) && string.IsNullOrWhiteSpace(guide.Email)) { <span>—</span> }
+                            </td>
+                            <td>
+                                <span class="pill pill-blue">@(routeCounts.ContainsKey(guide.Id) ? routeCounts[guide.Id] : 0)</span>
+                            </td>
+                            <td>
+                                @if (guide.IsActive)
+                                {
+                                    <span class="pill pill-green">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="pill pill-gray">Inactivo</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="row-actions">
+                                    <a asp-action="GuideEdit" asp-route-id="@guide.Id" class="btn-admin btn-admin-outline btn-admin-sm">Editar</a>
+                                    <form asp-action="GuideDelete" asp-route-id="@guide.Id" method="post"
+                                          onsubmit="return confirm('¿Eliminar al guía \'@guide.Name.Replace("'", "\\'")\'?');">
+                                        <button type="submit" class="btn-admin btn-admin-danger btn-admin-sm">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

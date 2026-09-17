@@ -1,0 +1,206 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using EcommerceApp.Data;
+using EcommerceApp.Models;
+
+namespace EcommerceApp.Controllers
+{
+    // Tienda pública: catálogo de productos en solo lectura.
+    // El CRUD se maneja desde el panel de administración (AdminController).
+    public class ProductsController(ApplicationDbContext context) : Controller
+    {
+        // Experiencia mejorada de productos: Hero + categorías + catálogo con filtros.
+        [AllowAnonymous]
+        public async Task<IActionResult> Index(
+            string? category = null,
+            string? search = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null,
+            string? brand = null,
+            string? orderBy = "featured")
+        {
+            // Consulta base: todos los productos
+            var productsQuery = context.Products.AsNoTracking();
+
+            // Filtro por categoría
+            if (!string.IsNullOrEmpty(category))
+            {
+                productsQuery = productsQuery.Where(p => p.Category == category);
+            }
+
+            // Filtro por búsqueda
+            if (!string.IsNullOrEmpty(search))
+            {
+                var searchLower = search.ToLower();
+                productsQuery = productsQuery.Where(p =>
+                    p.Name.ToLower().Contains(searchLower) ||
+                    p.Description.ToLower().Contains(searchLower) ||
+                    (p.Brand != null && p.Brand.ToLower().Contains(searchLower)));
+            }
+
+            // Filtro por marca
+            if (!string.IsNullOrEmpty(brand))
+            {
+                productsQuery = productsQuery.Where(p => p.Brand == brand);
+            }
+
+            // Filtro por rango de precios
+            if (minPrice.HasValue)
+            {
+                productsQuery = productsQuery.Where(p =>
+                    (p.PromotionalPrice.HasValue && p.PromotionalPrice >= minPrice) ||
+                    (!p.PromotionalPrice.HasValue && p.Price >= minPrice));
+            }
+
+            if (maxPrice.HasValue)
+            {
+                productsQuery = productsQuery.Where(p =>
+                    (p.PromotionalPrice.HasValue && p.PromotionalPrice <= maxPrice) ||
+                    (!p.PromotionalPrice.HasValue && p.Price <= maxPrice));
+            }
+
+            // Obtener total antes de aplicar orden
+            var totalProducts = await productsQuery.CountAsync();
+
+            // Aplicar ordenamiento
+            productsQuery = orderBy switch
+            {
+                "price-asc" => productsQuery.OrderBy(p => p.PromotionalPrice ?? p.Price),
+                "price-desc" => productsQuery.OrderByDescending(p => p.PromotionalPrice ?? p.Price),
+                "newest" => productsQuery.OrderByDescending(p => p.CreatedAt),
+                _ => productsQuery.OrderByDescending(p => p.IsFeatured)
+                    .ThenByDescending(p => p.IsBestSeller)
+                    .ThenByDescending(p => p.CreatedAt) // "featured" es el default
+            };
+
+            var products = await productsQuery.ToListAsync();
+
+            // Obtener categorías y marcas disponibles para los filtros
+            var allCategories = await context.Products.AsNoTracking()
+                .Where(p => p.Category != null)
+                .Select(p => p.Category)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
+
+            var allBrands = await context.Products.AsNoTracking()
+                .Where(p => p.Brand != null)
+                .Select(p => p.Brand)
+                .Distinct()
+                .OrderBy(b => b)
+                .ToListAsync();
+
+            // Calcular el precio máximo en la tienda
+            var maxPriceInStore = await context.Products.AsNoTracking()
+                .Select(p => (decimal?)(p.PromotionalPrice ?? p.Price))
+                .MaxAsync() ?? 0;
+
+            var model = new ProductosViewModel
+            {
+                Products = products,
+                ActiveCategory = category,
+                SearchTerm = search,
+                MinPrice = minPrice,
+                MaxPrice = maxPrice,
+                SelectedBrand = brand,
+                AvailableCategories = allCategories ?? new List<string>(),
+                AvailableBrands = allBrands ?? new List<string>(),
+                TotalProducts = totalProducts,
+                MaxPriceInStore = maxPriceInStore,
+                OrderBy = orderBy
+            };
+
+            return View(model);
+        }
+
+        // Detalle de un producto
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(int id)
+        {
+            var product = await context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+            return View(product);
+        }
+
+        // Endpoints auxiliares para AJAX (filtros, búsqueda)
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetFilteredProducts(
+            string? category = null,
+            string? search = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null,
+            string? brand = null,
+            string? orderBy = "featured")
+        {
+            // Reutilizar la lógica de Index pero devolver partial view
+            var productsQuery = context.Products.AsNoTracking();
+
+            if (!string.IsNullOrEmpty(category))
+                productsQuery = productsQuery.Where(p => p.Category == category);
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                var searchLower = search.ToLower();
+                productsQuery = productsQuery.Where(p =>
+                    p.Name.ToLower().Contains(searchLower) ||
+                    p.Description.ToLower().Contains(searchLower) ||
+                    (p.Brand != null && p.Brand.ToLower().Contains(searchLower)));
+            }
+
+            if (!string.IsNullOrEmpty(brand))
+                productsQuery = productsQuery.Where(p => p.Brand == brand);
+
+            if (minPrice.HasValue)
+                productsQuery = productsQuery.Where(p =>
+                    (p.PromotionalPrice.HasValue && p.PromotionalPrice >= minPrice) ||
+                    (!p.PromotionalPrice.HasValue && p.Price >= minPrice));
+
+            if (maxPrice.HasValue)
+                productsQuery = productsQuery.Where(p =>
+                    (p.PromotionalPrice.HasValue && p.PromotionalPrice <= maxPrice) ||
+                    (!p.PromotionalPrice.HasValue && p.Price <= maxPrice));
+
+            productsQuery = orderBy switch
+            {
+                "price-asc" => productsQuery.OrderBy(p => p.PromotionalPrice ?? p.Price),
+                "price-desc" => productsQuery.OrderByDescending(p => p.PromotionalPrice ?? p.Price),
+                "newest" => productsQuery.OrderByDescending(p => p.CreatedAt),
+                _ => productsQuery.OrderByDescending(p => p.IsFeatured)
+                    .ThenByDescending(p => p.IsBestSeller)
+                    .ThenByDescending(p => p.CreatedAt)
+            };
+
+            var products = await productsQuery.ToListAsync();
+
+            return PartialView("_ProductGrid", products);
+        }
+
+        // Endpoint para obtener disponibilidad de filtros dinámicamente
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<JsonResult> GetFilterOptions()
+        {
+            var categories = await context.Products.AsNoTracking()
+                .Where(p => p.Category != null)
+                .Select(p => p.Category)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
+
+            var brands = await context.Products.AsNoTracking()
+                .Where(p => p.Brand != null)
+                .Select(p => p.Brand)
+                .Distinct()
+                .OrderBy(b => b)
+                .ToListAsync();
+
+            var maxPrice = await context.Products.AsNoTracking()
+                .Select(p => (decimal?)(p.PromotionalPrice ?? p.Price))
+                .MaxAsync() ?? 0;
+
+            return Json(new { categories, brands, maxPrice });
+        }
+    }
+}
