@@ -7,7 +7,7 @@ namespace EcommerceApp.Models
         [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(100), RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo letras y espacios permitidos.")]
+        [Required, MaxLength(100), RegularExpression(@"^[\w\s\-]+$", ErrorMessage = "Solo texto, números, espacios y guiones.")]
         public string Name { get; set; } = string.Empty;
 
         [Required, MaxLength(500)]

@@ -139,7 +139,7 @@ namespace EcommerceApp.Controllers
             var query = context.Products.AsNoTracking().AsQueryable();
             if (!string.IsNullOrWhiteSpace(q))
             {
-                query = query.Where(p => p.Name.Contains(q) || (p.Brand != null && p.Brand.Contains(q)));
+                query = query.Where(p => p.Name.ToLower().Contains(q.ToLower()) || (p.Brand != null && p.Brand.ToLower().Contains(q.ToLower())));
             }
 
             ViewBag.Query = q;
@@ -263,7 +263,7 @@ namespace EcommerceApp.Controllers
             var query = context.Services.AsNoTracking().Include(s => s.Guide).Include(s => s.Transport).AsQueryable();
             if (!string.IsNullOrWhiteSpace(q))
             {
-                query = query.Where(s => s.Name.Contains(q) || (s.Region != null && s.Region.Contains(q)));
+                query = query.Where(s => s.Name.ToLower().Contains(q.ToLower()) || (s.Region != null && s.Region.ToLower().Contains(q.ToLower())));
             }
 
             ViewBag.Query = q;
@@ -413,7 +413,7 @@ namespace EcommerceApp.Controllers
             var query = context.Guides.AsNoTracking().AsQueryable();
             if (!string.IsNullOrWhiteSpace(q))
             {
-                query = query.Where(g => g.Name.Contains(q) || (g.Specialty != null && g.Specialty.Contains(q)));
+                query = query.Where(g => g.Name.ToLower().Contains(q.ToLower()) || (g.Specialty != null && g.Specialty.ToLower().Contains(q.ToLower())));
             }
 
             ViewBag.Query = q;
@@ -514,7 +514,7 @@ namespace EcommerceApp.Controllers
             var query = context.Transports.AsNoTracking().AsQueryable();
             if (!string.IsNullOrWhiteSpace(q))
             {
-                query = query.Where(t => t.Name.Contains(q) || (t.Type != null && t.Type.Contains(q)));
+                query = query.Where(t => t.Name.ToLower().Contains(q.ToLower()) || (t.Type != null && t.Type.ToLower().Contains(q.ToLower())));
             }
 
             ViewBag.Query = q;
@@ -653,7 +653,8 @@ namespace EcommerceApp.Controllers
                 .Where(s => s.Status == "Active")
                 .OrderBy(s => s.Name)
                 .ToListAsync();
-            return View();
+            // Se pasa modelo vacío para que el formulario no falle con null
+            return View(new Reservation());
         }
 
         // Crea una nueva reserva con los datos del formulario.
@@ -723,6 +724,10 @@ namespace EcommerceApp.Controllers
 
             var existing = await context.Reservations.FindAsync(userId, serviceId);
             if (existing == null) return NotFound();
+
+            // Convertir fecha a UTC para evitar error de PostgreSQL con DateTime Kind=Unspecified
+            if (reservation.BookingDate.Kind == DateTimeKind.Unspecified)
+                reservation.BookingDate = DateTime.SpecifyKind(reservation.BookingDate, DateTimeKind.Utc);
 
             existing.PeopleCount = reservation.PeopleCount;
             existing.UnitPrice = reservation.UnitPrice;

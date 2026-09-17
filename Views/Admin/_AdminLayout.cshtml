@@ -113,7 +113,10 @@
             <div class="admin-content">
                 @if (TempData["Success"] != null)
                 {
-                    <div class="admin-toast">✓ @TempData["Success"]</div>
+                    <div class="admin-toast" style="background: var(--bg-deep); border: 1px solid var(--danger); color: #fff; font-weight: 600; padding: 0.85rem 1.2rem; border-radius: 0.6rem; display: flex; align-items: center; gap: 0.6rem; animation: fadeIn 0.3s ease;">
+            <span style="font-size: 1.2rem;">⚠</span>
+            <span>@TempData["Success"]</span>
+        </div>
                 }
                 @RenderBody()
             </div>
