@@ -1,0 +1,135 @@
+/* ============================================
+   CARRITO — Premium Outdoor
+   Paleta: bosque, arena, vidrio oscuro
+   ============================================ */
+
+:root {
+  --cart-bg: #080d0b;
+  --cart-card: rgba(23, 61, 45, 0.55);
+  --cart-card-border: rgba(79, 138, 104, 0.35);
+  --cart-glass: rgba(11, 16, 14, 0.7);
+  --cart-text: #f2f1ea;
+  --cart-sub: #a8b0aa;
+  --cart-sand: #d8c9a8;
+  --cart-forest: #2e6b4d;
+  --cart-forest-deep: #173d2d;
+}
+
+.cart-page {
+  background: linear-gradient(180deg, #080d0b 0%, #111a16 60%, #173d2d 140%);
+  min-height: 100vh;
+  color: var(--cart-text);
+  font-family: "Outfit", "Segoe UI", system-ui, sans-serif;
+}
+
+.cart-hero {
+  position: relative;
+  padding: 1.5rem 0 1.5rem;
+  overflow: hidden;
+}
+.cart-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(79,138,104,0.12), transparent 70%);
+  pointer-events: none;
+}
+
+.cart-title {
+  font-weight: 800;
+  font-size: clamp(2.5rem, 5vw, 3.8rem);
+  color: var(--cart-sand);
+  letter-spacing: -0.03em;
+  text-shadow: 0 4px 30px rgba(79,138,104,0.25);
+  position: relative;
+  z-index: 1;
+}
+
+.cart-sub {
+  color: var(--cart-sub);
+  font-size: 1.1rem;
+  max-width: 560px;
+  position: relative;
+  z-index: 1;
+}
+
+.cart-card {
+  background: linear-gradient(135deg, rgba(23,61,45,0.55), rgba(23,61,45,0.35));
+  border: 1px solid rgba(79,138,104,0.35);
+  border-radius: 1.2rem;
+  padding: 1.2rem 1.4rem;
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  transition: transform 0.35s cubic-bezier(0.65,0,0.35,1), box-shadow 0.35s ease, border-color 0.35s ease;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.cart-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(79,138,104,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  border-color: rgba(79,138,104,0.65);
+}
+
+.cart-card img {
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease;
+}
+.cart-card:hover img {
+  transform: scale(1.02);
+}
+
+.cart-qty-btn {
+  background: rgba(79,138,104,0.25);
+  border: 1px solid rgba(79,138,104,0.4);
+  color: var(--cart-sand);
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  font-weight: 600;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.cart-qty-btn:hover {
+  background: rgba(79,138,104,0.45);
+  border-color: rgba(79,138,104,0.7);
+}
+
+.cart-summary-glass {
+  background: linear-gradient(180deg, rgba(23,61,45,0.6), rgba(11,16,14,0.85));
+  border: 1px solid rgba(79,138,104,0.35);
+  border-radius: 1.2rem;
+  padding: 1.5rem;
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+  position: sticky;
+  top: 1.5rem;
+}
+
+.cart-btn-primary {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 0.9rem 1rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, var(--cart-forest-deep), var(--cart-forest));
+  color: var(--cart-sand);
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid rgba(79,138,104,0.5);
+  box-shadow: 0 4px 20px rgba(79,138,104,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.cart-btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+  box-shadow: 0 8px 28px rgba(79,138,104,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
+  border-color: rgba(79,138,104,0.8);
+}
+
+.cart-empty-state {
+  background: linear-gradient(135deg, rgba(23,61,45,0.3), rgba(23,61,45,0.15));
+  border: 1px dashed rgba(79,138,104,0.35);
+  border-radius: 1.2rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  backdrop-filter: blur(8px);
+}

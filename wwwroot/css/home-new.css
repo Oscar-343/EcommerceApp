@@ -231,13 +231,23 @@ p, .section-subtitle, .hero-subtitle {
     z-index: 2;
 }
 
-    .hero-title {
-        font-size: 4rem;
-        margin-bottom: 1.5rem;
-        color: var(--home-text);
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    }
+@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap');
 
+.hero-title {
+    font-family: 'Caveat Brush', cursive;
+    font-size: clamp(2.75rem, 5vw, 5.25rem);
+    line-height: 1;
+    color: #f1f3f1;
+    text-shadow: 2px 2px 0 rgba(0,0,0,.15), 0 5px 20px rgba(0,0,0,.35);
+    -webkit-text-stroke: 0.4px rgba(255,255,255,.15);
+    margin:30px 0 30px 0;
+}
+
+    .hero-title span {
+        display: block;
+        color: #7FA58C;
+        margin-top: 0.15em;
+    }
     .hero-subtitle {
         font-size: 1.3rem;
         color: var(--home-text-secondary);
@@ -452,6 +462,145 @@ p, .section-subtitle, .hero-subtitle {
             background-color: var(--home-green);
             border-color: var(--home-green);
         }
+
+/* === CARRUSEL "DESCUBRE TU PRÓXIMO CAMINO" (paneles que se expanden en hover) === */
+.discover-carousel {
+    display: flex;
+    gap: 0.75rem;
+    height: 450px;
+    width: 100%;
+    margin-top: 3rem;
+}
+
+.discover-panel {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    display: block;
+    overflow: hidden;
+    border-radius: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: flex 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.discover-carousel:hover .discover-panel {
+    flex: 0.6;
+}
+
+    .discover-carousel:hover .discover-panel:hover {
+        flex: 5;
+    }
+
+.discover-panel__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.discover-panel:hover .discover-panel__image {
+    transform: scale(1.06);
+}
+
+.discover-panel__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 16, 14, 0) 35%, rgba(11, 16, 14, 0.9) 100%);
+    opacity: 0.5;
+    transition: opacity 0.4s ease;
+}
+
+.discover-panel:hover .discover-panel__overlay {
+    opacity: 1;
+}
+
+.discover-panel__vertical-label {
+    position: absolute;
+    left: 1.25rem;
+    bottom: 1.5rem;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    color: var(--home-text);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.discover-panel:hover .discover-panel__vertical-label {
+    opacity: 0;
+}
+
+.discover-panel__caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1.75rem;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.discover-panel:hover .discover-panel__caption {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.discover-panel__location {
+    display: block;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--home-text-secondary);
+    margin-bottom: 0.4rem;
+}
+
+.discover-panel__name {
+    font-size: 1.5rem;
+    color: var(--home-text);
+    margin: 0 0 0.75rem;
+}
+
+.discover-panel__cta {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--home-green-hover);
+}
+
+@media (max-width: 768px) {
+    .discover-carousel {
+        flex-direction: column;
+        height: auto;
+    }
+
+        .discover-panel,
+        .discover-carousel:hover .discover-panel,
+        .discover-carousel:hover .discover-panel:hover {
+            flex: none;
+            height: 220px;
+        }
+
+    .discover-panel__vertical-label {
+        display: none;
+    }
+
+    .discover-panel__overlay,
+    .discover-panel__caption {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* === EXPLORA A TU MANERA === */
     /* === EXPLORA A TU MANERA === */
     .section-explore-way {
         background-color: var(--home-section);
@@ -1225,3 +1374,49 @@ p, .section-subtitle, .hero-subtitle {
         .home-animate:nth-child(5) {
             animation-delay: 0.5s;
         }
+/* === BARRA INFERIOR MÓVIL (solo visible < 768px) === */
+.mobile-bottom-nav {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 64px;
+        background-color: var(--home-overlay-dark);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid var(--home-border);
+        z-index: 1000;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .mobile-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        color: var(--home-text-secondary);
+        text-decoration: none;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+        .mobile-nav-item i {
+            font-size: 1.1rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--home-green-hover);
+        }
+
+    /* Espacio para que el contenido no quede tapado por la barra */
+    body {
+        padding-bottom: 64px;
+    }
+}

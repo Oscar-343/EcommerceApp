@@ -116,21 +116,19 @@ namespace EcommerceApp.Models
         public DateTime? UpdatedAt { get; set; }
     }
 
-    // Categorías de rutas predefinidas
+    // Categorías de rutas predefinidas (reducidas a 6 según especificación del usuario).
     public static class RouteCategories
     {
         public static readonly string[] All =
         {
             "Senderismo",
-            "Montañismo",
-            "Bosque",
             "Trekking",
-            "Escalada",
-            "Alta montaña",
-            "Miradores naturales",
-            "Caminatas de naturaleza",
-            "Volcanes",
-            "Trekking con camping"
+            "Montañismo",
+            "Bosque y naturaleza",
+            "Volcanes y altura",
+            "Trekking con camping",
+            "Aventuras extremas",
+            "Escalada"
         };
     }
 

@@ -1,4 +1,4 @@
-﻿@model EcommerceApp.Models.ProductosViewModel
+﻿    @model EcommerceApp.Models.ProductosViewModel
 @{
     ViewData["Title"] = "Productos - Equipamiento Outdoor";
     Layout = null;
@@ -15,6 +15,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    @* Token CSRF para las llamadas AJAX de carrito/favoritos (ver wwwroot/js/productos.js) *@
+    @Html.AntiForgeryToken()
 
     <!-- === NAVBAR CINEMATOGRÁFICA (idéntica a Home / Servicios) === -->
     <nav id="mainNav" class="navbar-cinematic">
@@ -32,8 +34,8 @@
 
             <div class="nav-actions">
                 <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
-                <a href="#favorites" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
-                <a asp-controller="Products" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
+                <a asp-controller="Favorites" asp-action="Index" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
+                <a asp-controller="Cart" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
                 <div class="nav-user">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
@@ -66,40 +68,7 @@
             
         </section>
 
-        <!-- === SECCIÓN: TODO COMIENZA CON EL EQUIPO === -->
-        <section class="productos-intro">
-            <div class="productos-container">
-                <div class="productos-intro__header">
-                    <h2 class="productos-intro__title">TODO COMIENZA CON EL EQUIPO</h2>
-                    <p class="productos-intro__text">
-                        Prepara tu próxima aventura con equipamiento pensado para moverte, explorar y disfrutar del camino.
-                    </p>
-                </div>
-
-                <div class="productos-intro__blocks">
-                    <!-- BLOQUE 1: EQUÍPATE -->
-                    <div class="productos-intro__block productos-animate" style="background-image: url('https://images.unsplash.com/photo-1478098711619-69891b0ec21a?w=800&h=600&fit=crop');">
-                        <img src="https://images.unsplash.com/photo-1478098711619-69891b0ec21a?w=800&h=600&fit=crop" alt="Equipamiento" class="productos-intro__block-image" loading="lazy" />
-                        <div class="productos-intro__block-overlay">
-                            <h3 class="productos-intro__block-title">EQUÍPATE</h3>
-                            <p class="productos-intro__block-text">Encuentra el equipo que necesitas para tu próxima ruta.</p>
-                            <a href="#catalogo" class="productos-intro__block-btn">VER EQUIPAMIENTO</a>
-                        </div>
-                    </div>
-
-                    <!-- BLOQUE 2: PREPÁRATE PARA LA RUTA -->
-                    <div class="productos-intro__block productos-animate" style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop');">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop" alt="Prepararse para la ruta" class="productos-intro__block-image" loading="lazy" />
-                        <div class="productos-intro__block-overlay">
-                            <h3 class="productos-intro__block-title">PREPÁRATE PARA LA RUTA</h3>
-                            <p class="productos-intro__block-text">Elige tu equipo según el tipo de aventura que tienes en mente.</p>
-                            <a asp-controller="Services" asp-action="Index" class="productos-intro__block-btn">VER RUTAS</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+       
         <!-- === CATEGORÍAS === -->
         <section class="productos-categories">
             <div class="productos-container">
@@ -235,7 +204,13 @@
                                 @foreach (var product in Model.Products)
                                 {
                                     <div class="productos-animate">
-                                        @await Html.PartialAsync("_ProductoCard", product)
+                                        @{
+                                            var cardViewData = new ViewDataDictionary(ViewData)
+                                            {
+                                                ["IsFavorite"] = Model.FavoriteProductIds.Contains(product.Id)
+                                            };
+                                        }
+                                        @await Html.PartialAsync("_ProductoCard", product, cardViewData)
                                     </div>
                                 }
                             }

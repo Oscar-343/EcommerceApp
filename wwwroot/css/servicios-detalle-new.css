@@ -434,25 +434,55 @@
     min-height: 400px;
 }
 
-.ruta-map__placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.ruta-map__visual {
+    width: 100%;
     height: 100%;
-    padding: 2rem;
-    color: var(--sv-text-secondary);
-    text-align: center;
+    min-height: 400px;
+    display: block;
 }
 
-.ruta-map__placeholder p {
+.ruta-map__contour {
+    fill: none;
+    stroke: var(--sv-border);
+    stroke-width: 1.5;
+    opacity: 0.6;
+}
+
+.ruta-map__trail {
+    fill: none;
+    stroke: var(--sv-green-hover);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 8 8;
+    animation: ruta-trail-dash 25s linear infinite;
+}
+
+@keyframes ruta-trail-dash {
+    to {
+        stroke-dashoffset: -400;
+    }
+}
+
+.ruta-map__point {
+    stroke: var(--sv-bg-section);
+    stroke-width: 3;
+}
+
+.ruta-map__point--start {
+    fill: #4CAF50;
+}
+
+.ruta-map__point--end {
+    fill: #F44336;
+}
+
+.ruta-map__label {
+    fill: var(--sv-text-primary);
     font-family: var(--sv-font-display);
-    font-size: 1.2rem;
-    margin: 0 0 0.5rem;
-}
-
-.ruta-map__placeholder small {
-    font-size: 0.85rem;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-anchor: middle;
 }
 
 .ruta-map-info {

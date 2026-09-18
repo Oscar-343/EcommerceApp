@@ -49,8 +49,8 @@
             
             <div class="nav-actions">
                 <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
-                <a href="#favorites" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
-                <a asp-controller="Products" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
+                <a asp-controller="Favorites" asp-action="Index" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
+                <a asp-controller="Cart" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
                 <div class="nav-user">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
@@ -80,8 +80,9 @@
 
     <div class="hero-content">
 
-        <h1 class="hero-title">
-            TU PRÓXIMA AVENTURA COMIENZA AQUÍ
+                    <h1 class="hero-title">
+            TU PRÓXIMA AVENTURA
+            <span>COMIENZA AQUÍ</span>
         </h1>
 
         <p class="hero-subtitle">
@@ -96,18 +97,64 @@
                class="hero-btn hero-btn-primary">
                 EXPLORAR RUTAS
             </a>
-            <a asp-controller="Products"asp-action="Index" class="hero-btn hero-btn-secondary">EQUIPARME</a>
+            <a asp-controller="Products"asp-action="Index" class="hero-btn hero-btn-secondary">EQUIPATE</a>
         </div>
     </div>
     <div class="hero-scroll-indicator">
         <div class="scroll-icon"></div>
     </div>
-
 </section>
-
     <!-- === DESCUBRE TU PRÓXIMO CAMINO === -->
+    <section class="section-discover">
+        <div class="container-fluid">
+            <div class="section-header">
+                <h2 class="section-title">DESCUBRE TU PRÓXIMO CAMINO</h2>
+                <p class="section-subtitle">
+                    Explora rutas, descubre nuevos paisajes y encuentra una aventura que quieras vivir.
+                </p>
+            </div>
 
+            @{
+                // Imágenes de relleno mientras no haya suficientes rutas reales cargadas.
+                // Cuando agregues rutas con ImageUrl en la base, este carrusel las toma solas.
+                var discoverPlaceholders = new[]
+                {
+                    "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=1200&fit=crop",
+                    "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=1200&fit=crop",
+                    "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=800&h=1200&fit=crop",
+                    "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800&h=1200&fit=crop"
+                };
+                var discoverSlots = Math.Max(Model.FeaturedRoutes.Count, 4);
+            }
 
+            <div class="discover-carousel">
+                @for (int i = 0; i < discoverSlots; i++)
+                {
+                    var hasRoute = i < Model.FeaturedRoutes.Count;
+                    var route = hasRoute ? Model.FeaturedRoutes[i] : null;
+                    var imageUrl = (hasRoute && !string.IsNullOrEmpty(route!.ImageUrl))
+                        ? route!.ImageUrl
+                        : discoverPlaceholders[i % discoverPlaceholders.Length];
+                    var name = hasRoute ? route!.Name : "PRÓXIMAMENTE";
+                    var location = hasRoute ? (route!.Location ?? route!.Region ?? "Bolivia") : "Nueva ruta en camino";
+                    var link = hasRoute
+                        ? Url.Action("Details", "Services", new { id = route!.Id })
+                        : Url.Action("Index", "Services");
+
+                    <a class="discover-panel" href="@link">
+                        <img src="@imageUrl" alt="@name" class="discover-panel__image" loading="lazy">
+                        <div class="discover-panel__overlay"></div>
+                        <span class="discover-panel__vertical-label">@name.ToUpper()</span>
+                        <div class="discover-panel__caption">
+                            <span class="discover-panel__location">@location</span>
+                            <h3 class="discover-panel__name">@name</h3>
+                            <span class="discover-panel__cta">@(hasRoute ? "DESCUBRIR RUTA →" : "VER TODAS LAS RUTAS →")</span>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
     <!-- === EXPLORA A TU MANERA === -->
     <section class="section-explore-way">
         <div class="container-fluid">
@@ -123,15 +170,13 @@
                     var categoryImages = new Dictionary<string, string>
                     {
                         { "Senderismo", "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop" },
-                        { "Montañismo", "https://images.unsplash.com/photo-1506629082847-11b7fb5f2e5c?w=800&h=600&fit=crop" },
-                        { "Bosque", "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop" },
                         { "Trekking", "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=600&fit=crop" },
-                        { "Escalada", "https://images.unsplash.com/photo-1505228395891-9a51e7e86e81?w=800&h=600&fit=crop" },
-                        { "Alta montaña", "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=600&fit=crop" },
-                        { "Miradores naturales", "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&h=600&fit=crop" },
-                        { "Volcanes", "https://images.unsplash.com/photo-1505259785-1c0925491c8a?w=800&h=600&fit=crop" },
-                        { "Caminatas de naturaleza", "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop" },
-                        { "Trekking con camping", "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&h=600&fit=crop" }
+                        { "Montañismo", "https://images.unsplash.com/photo-1506629082847-11b7fb5f2e5c?w=800&h=600&fit=crop" },
+                        { "Bosque y naturaleza", "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop" },
+                        { "Volcanes y altura", "https://images.unsplash.com/photo-1505259785-1c0925491c8a?w=800&h=600&fit=crop" },
+                        { "Trekking con camping", "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&h=600&fit=crop" },
+                        { "Aventuras extremas", "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&h=600&fit=crop" },
+                        { "Escalada", "https://images.unsplash.com/photo-1521334884684-d9eb8eb55b91?w=800&h=600&fit=crop" }
                     };
                 }
 
@@ -259,56 +304,6 @@
         </div>
     </section>
 
-    <!-- === COMPARTE EL CAMINO (COMUNIDAD) === -->
-    <section class="section-community-share">
-        <div class="container-fluid">
-            <div class="section-header">
-                <h2 class="section-title">COMPARTE EL CAMINO</h2>
-                <p class="section-subtitle">
-                    Las mejores aventuras también se recuerdan a través de quienes las viven.
-                </p>
-            </div>
-
-            <div class="community-mosaic">
-                <!-- MOSAICO EDITORIAL: Fotografías de comunidad -->
-                <div class="mosaic-grid">
-                    <div class="mosaic-item large">
-                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop" alt="Comunidad trekking" loading="lazy">
-                        <div class="mosaic-caption">
-                            <span class="mosaic-user">montañista_boliviano</span>
-                            <span class="mosaic-route">Parque Nacional Tunari</span>
-                            <span class="mosaic-location">📍 Cochabamba</span>
-                        </div>
-                    </div>
-                    <div class="mosaic-item">
-                        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=600&fit=crop" alt="Senderismo en bosque" loading="lazy">
-                        <div class="mosaic-caption">
-                            <span class="mosaic-user">trekking_aventura</span>
-                            <span class="mosaic-route">Sendero Bosque</span>
-                            <span class="mosaic-location">📍 Tiquipaya</span>
-                        </div>
-                    </div>
-                    <div class="mosaic-item">
-                        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=600&fit=crop" alt="Montañismo" loading="lazy">
-                        <div class="mosaic-caption">
-                            <span class="mosaic-user">explorador_andino</span>
-                            <span class="mosaic-route">Ascenso Montaña</span>
-                            <span class="mosaic-location">📍 Andes</span>
-                        </div>
-                    </div>
-                    <div class="mosaic-item tall">
-                        <img src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=600&h=800&fit=crop" alt="Campamento" loading="lazy">
-                        <div class="mosaic-caption">
-                            <span class="mosaic-user">camping_life</span>
-                            <span class="mosaic-route">Noche en la montaña</span>
-                            <span class="mosaic-location">📍 Valle</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- === SECCIÓN EMOCIONAL === -->
     <section class="section-emotional-impact">
         <!-- IMAGEN EMOCIONAL: Persona caminando hacia montaña -->
@@ -317,20 +312,6 @@
             <div class="emotional-content">
                 <h2 class="emotional-title">NO TODOS LOS CAMINOS APARECEN EN UN MAPA.</h2>
                 <p class="emotional-subtitle">Algunos se encuentran caminando.</p>
-                <a asp-controller="Services" asp-action="Index" class="emotional-cta">DESCUBRE TU PRÓXIMA RUTA →</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- === CTA FINAL === -->
-    <section class="section-final-cta">
-        <div class="container-fluid">
-            <div class="final-cta-container">
-                <h2 class="final-cta-title">¿LISTO PARA SALIR DE LA RUTINA?</h2>
-                <p class="final-cta-text">
-                    Encuentra un nuevo camino y empieza tu próxima aventura con nosotros.
-                </p>
-                <a asp-controller="Services" asp-action="Index" class="final-cta-btn">EXPLORAR RUTAS</a>
             </div>
         </div>
     </section>
@@ -378,6 +359,30 @@
             </div>
         </div>
     </footer>
+
+    <!-- === BARRA INFERIOR MÓVIL === -->
+    <nav class="mobile-bottom-nav">
+        <a asp-controller="Home" asp-action="Index" class="mobile-nav-item active">
+            <i class="fas fa-home"></i><span>Inicio</span>
+        </a>
+        <a asp-controller="Services" asp-action="Index" class="mobile-nav-item">
+            <i class="fas fa-map-marked-alt"></i><span>Explorar</span>
+        </a>
+        <a asp-controller="Products" asp-action="Index" class="mobile-nav-item">
+            <i class="fas fa-campground"></i><span>Productos</span>
+        </a>
+        <a asp-controller="Products" asp-action="Index" class="mobile-nav-item">
+            <i class="fas fa-shopping-cart"></i><span>Carrito</span>
+        </a>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a href="#profile" class="mobile-nav-item"><i class="fas fa-user"></i><span>Perfil</span></a>
+        }
+        else
+        {
+            <a asp-controller="Account" asp-action="Login" class="mobile-nav-item"><i class="fas fa-user"></i><span>Perfil</span></a>
+        }
+    </nav>
 
     <script src="~/js/home-new.js" asp-append-version="true"></script>
 </body>

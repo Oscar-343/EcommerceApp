@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EcommerceApp.Data;
 using EcommerceApp.Models;
+using System.Security.Claims;
 
 namespace EcommerceApp.Controllers
 {
@@ -96,9 +97,22 @@ namespace EcommerceApp.Controllers
                 .Select(p => (decimal?)(p.PromotionalPrice ?? p.Price))
                 .MaxAsync() ?? 0;
 
+            // Favoritos del usuario actual (para pintar el corazón activo/inactivo).
+            var favoriteProductIds = new List<int>();
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+                favoriteProductIds = await context.FavoriteItems
+                    .AsNoTracking()
+                    .Where(f => f.UserId == userId && f.Type == "Product")
+                    .Select(f => f.ItemId)
+                    .ToListAsync();
+            }
+
             var model = new ProductosViewModel
             {
                 Products = products,
+                FavoriteProductIds = favoriteProductIds,
                 ActiveCategory = category,
                 SearchTerm = search,
                 MinPrice = minPrice,

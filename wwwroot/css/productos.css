@@ -170,14 +170,14 @@ html, body {
 /* === HERO DE PRODUCTOS === */
 .productos-hero {
     position: relative;
-    height: 70vh;
-    min-height: 500px;
-    max-height: 700px;
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
     overflow: hidden;
     display: flex;
     align-items: center;
-    margin-top: 0;
     justify-content: center;
+    margin-top: 0;
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -403,7 +403,7 @@ html, body {
 /* === CATEGORÍAS === */
 .productos-categories {
     background-color: var(--productos-section);
-    padding: 5rem 0;
+    padding: 3rem 0;
 }
 
 .productos-categories__header {
@@ -436,7 +436,7 @@ html, body {
 
 .productos-category {
     position: relative;
-    height: 280px;
+    height: 210px;
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
@@ -508,7 +508,7 @@ html, body {
 
 .productos-category--featured {
     grid-column: span 2;
-    height: 320px;
+    height: 230px;
 }
 
 .productos-category--featured .productos-category__name {
@@ -547,6 +547,7 @@ html, body {
     max-width: 1600px;
     margin: 0 auto;
     padding: 0 2rem;
+    min-height: 600px;
 }
 
 /* === FILTROS === */
@@ -558,6 +559,9 @@ html, body {
     height: fit-content;
     position: sticky;
     top: 2rem;
+    min-height: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .productos-filters__title {

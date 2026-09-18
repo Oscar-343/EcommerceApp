@@ -436,8 +436,8 @@
 
             <div class="nav-actions">
                 <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
-                <a href="#favorites" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
-                <a asp-controller="Products" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
+                <a asp-controller="Favorites" asp-action="Index" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
+                <a asp-controller="Cart" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
                 <div class="nav-user">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
@@ -566,16 +566,18 @@
                     </div>
 
                     <!-- Acciones -->
-                    <div class="producto-info__actions">
-                        <button class="producto-info__btn producto-info__btn--primary" onclick="agregarAlCarrito(@Model.Id)">
-                            <span>🛒</span> AGREGAR AL CARRITO
-                        </button>
-                        <button class="producto-info__btn producto-info__btn--secondary" onclick="comprarAhora(@Model.Id)">
-                            COMPRAR AHORA
-                        </button>
-                        <button class="producto-info__favorite" id="favoriteBtn" onclick="toggleFavorito(@Model.Id)">
-                            ♡
-                        </button>
+                    <div class="producto-info__actions" style="flex-wrap: wrap; gap: 0.75rem;">
+                        <form asp-controller="Cart" asp-action="Add" method="post" style="flex: 1 1 60%;">
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <button type="submit" class="producto-info__btn producto-info__btn--primary" style="width:100%; padding: 0.9rem 1rem; font-size: 0.9rem;">
+                                <span>🛒</span> AGREGAR AL CARRITO
+                            </button>
+                        </form>
+                        <form asp-controller="Favorites" asp-action="Toggle" method="post" style="flex: 1 1 auto;">
+                            <input type="hidden" name="type" value="Product" />
+                            <input type="hidden" name="itemId" value="@Model.Id" />
+                            <button type="submit" class="producto-info__favorite" title="Guardar favorito" style="width: 48px; height: 48px; font-size: 1.4rem;">♡</button>
+                        </form>
                     </div>
                 }
                 else

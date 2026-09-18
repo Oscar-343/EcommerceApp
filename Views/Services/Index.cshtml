@@ -44,8 +44,8 @@
 
             <div class="nav-actions">
                 <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
-                <a href="#favorites" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
-                <a asp-controller="Products" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
+                <a asp-controller="Favorites" asp-action="Index" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
+                <a asp-controller="Cart" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
                 <div class="nav-user">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
@@ -124,7 +124,7 @@
                         </div>
                     </div>
 
-                    <div class="servicios-filter-group">
+                                        <div class="servicios-filter-group">
                         <h3 class="servicios-filter-label">Categoría</h3>
                         <div class="servicios-filter-options">
                             <a asp-action="Index" asp-route-region="@Model.ActiveRegion" asp-route-difficulty="@Model.ActiveDifficulty"
@@ -134,6 +134,22 @@
                                 <a asp-action="Index" asp-route-category="@cat" asp-route-region="@Model.ActiveRegion" asp-route-difficulty="@Model.ActiveDifficulty"
                                    class="servicios-filter-option @(Model.ActiveCategory == cat ? "servicios-filter-option--active" : "")">@cat</a>
                             }
+                        </div>
+                    </div>
+
+                    <div class="servicios-filter-group">
+                        <h3 class="servicios-filter-label">Duración</h3>
+                        <div class="servicios-filter-options">
+                            <a asp-action="Index" asp-route-region="@Model.ActiveRegion" asp-route-difficulty="@Model.ActiveDifficulty" asp-route-category="@Model.ActiveCategory"
+                               class="servicios-filter-option @(!Model.MinDuration.HasValue && !Model.MaxDuration.HasValue ? "servicios-filter-option--active" : "")">Todas</a>
+                            <a asp-action="Index" asp-route-maxduration="3" asp-route-region="@Model.ActiveRegion" asp-route-difficulty="@Model.ActiveDifficulty" asp-route-category="@Model.ActiveCategory"
+                               class="servicios-filter-option @(Model.MaxDuration == 3 && !Model.MinDuration.HasValue ? "servicios-filter-option--active" : "")">Hasta 3 horas</a>
+                            <a asp-action="Index" asp-route-minduration="3" asp-route-maxduration="6" asp-route-region="@Model.ActiveRegion" asp-route-difficulty="@Model.ActiveDifficulty" asp-route-category="@Model.ActiveCategory"
+                               class="servicios-filter-option @(Model.MinDuration == 3 && Model.MaxDuration == 6 ? "servicios-filter-option--active" : "")">3-6 horas</a>
+                            <a asp-action="Index" asp-route-minduration="6" asp-route-maxduration="10" asp-route-region="@Model.ActiveRegion" asp-route-difficulty="@Model.ActiveDifficulty" asp-route-category="@Model.ActiveCategory"
+                               class="servicios-filter-option @(Model.MinDuration == 6 && Model.MaxDuration == 10 ? "servicios-filter-option--active" : "")">6-10 horas</a>
+                            <a asp-action="Index" asp-route-minduration="10" asp-route-region="@Model.ActiveRegion" asp-route-difficulty="@Model.ActiveDifficulty" asp-route-category="@Model.ActiveCategory"
+                               class="servicios-filter-option @(Model.MinDuration == 10 && !Model.MaxDuration.HasValue ? "servicios-filter-option--active" : "")">Más de 10 horas</a>
                         </div>
                     </div>
                 </div>
@@ -184,8 +200,15 @@
                                             <span class="servicios-route-block__info-item">📍 @route.DistanceKm km</span>
                                         }
                                     </div>
-
-                                    <a asp-controller="Services" asp-action="Details" asp-route-id="@route.Id" class="servicios-route-block__cta">DESCUBRIR RUTA →</a>
+                                    <p class="servicios-route-block__price">Desde Bs. @route.Price.ToString("0") / persona</p>
+                                    <div class="servicios-route-block__actions" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                        <a asp-controller="Services" asp-action="Details" asp-route-id="@route.Id" class="servicios-route-block__cta">DESCUBRIR RUTA →</a>
+                                        <form asp-controller="Favorites" asp-action="Toggle" method="post" style="display: inline;">
+                                            <input type="hidden" name="type" value="Service" />
+                                            <input type="hidden" name="itemId" value="@route.Id" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">❤️ Favorito</button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                             alt = !alt;

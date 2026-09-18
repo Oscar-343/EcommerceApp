@@ -35,5 +35,8 @@ namespace EcommerceApp.Models
 
         // Ordenamiento actual: "featured", "newest", "price-asc", "price-desc"
         public string? OrderBy { get; set; } = "featured";
+
+        // Ids de productos que el usuario actual ya tiene en favoritos (vacío si no hay sesión).
+        public List<int> FavoriteProductIds { get; set; } = new();
     }
 }

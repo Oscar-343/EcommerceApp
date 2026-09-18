@@ -8,53 +8,29 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/EcommerceApp.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home-new.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tren-al-sur.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <!-- LOGO: reemplazá src por la URL de tu imagen (ej: /images/logo.png o https://...) -->
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+        <nav class="navbar-cinematic">
+            <div class="nav-container">
+                <a class="nav-logo" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg" alt="Logo" />
-                    Tren al Sur
+                    <span>Tren al Sur</span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Products" asp-action="Index">Tienda</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Categorías</a>
-                            <ul class="dropdown-menu">
-                                @foreach (var category in ProductCategories.All)
-                                {
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Products" asp-action="Index" asp-route-category="@category">@category</a>
-                                    </li>
-                                }
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Services" asp-action="Index">Servicios</a>
-                        </li>
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">Panel de administración</a>
-                            </li>
-                        }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
+                <ul class="nav-menu">
+                    <li><a class="nav-link" asp-controller="Products" asp-action="Index">Tienda</a></li>
+                    <li><a class="nav-link" asp-controller="Services" asp-action="Index">Servicios</a></li>
+                    <li><a class="nav-link" asp-controller="Cart" asp-action="Index">Carrito 🏔</a></li>
+                    <li><a class="nav-link" asp-controller="Favorites" asp-action="Index">Favoritos ❤️</a></li>
+                    <li><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li><a class="nav-link" asp-controller="Admin" asp-action="Index">Admin</a></li>
+                    }
+                </ul>
             </div>
         </nav>
     </header>

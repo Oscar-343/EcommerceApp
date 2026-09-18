@@ -183,7 +183,8 @@ body, html {
 .servicios-hero {
     position: relative;
     height: 100vh;
-    min-height: 600px;
+    min-height: 100vh;
+    max-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -219,6 +220,9 @@ body, html {
     text-align: center;
     animation: heroFadeIn 1.2s var(--sv-ease) forwards;
     opacity: 0;
+    justify-content:center;
+    align-items:center;
+    margin:20px;
 }
 
 @keyframes heroFadeIn {
@@ -234,25 +238,24 @@ body, html {
 
 .servicios-hero__title {
     font-family: var(--sv-font-display);
-    font-size: 4rem;
+    font-size: 3.25rem;
     font-weight: 700;
     letter-spacing: 0.03em;
-    margin: 0 0 1.5rem;
-    line-height: 1.1;
+    margin: 0 0 1.2rem;
+    line-height: 1.15;
     color: var(--sv-text-primary);
     text-transform: uppercase;
-    max-width: 900px;
+    max-width: 800px;
 }
 
 .servicios-hero__subtitle {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     color: var(--sv-text-secondary);
-    margin: 0 0 2.5rem;
-    max-width: 700px;
+    margin: 0 0 2rem;
+    max-width: 620px;
     line-height: 1.6;
     font-weight: 300;
 }
-
 .servicios-hero__cta {
     display: inline-block;
     padding: 0.9rem 2.5rem;
@@ -291,9 +294,9 @@ body, html {
     position: relative;
     z-index: 3;
     display: flex;
-    gap: 3.5rem;
-    margin-top: 3rem;
-    padding-top: 2rem;
+    gap: 3rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
     border-top: 1px solid rgba(241, 243, 241, 0.15);
 }
 
@@ -409,7 +412,7 @@ body, html {
 .servicios-route-block {
     display: flex;
     align-items: stretch;
-    min-height: 460px;
+    min-height: 380px;
     background: var(--sv-bg-block);
     border: 1px solid var(--sv-border);
     opacity: 0;
@@ -451,7 +454,7 @@ body, html {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 3.5rem;
+    padding: 2.75rem;
 }
 
 .servicios-route-block__meta {
@@ -474,12 +477,12 @@ body, html {
 
 .servicios-route-block__title {
     font-family: var(--sv-font-display);
-    font-size: 2.1rem;
+    font-size: 1.85rem;
     font-weight: 700;
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--sv-text-primary);
-    margin-bottom: 1rem;
+    margin-bottom: 0.85rem;
     line-height: 1.15;
 }
 
@@ -506,74 +509,80 @@ body, html {
     align-items: center;
     gap: 0.4rem;
 }
+.servicios-route-block__price {
+    font-size: 0.85rem;
+    color: var(--sv-text-secondary);
+    margin-bottom: 1rem;
+    letter-spacing: 0.02em;
+}
 
 .servicios-route-block__cta {
-    align-self: flex-start;
-    font-family: var(--sv-font-display);
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--sv-text-primary);
-    text-decoration: none;
-    padding-bottom: 0.4rem;
-    border-bottom: 2px solid var(--sv-green-main);
-    transition: all 0.3s ease;
-}
-
-    .servicios-route-block__cta:hover {
-        border-color: var(--sv-green-hover);
-        letter-spacing: 0.12em;
+    .servicios-route-block__cta {
+        align-self: flex-start;
+        font-family: var(--sv-font-display);
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--sv-text-primary);
+        text-decoration: none;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--sv-green-main);
+        transition: all 0.3s ease;
     }
 
-.servicios-no-routes {
-    text-align: center;
-    padding: 4rem 0;
-    color: var(--sv-text-secondary);
-    font-size: 1rem;
-}
+        .servicios-route-block__cta:hover {
+            border-color: var(--sv-green-hover);
+            letter-spacing: 0.12em;
+        }
 
-/* =========================================================
+    .servicios-no-routes {
+        text-align: center;
+        padding: 4rem 0;
+        color: var(--sv-text-secondary);
+        font-size: 1rem;
+    }
+    /* =========================================================
    RESPONSIVE
    ========================================================= */
-@media (max-width: 900px) {
-    .servicios-hero__title {
-        font-size: 2.6rem;
+    @media (max-width: 900px) {
+        .servicios-hero__title {
+            font-size: 2.6rem;
+        }
+
+        .servicios-hero__stats {
+            gap: 2rem;
+        }
+
+        .servicios-route-block,
+        .servicios-route-block--alt {
+            flex-direction: column;
+            min-height: auto;
+        }
+
+        .servicios-route-block__image {
+            min-height: 260px;
+        }
+
+        .servicios-route-block__content {
+            padding: 2rem;
+        }
     }
 
-    .servicios-hero__stats {
-        gap: 2rem;
-    }
+    @media (max-width: 480px) {
+        .servicios-hero__stats {
+            gap: 1.25rem;
+        }
 
-    .servicios-route-block,
-    .servicios-route-block--alt {
-        flex-direction: column;
-        min-height: auto;
-    }
+        .servicios-hero__stat-number {
+            font-size: 1.6rem;
+        }
 
-    .servicios-route-block__image {
-        min-height: 260px;
-    }
+        .servicios-route-block__title {
+            font-size: 1.6rem;
+        }
 
-    .servicios-route-block__content {
-        padding: 2rem;
+        .servicios-route-block__content {
+            padding: 1.5rem;
+        }
     }
-}
-
-@media (max-width: 480px) {
-    .servicios-hero__stats {
-        gap: 1.25rem;
-    }
-
-    .servicios-hero__stat-number {
-        font-size: 1.6rem;
-    }
-
-    .servicios-route-block__title {
-        font-size: 1.6rem;
-    }
-
-    .servicios-route-block__content {
-        padding: 1.5rem;
-    }
-}

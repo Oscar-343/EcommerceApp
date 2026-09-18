@@ -1,0 +1,67 @@
+@model List<EcommerceApp.Models.FavoriteItem>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Mis favoritos";
+    var products = ViewBag.Products as List<EcommerceApp.Models.Product> ?? new();
+    var services = ViewBag.Services as List<EcommerceApp.Models.Service> ?? new();
+}
+<link rel="stylesheet" href="~/css/favoritos.css" asp-append-version="true" />
+
+<div class="container fav-page" style="padding: 2rem 0;">
+    <section class="fav-hero">
+        <h1 class="fav-title">Mis favoritos</h1>
+        <p class="fav-sub">Productos y rutas que guardaste para después.</p>
+    </section>
+    <div class="fav-grid" style="margin-top: 2rem; gap: 1rem;">
+        @if (!Model.Any())
+        {
+            <div class="fav-empty-state" style="width: 100%;">
+                <h3 style="color: var(--fav-sand); font-family: 'Outfit'; font-weight: 700;">Aún no tenés favoritos</h3>
+                <p>Explorá productos o rutas y hacé clic en el corazón para guardarlos.</p>
+                <a asp-controller="Products" asp-action="Index" class="cart-btn-primary" style="margin-top: 1rem; display: inline-block; width: auto;">Ver tienda</a>
+            </div>
+        }
+        else
+        {
+            @foreach (var fav in Model)
+            {
+                if (fav.Type == "Product")
+                {
+                    var p = products.FirstOrDefault(x => x.Id == fav.ItemId);
+                    if (p != null)
+                    {
+                        <div class="fav-card">
+                            <img src="@(p.ImageUrl ?? "/images/default-product.jpg")" alt="" />
+                            <h4>@p.Name</h4>
+                            <div class="meta">@p.Category</div>
+                            <div class="price">@p.Price.ToString("C")</div>
+                            <form asp-action="Toggle" method="post">
+                                <input type="hidden" name="type" value="Product" />
+                                <input type="hidden" name="itemId" value="@p.Id" />
+                                <button type="submit" class="fav-btn-remove">Eliminar de favoritos</button>
+                            </form>
+                        </div>
+                    }
+                }
+                else if (fav.Type == "Service")
+                {
+                    var s = services.FirstOrDefault(x => x.Id == fav.ItemId);
+                    if (s != null)
+                    {
+                        <div class="fav-card">
+                            <img src="@(s.ImageUrl ?? "/images/default-product.jpg")" alt="" />
+                            <h4>@s.Name</h4>
+                            <div class="meta">@s.Category · @s.Region</div>
+                            <div class="price">@s.Price.ToString("C")</div>
+                            <form asp-action="Toggle" method="post">
+                                <input type="hidden" name="type" value="Service" />
+                                <input type="hidden" name="itemId" value="@s.Id" />
+                                <button type="submit" class="fav-btn-remove">Eliminar de favoritos</button>
+                            </form>
+                        </div>
+                    }
+                }
+            }
+        }
+    </div>
+</div>

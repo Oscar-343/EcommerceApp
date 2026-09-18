@@ -16,6 +16,7 @@ namespace EcommerceApp.Controllers
             string? region = null,
             string? difficulty = null,
             string? category = null,
+            double? minDuration = null,
             double? maxDuration = null,
             string? search = null)
         {
@@ -41,10 +42,15 @@ namespace EcommerceApp.Controllers
                 servicesQuery = servicesQuery.Where(s => s.Category == category);
             }
 
-            // Filtro por duración máxima
+            // Filtro por rango de duración
+            if (minDuration.HasValue)
+            {
+                servicesQuery = servicesQuery.Where(s =>
+                    s.DurationHours.HasValue && s.DurationHours >= minDuration);
+            }
             if (maxDuration.HasValue)
             {
-                servicesQuery = servicesQuery.Where(s => 
+                servicesQuery = servicesQuery.Where(s =>
                     s.DurationHours.HasValue && s.DurationHours <= maxDuration);
             }
 
@@ -101,6 +107,7 @@ namespace EcommerceApp.Controllers
                 ActiveRegion = region,
                 ActiveDifficulty = difficulty,
                 ActiveCategory = category,
+                MinDuration = minDuration,
                 MaxDuration = maxDuration,
                 SearchTerm = search,
                 TotalRoutes = totalRoutes,
@@ -187,8 +194,14 @@ namespace EcommerceApp.Controllers
             };
 
             // TODO: Obtener productos recomendados relacionados con esta ruta
-            // Por ahora dejamos la lista vacía, se implementará después
-            var recommendedProducts = new List<Product>();
+            var equipmentCategories = new[] { "Bolsos y mochilas", "Equipamiento", "Tiendas de campaña", "Ropa de abrigo" };
+            var recommendedProducts = await context.Products.AsNoTracking()
+                .Where(p => p.Stock > 0 && p.Category != null && equipmentCategories.Contains(p.Category))
+                .OrderByDescending(p => p.IsBestSeller)
+                .ThenByDescending(p => p.IsFeatured)
+                .ThenByDescending(p => p.CreatedAt)
+                .Take(4)
+                .ToListAsync();
 
             var model = new ServicioDetalleViewModel
             {

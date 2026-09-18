@@ -17,7 +17,8 @@ namespace EcommerceApp.Models
         // Categoría activa (filtro)
         public string? ActiveCategory { get; set; }
 
-        // Duración máxima en horas (filtro)
+        // Duración mínima y máxima en horas (filtro por rango)
+        public double? MinDuration { get; set; }
         public double? MaxDuration { get; set; }
 
         // Búsqueda

@@ -49,8 +49,8 @@
 
             <div class="nav-actions">
                 <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
-                <a href="#favorites" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
-                <a asp-controller="Products" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
+                <a asp-controller="Favorites" asp-action="Index" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
+                <a asp-controller="Cart" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
                 <div class="nav-user">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
@@ -186,14 +186,24 @@
                 
                 <div class="ruta-map-section">
                     <!-- Mapa placeholder para integración futura (Leaflet, Google Maps, etc.) -->
-                    <div class="ruta-map" id="rutaMap">
-                        <!-- Comentado: integración futura de mapa
-                        <div id="map" class="ruta-map__canvas"></div>
-                        -->
-                        <div class="ruta-map__placeholder">
-                            <p>Mapa interactivo del recorrido</p>
-                            <small>Preparado para integración de Google Maps o Leaflet</small>
-                        </div>
+                                        <div class="ruta-map" id="rutaMap" data-lat-inicio="@Model.Service.StartLatitude" data-lng-inicio="@Model.Service.StartLongitude" data-lat-fin="@Model.Service.EndLatitude" data-lng-fin="@Model.Service.EndLongitude">
+                        <!-- Representación visual del recorrido.
+                             Cuando se integre una API real (Leaflet / Google Maps), este SVG
+                             se reemplaza por el canvas del mapa; el contenedor #rutaMap y los
+                             data-attributes con las coordenadas ya quedan preparados para eso. -->
+                        <svg viewBox="0 0 600 400" class="ruta-map__visual" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Representación del recorrido de la ruta">
+                            <path d="M0,90 Q150,50 300,90 T600,90" class="ruta-map__contour"></path>
+                            <path d="M0,190 Q150,150 300,190 T600,190" class="ruta-map__contour"></path>
+                            <path d="M0,300 Q150,265 300,300 T600,300" class="ruta-map__contour"></path>
+
+                            <path d="M90,320 C 190,270 210,150 500,70" class="ruta-map__trail"></path>
+
+                            <circle cx="90" cy="320" r="9" class="ruta-map__point ruta-map__point--start"></circle>
+                            <text x="90" y="345" class="ruta-map__label">INICIO</text>
+
+                            <circle cx="500" cy="70" r="9" class="ruta-map__point ruta-map__point--end"></circle>
+                            <text x="500" y="52" class="ruta-map__label">FIN</text>
+                        </svg>
                     </div>
 
                     <div class="ruta-map-info">

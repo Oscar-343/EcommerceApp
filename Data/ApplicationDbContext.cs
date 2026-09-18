@@ -13,6 +13,8 @@ namespace EcommerceApp.Data
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Guide> Guides { get; set; }
         public DbSet<Transport> Transports { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<FavoriteItem> FavoriteItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

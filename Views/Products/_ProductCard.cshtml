@@ -20,5 +20,18 @@
         }
 
         <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info mt-auto">Ver detalle</a>
+
+        <!-- Botones de carrito y favoritos -->
+        <div class="d-flex gap-2 mt-2">
+            <form asp-controller="Cart" asp-action="Add" method="post" style="display:inline;">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <button type="submit" class="btn btn-success btn-sm flex-grow-1">🛒 Carrito</button>
+            </form>
+            <form asp-controller="Favorites" asp-action="Toggle" method="post" style="display:inline;">
+                <input type="hidden" name="type" value="Product" />
+                <input type="hidden" name="itemId" value="@Model.Id" />
+                <button type="submit" class="btn btn-outline-danger btn-sm">❤️</button>
+            </form>
+        </div>
     </div>
 </div>

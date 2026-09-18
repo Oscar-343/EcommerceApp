@@ -1,0 +1,65 @@
+@model List<EcommerceApp.Models.CartItem>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Tu carrito";
+}
+<link rel="stylesheet" href="~/css/carrito.css" asp-append-version="true" />
+
+<div class="container cart-page" style="padding: 2rem 0;">
+    <section class="cart-hero">
+        <h1 class="cart-title">Tu carrito 🏔</h1>
+        <p class="cart-sub">Productos seleccionados para tu aventura.</p>
+    </section>
+
+    <div class="row" style="margin-top: 2rem;">
+        <div class="col-md-8">
+            @if (!Model.Any())
+            {
+                <div class="cart-empty-state">
+                    <h3 style="color: var(--cart-sand); font-family: 'Outfit'; font-weight: 700;">Tu carrito está vacío</h3>
+                    <p>Explorá nuestra tienda y agregá productos de senderismo.</p>
+                    <a asp-controller="Products" asp-action="Index" class="cart-btn-primary" style="margin-top: 1rem; display: inline-block; width: auto;">Ver tienda</a>
+                </div>
+            }
+            else
+            {
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    @foreach (var item in Model)
+                    {
+                        var p = item.Product;
+                        <div style="display: flex; gap: 1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.8rem; padding: 1rem; transition: transform 0.2s ease; align-items: center;">
+                            <img src="@(p?.ImageUrl ?? "/images/default-product.jpg")" style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;" alt="" />
+                            <div style="flex: 1;">
+                                <h4 style="color: var(--sand); font-family: 'Outfit'; margin: 0;">@p?.Name</h4>
+                                <div style="color: var(--text-secondary); font-size: 0.85rem;">@p?.Category</div>
+                                <div style="margin-top: 0.3rem; font-weight: 600; color: #fff;">@item.UnitPrice.ToString("C") c/u</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span>@item.Quantity</span>
+                                <form asp-action="Remove" method="post" style="display: inline;">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">✕</button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="col-md-4">
+            <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); position: sticky; top: 1rem;">
+                <h3 style="font-family: 'Outfit'; color: var(--sand);">Resumen</h3>
+                <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                    <span>Subtotal</span>
+                    <strong>@ViewBag.Total.ToString("C")</strong>
+                </div>
+                <hr style="border-color: rgba(255,255,255,0.1);" />
+                <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; color: #fff;">
+                    <span>Total estimado</span>
+                    <span>@ViewBag.Total.ToString("C")</span>
+                </div>
+                <a asp-controller="Account" asp-action="Login" class="btn-admin btn-admin-primary" style="width: 100%; margin-top: 1rem; display: block; text-align: center;">Finalizar compra</a>
+            </div>
+        </div>
+    </div>
+</div>
