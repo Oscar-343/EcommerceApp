@@ -94,6 +94,10 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await ProductSeeder.SeedProductsAsync(context);
     await ServiceSeeder.SeedServicesAsync(context);
+
+    // Cuenta de administración
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    await AdminSeeder.SeedAdminAsync(userManager, roleManager);
 }
 
 app.Run();
