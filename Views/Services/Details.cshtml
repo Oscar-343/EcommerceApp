@@ -338,9 +338,50 @@
                     </p>
                 </div>
 
-                <button class="ruta-cta-button" disabled title="Próximamente">
-                    Reservas próximamente
-                </button>
+                @if (!Model.IsAvailable)
+                {
+                    <button class="ruta-cta-button" disabled title="Ruta no disponible">
+                        Ruta no disponible
+                    </button>
+                }
+                else if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form asp-controller="Reservations" asp-action="Create" method="post" style="display:flex; flex-wrap:wrap; gap:0.75rem; align-items:flex-end;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="serviceId" value="@Model.Service.Id" />
+                        <div>
+                            <label style="display:block; font-size:0.8rem; margin-bottom:0.2rem;">Fecha de salida</label>
+                            <input type="date" name="tripDate" id="tripDate" min="@DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd")" required style="padding:0.5rem;" />
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.8rem; margin-bottom:0.2rem;">Personas</label>
+                            <input type="number" name="peopleCount" id="peopleCount" min="1" max="@Model.Service.MaxGroupSize" value="1" required style="padding:0.5rem; width:80px;" />
+                        </div>
+                        <div style="font-size:0.9rem;">
+                            Total estimado: <strong id="totalEstimado">@PriceFormatter.Format(Model.Service.Price)</strong>
+                        </div>
+                        <button type="submit" class="ruta-cta-button">Reservar</button>
+                    </form>
+                    <script>
+                        // Recalcula el total estimado en el cliente; el servidor igual lo vuelve a calcular.
+                        (function () {
+                            var precio = @Model.Service.Price.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            var personas = document.getElementById('peopleCount');
+                            var totalEl = document.getElementById('totalEstimado');
+                            personas.addEventListener('input', function () {
+                                var n = parseInt(personas.value, 10) || 0;
+                                totalEl.textContent = 'Bs. ' + (precio * n).toFixed(2);
+                            });
+                        })();
+                    </script>
+                }
+                else
+                {
+                    <a class="ruta-cta-button" asp-controller="Account" asp-action="Login"
+                       asp-route-returnUrl="@Url.Action("Details", "Services", new { id = Model.Service.Id })">
+                        Inicia sesión para reservar
+                    </a>
+                }
             </div>
         </section>
 

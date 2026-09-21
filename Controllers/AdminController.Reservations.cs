@@ -27,28 +27,36 @@ namespace EcommerceApp.Controllers
             }
 
             ViewBag.StatusFilter = status;
-            var reservations = await query.OrderByDescending(r => r.BookingDate).ToListAsync();
+            var reservations = await query.OrderByDescending(r => r.TripDate).ToListAsync();
             return View(reservations);
         }
 
+        // Transiciones válidas: Pendiente->Recorrido->Acabado; Pendiente o Recorrido->Cancelado.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReservationUpdateStatus(string userId, int serviceId, string status)
+        public async Task<IActionResult> ReservationUpdateStatus(int id, string status)
         {
-            var estadosValidos = new[] { "Pendiente", "Recorrido", "Acabado", "Cancelado" };
-            if (!estadosValidos.Contains(status))
+            var reservation = await context.Reservations.FindAsync(id);
+            if (reservation == null) return NotFound();
+
+            var transicionValida =
+                (reservation.Status == "Pendiente" && (status == "Recorrido" || status == "Cancelado")) ||
+                (reservation.Status == "Recorrido" && (status == "Acabado" || status == "Cancelado"));
+
+            if (!transicionValida)
             {
-                TempData["Success"] = "Estado no válido.";
+                TempData["Success"] = $"No se puede pasar de \"{reservation.Status}\" a \"{status}\".";
                 return RedirectToAction(nameof(Reservations));
             }
 
-            var reservation = await context.Reservations.FindAsync(userId, serviceId);
-            if (reservation != null)
+            if (status == "Acabado")
             {
-                reservation.Status = status;
-                await context.SaveChangesAsync();
-                TempData["Success"] = "Estado de la reserva actualizado.";
+                reservation.CompletedAt = DateTime.UtcNow;
             }
+
+            reservation.Status = status;
+            await context.SaveChangesAsync();
+            TempData["Success"] = "Estado de la reserva actualizado.";
             return RedirectToAction(nameof(Reservations));
         }
 
@@ -58,14 +66,7 @@ namespace EcommerceApp.Controllers
         {
             ViewData["Title"] = "Nueva reserva";
             ViewData["Subtitle"] = "Reservas";
-            ViewBag.Usuarios = await context.Users.AsNoTracking()
-                .Select(u => new { u.Id, Email = u.Email ?? u.UserName ?? "", u.FullName })
-                .OrderBy(u => u.Email)
-                .ToListAsync();
-            ViewBag.Servicios = await context.Services.AsNoTracking()
-                .Where(s => s.Status == "Active")
-                .OrderBy(s => s.Name)
-                .ToListAsync();
+            await LoadReservationLookupsAsync();
             // Se pasa modelo vacío para que el formulario no falle con null
             return View(new Reservation());
         }
@@ -83,11 +84,12 @@ namespace EcommerceApp.Controllers
                 return View(reservation);
             }
 
-            // Verificar que no exista otra reserva para el mismo usuario-servicio (clave compuesta).
-            var exists = await context.Reservations.AnyAsync(r => r.UserId == reservation.UserId && r.ServiceId == reservation.ServiceId);
+            // Verificar que no exista otra reserva para el mismo usuario, servicio y fecha de salida.
+            var exists = await context.Reservations.AnyAsync(r =>
+                r.UserId == reservation.UserId && r.ServiceId == reservation.ServiceId && r.TripDate == reservation.TripDate);
             if (exists)
             {
-                ModelState.AddModelError(string.Empty, "Ya existe una reserva para este usuario con este servicio. Use edición para modificarla.");
+                ModelState.AddModelError(string.Empty, "Ya existe una reserva para este usuario, ruta y fecha de salida. Use edición para modificarla.");
                 await LoadReservationLookupsAsync();
                 return View(reservation);
             }
@@ -103,17 +105,17 @@ namespace EcommerceApp.Controllers
 
             context.Reservations.Add(reservation);
             await context.SaveChangesAsync();
-            TempData["Success"] = $"Reserva creada correctamente para {reservation.UserId} en la ruta {reservation.ServiceId}.";
+            TempData["Success"] = "Reserva creada correctamente.";
             return RedirectToAction(nameof(Reservations));
         }
 
         // Muestra el formulario para editar una reserva existente.
         [HttpGet]
-        public async Task<IActionResult> ReservationEdit(string userId, int serviceId)
+        public async Task<IActionResult> ReservationEdit(int id)
         {
             ViewData["Title"] = "Editar reserva";
             ViewData["Subtitle"] = "Reservas";
-            var reservation = await context.Reservations.FindAsync(userId, serviceId);
+            var reservation = await context.Reservations.FindAsync(id);
             if (reservation == null) return NotFound();
             await LoadReservationLookupsAsync();
             return View(reservation);
@@ -122,12 +124,11 @@ namespace EcommerceApp.Controllers
         // Guarda los cambios de una reserva existente.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReservationEdit(string userId, int serviceId, Reservation reservation)
+        public async Task<IActionResult> ReservationEdit(int id, Reservation reservation)
         {
             ViewData["Title"] = "Editar reserva";
             ViewData["Subtitle"] = "Reservas";
-            if (reservation.UserId != userId || reservation.ServiceId != serviceId)
-                return NotFound();
+            if (reservation.Id != id) return NotFound();
 
             if (!ModelState.IsValid)
             {
@@ -135,41 +136,49 @@ namespace EcommerceApp.Controllers
                 return View(reservation);
             }
 
-            var existing = await context.Reservations.FindAsync(userId, serviceId);
+            var existing = await context.Reservations.FindAsync(id);
             if (existing == null) return NotFound();
 
             // Convertir fecha a UTC para evitar error de PostgreSQL con DateTime Kind=Unspecified
             if (reservation.BookingDate.Kind == DateTimeKind.Unspecified)
                 reservation.BookingDate = DateTime.SpecifyKind(reservation.BookingDate, DateTimeKind.Utc);
 
+            existing.UserId = reservation.UserId;
+            existing.ServiceId = reservation.ServiceId;
+            existing.TripDate = reservation.TripDate;
             existing.PeopleCount = reservation.PeopleCount;
             existing.UnitPrice = reservation.UnitPrice;
             existing.TotalPrice = reservation.UnitPrice * reservation.PeopleCount;
             existing.Status = reservation.Status;
             existing.BookingDate = reservation.BookingDate;
 
-            context.Reservations.Update(existing);
             await context.SaveChangesAsync();
             TempData["Success"] = "Reserva actualizada correctamente.";
             return RedirectToAction(nameof(Reservations));
         }
 
-        // Elimina permanentemente una reserva.
+        // Elimina permanentemente una reserva. Una reserva Acabado representa un ingreso ya
+        // contado y no se puede borrar; Pendiente y Cancelado sí.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReservationDelete(string userId, int serviceId)
+        public async Task<IActionResult> ReservationDelete(int id)
         {
-            var reservation = await context.Reservations.FindAsync(userId, serviceId);
-            if (reservation != null)
-            {
-                context.Reservations.Remove(reservation);
-                await context.SaveChangesAsync();
-                TempData["Success"] = "Reserva eliminada permanentemente.";
-            }
-            else
+            var reservation = await context.Reservations.FindAsync(id);
+            if (reservation == null)
             {
                 TempData["Success"] = "Reserva no encontrada.";
+                return RedirectToAction(nameof(Reservations));
             }
+
+            if (reservation.Status == "Acabado")
+            {
+                TempData["Success"] = "No se puede eliminar una reserva Acabado.";
+                return RedirectToAction(nameof(Reservations));
+            }
+
+            context.Reservations.Remove(reservation);
+            await context.SaveChangesAsync();
+            TempData["Success"] = "Reserva eliminada permanentemente.";
             return RedirectToAction(nameof(Reservations));
         }
 

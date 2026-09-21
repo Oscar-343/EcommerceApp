@@ -18,6 +18,7 @@
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <li><a class="nav-link @(currentController == "Orders" ? "active" : "")" asp-controller="Orders" asp-action="Index">Mis pedidos</a></li>
+                <li><a class="nav-link @(currentController == "Reservations" ? "active" : "")" asp-controller="Reservations" asp-action="Index">Mis reservas</a></li>
             }
             @if (User.IsInRole("Admin"))
             {

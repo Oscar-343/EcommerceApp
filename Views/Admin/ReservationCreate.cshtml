@@ -61,6 +61,12 @@
                 </div>
 
                 <div class="form-field">
+                    <label asp-for="TripDate">Fecha de salida</label>
+                    <input asp-for="TripDate" class="form-control" type="date" />
+                    <span asp-validation-for="TripDate" class="text-danger"></span>
+                </div>
+
+                <div class="form-field">
                     <label asp-for="BookingDate">Fecha de reserva</label>
                     <input asp-for="BookingDate" class="form-control" type="datetime-local" />
                     <span asp-validation-for="BookingDate" class="text-danger"></span>

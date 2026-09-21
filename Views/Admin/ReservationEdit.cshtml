@@ -18,8 +18,7 @@
     <form asp-action="ReservationEdit" method="post" class="admin-form">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         
-        <input type="hidden" asp-for="UserId" />
-        <input type="hidden" asp-for="ServiceId" />
+        <input type="hidden" asp-for="Id" />
         
         <div class="admin-form-section">
             <h3>Datos del usuario</h3>
@@ -62,7 +61,13 @@
                     <input asp-for="PeopleCount" class="form-control" type="number" min="1" />
                     <span asp-validation-for="PeopleCount" class="text-danger"></span>
                 </div>
-                
+
+                <div class="form-field">
+                    <label asp-for="TripDate">Fecha de salida</label>
+                    <input asp-for="TripDate" class="form-control" type="date" />
+                    <span asp-validation-for="TripDate" class="text-danger"></span>
+                </div>
+
                 <div class="form-field">
                     <label asp-for="BookingDate">Fecha de reserva</label>
                     <input asp-for="BookingDate" class="form-control" type="datetime-local" />

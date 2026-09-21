@@ -44,6 +44,7 @@
                     <tr>
                         <th>Cliente</th>
                         <th>Ruta</th>
+                        <th>Fecha de salida</th>
                         <th>Fecha de reserva</th>
                         <th>Personas</th>
                         <th>Precio unitario</th>
@@ -61,14 +62,14 @@
                                 <div class="cell-muted" style="font-size:0.76rem;">@(r.User?.Email ?? r.UserId)</div>
                             </td>
                             <td>@(r.Service?.Name ?? "Ruta eliminada")</td>
+                            <td class="cell-muted">@r.TripDate.ToString("dd/MM/yyyy")</td>
                             <td class="cell-muted">@r.BookingDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                             <td>@r.PeopleCount</td>
                             <td class="cell-muted">@PriceFormatter.Format(r.UnitPrice)</td>
                             <td><strong>@PriceFormatter.Format(r.TotalPrice)</strong></td>
                             <td>
                                 <form asp-action="ReservationUpdateStatus" method="post" style="display:flex; gap:0.4rem; align-items:center;">
-                                    <input type="hidden" name="userId" value="@r.UserId" />
-                                    <input type="hidden" name="serviceId" value="@r.ServiceId" />
+                                    <input type="hidden" name="id" value="@r.Id" />
                                     <select name="status" class="form-select" style="min-width:130px; padding:0.3rem 0.6rem; font-size:0.78rem;" onchange="this.form.submit()">
                                         @foreach (var s in statuses)
                                         {
@@ -78,10 +79,9 @@
                                 </form>
                             </td>
                             <td>
-                                <a asp-action="ReservationEdit" asp-route-userid="@r.UserId" asp-route-serviceid="@r.ServiceId" class="btn btn-sm btn-outline-primary" style="margin-right:0.3rem;">Editar</a>
+                                <a asp-action="ReservationEdit" asp-route-id="@r.Id" class="btn btn-sm btn-outline-primary" style="margin-right:0.3rem;">Editar</a>
                                 <form asp-action="ReservationDelete" method="post" style="display:inline;">
-                                    <input type="hidden" name="userId" value="@r.UserId" />
-                                    <input type="hidden" name="serviceId" value="@r.ServiceId" />
+                                    <input type="hidden" name="id" value="@r.Id" />
                                     <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar esta reserva permanentemente?')">Eliminar</button>
                                 </form>
                             </td>

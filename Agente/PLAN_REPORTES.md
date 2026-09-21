@@ -86,17 +86,17 @@ Este plan **reemplaza** las restricciones del plan anterior ("no implementes res
 
 Problemas de hoy: la clave `(UserId, ServiceId)` permite una sola reserva por ruta y no existe fecha de salida.
 
-- [ ] `Reservation`: nueva PK `Id` (identity), `TripDate` (`DateOnly`, fecha de salida), `CompletedAt` (`DateTime?`). Índice **único** `(UserId, ServiceId, TripDate)`. Conserva `BookingDate`, `PeopleCount`, `UnitPrice`, `TotalPrice` y `Status` con sus anotaciones.
-- [ ] **Migración cuidadosa:** la tabla ya tiene filas, cambia de PK y el SQL debe dar valor a `TripDate` en las existentes (usa la fecha de `BookingDate`). Revisa el SQL generado, muéstramelo y **detente**. No la apliques.
-- [ ] Actualizar `AdminController` (Reservas) a la nueva clave: rutas y vistas con `id` en vez de `userId + serviceId`. Formularios crear/editar con `TripDate`.
-- [ ] `ReservationsController` (`[Authorize]`):
+- [x] `Reservation`: nueva PK `Id` (identity), `TripDate` (`DateOnly`, fecha de salida), `CompletedAt` (`DateTime?`). Índice **único** `(UserId, ServiceId, TripDate)`. Conserva `BookingDate`, `PeopleCount`, `UnitPrice`, `TotalPrice` y `Status` con sus anotaciones.
+- [x] **Migración cuidadosa:** la tabla ya tiene filas, cambia de PK y el SQL debe dar valor a `TripDate` en las existentes (usa la fecha de `BookingDate`). Revisa el SQL generado, muéstramelo y **detente**. No la apliques.
+- [x] Actualizar `AdminController` (Reservas) a la nueva clave: rutas y vistas con `id` en vez de `userId + serviceId`. Formularios crear/editar con `TripDate`.
+- [x] `ReservationsController` (`[Authorize]`):
   - `Create` (POST): valida ruta `Active`, `TripDate` desde mañana, personas de 1 a `MaxGroupSize` y la **capacidad de esa fecha** (decisión 7). El servidor asigna `UnitPrice = Service.Price`, `TotalPrice = UnitPrice × PeopleCount`, `Status = "Pendiente"`, `BookingDate = UtcNow`.
   - `Index`: "Mis reservas", con estado, fecha de salida y total.
   - `Cancel`: solo reservas propias en `Pendiente`.
-- [ ] `Services/Details.cshtml`: reemplazar el botón deshabilitado por un formulario (fecha + personas) para usuarios con sesión. Para anónimos: "Inicia sesión para reservar", con `returnUrl` a esa misma página. Mostrar el total estimado.
-- [ ] **Cambio de estado en admin** (`ReservationUpdateStatus`): aplicar las transiciones de la decisión 4. Al pasar a `Acabado`, guardar `CompletedAt = UtcNow`. Rechazar transiciones inválidas con mensaje claro.
-- [ ] **No permitir borrar** una reserva `Acabado` (representa ingreso). Sí las `Pendiente` y `Cancelado`.
-- [ ] Enlace "Mis reservas" en la navbar y badge de pendientes en el admin (ya existe).
+- [x] `Services/Details.cshtml`: reemplazar el botón deshabilitado por un formulario (fecha + personas) para usuarios con sesión. Para anónimos: "Inicia sesión para reservar", con `returnUrl` a esa misma página. Mostrar el total estimado.
+- [x] **Cambio de estado en admin** (`ReservationUpdateStatus`): aplicar las transiciones de la decisión 4. Al pasar a `Acabado`, guardar `CompletedAt = UtcNow`. Rechazar transiciones inválidas con mensaje claro.
+- [x] **No permitir borrar** una reserva `Acabado` (representa ingreso). Sí las `Pendiente` y `Cancelado`.
+- [x] Enlace "Mis reservas" en la navbar y badge de pendientes en el admin (ya existe).
 
 ## Fase 4 — Base de reportes y los 4 reportes principales
 

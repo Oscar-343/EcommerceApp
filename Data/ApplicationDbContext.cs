@@ -35,12 +35,15 @@ namespace EcommerceApp.Data
                 .Property(s => s.Price)
                 .HasPrecision(18, 2);
 
-            // Clave compuesta (UserId, ServiceId) + relaciones de las reservas.
+            // PK propia por Id. Único (UserId, ServiceId, TripDate): mismo usuario y ruta
+            // pueden reservar en fechas distintas, pero no dos veces la misma fecha.
             modelBuilder.Entity<Reservation>(r =>
             {
-                r.HasKey(x => new { x.UserId, x.ServiceId });
+                r.HasKey(x => x.Id);
                 r.Property(x => x.UnitPrice).HasPrecision(18, 2);
                 r.Property(x => x.TotalPrice).HasPrecision(18, 2);
+
+                r.HasIndex(x => new { x.UserId, x.ServiceId, x.TripDate }).IsUnique();
 
                 r.HasOne(x => x.User)
                     .WithMany()
