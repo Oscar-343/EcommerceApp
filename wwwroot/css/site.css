@@ -129,6 +129,19 @@ body {
     background-color: var(--color-green);
 }
 
+.cart-count-badge {
+    display: inline-block;
+    min-width: 1.1rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background-color: var(--color-green);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.1rem;
+    text-align: center;
+}
+
 .nav-user {
     display: flex;
     align-items: center;

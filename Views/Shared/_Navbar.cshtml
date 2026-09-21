@@ -14,7 +14,7 @@
             <li><a class="nav-link @(currentController == "Services" ? "active" : "")" asp-controller="Services" asp-action="Index">Rutas</a></li>
             <li><a class="nav-link @(currentController == "Products" ? "active" : "")" asp-controller="Products" asp-action="Index">Productos</a></li>
             <li><a class="nav-link @(currentController == "Favorites" ? "active" : "")" asp-controller="Favorites" asp-action="Index">Favoritos</a></li>
-            <li><a class="nav-link @(currentController == "Cart" ? "active" : "")" asp-controller="Cart" asp-action="Index">Carrito</a></li>
+            <li><a class="nav-link @(currentController == "Cart" ? "active" : "")" asp-controller="Cart" asp-action="Index">Carrito @await Component.InvokeAsync("CartCount")</a></li>
             @if (User.IsInRole("Admin"))
             {
                 <li><a class="nav-link @(currentController == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="Index">Panel admin</a></li>

@@ -19,9 +19,34 @@ namespace EcommerceApp.Controllers
                 .Include(c => c.Product)
                 .ToListAsync();
 
-            ViewBag.Total = items.Sum(i => i.Quantity * i.UnitPrice);
+            // Precio vigente del producto (no el UnitPrice guardado al agregar, que queda obsoleto si el precio cambia).
+            ViewBag.Total = items.Sum(i => i.Quantity * (i.Product?.PromotionalPrice ?? i.Product?.Price ?? i.UnitPrice));
             ViewData["Title"] = "Tu carrito";
             return View(items);
+        }
+
+        // Cambia la cantidad de una línea del carrito con los botones − y +.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(int productId, string direction)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
+            var item = await context.CartItems.FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
+            if (item == null) return RedirectToAction(nameof(Index));
+
+            var product = await context.Products.FindAsync(productId);
+            if (product == null || product.Stock <= 0)
+            {
+                TempData["Success"] = "Ese producto ya no tiene stock disponible.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var limite = Math.Min(product.Stock, 100);
+            var delta = direction == "inc" ? 1 : -1;
+            item.Quantity = Math.Clamp(item.Quantity + delta, 1, limite);
+            await context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // Agrega un producto al carrito (o aumenta cantidad si ya existe).

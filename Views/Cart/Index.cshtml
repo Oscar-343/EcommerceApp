@@ -23,19 +23,43 @@
             }
             else
             {
+                <div style="margin-bottom: 1rem;">
+                    <a asp-controller="Products" asp-action="Index" style="color: var(--cart-sand);">&larr; Seguir comprando</a>
+                </div>
                 <div style="display: flex; flex-direction: column; gap: 1rem;">
                     @foreach (var item in Model)
                     {
                         var p = item.Product;
+                        var precioVigente = p?.PromotionalPrice ?? p?.Price ?? item.UnitPrice;
+                        var sinStock = p == null || p.Stock <= 0;
+                        var superaStock = p != null && !sinStock && item.Quantity > p.Stock;
                         <div style="display: flex; gap: 1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.8rem; padding: 1rem; transition: transform 0.2s ease; align-items: center;">
                             <img src="@(p?.ImageUrl ?? "/images/default-product.svg")" style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;" alt="" />
                             <div style="flex: 1;">
-                                <h4 style="color: var(--sand); font-family: 'Outfit'; margin: 0;">@p?.Name</h4>
+                                <h4 style="color: var(--sand); font-family: 'Outfit'; margin: 0;">@(p?.Name ?? "Producto no disponible")</h4>
                                 <div style="color: var(--text-secondary); font-size: 0.85rem;">@p?.Category</div>
-                                <div style="margin-top: 0.3rem; font-weight: 600; color: #fff;">@PriceFormatter.Format(item.UnitPrice) c/u</div>
+                                <div style="margin-top: 0.3rem; font-weight: 600; color: #fff;">@PriceFormatter.Format(precioVigente) c/u &middot; Subtotal: @PriceFormatter.Format(precioVigente * item.Quantity)</div>
+                                @if (sinStock)
+                                {
+                                    <div style="margin-top: 0.3rem; color: #e07a7a; font-size: 0.85rem;">Sin stock disponible. Quítalo del carrito para continuar.</div>
+                                }
+                                else if (superaStock)
+                                {
+                                    <div style="margin-top: 0.3rem; color: #e0b97a; font-size: 0.85rem;">Solo quedan @p!.Stock unidades. Ajusta la cantidad para continuar.</div>
+                                }
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span>@item.Quantity</span>
+                                <form asp-action="Update" method="post" style="display: inline;">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <input type="hidden" name="direction" value="dec" />
+                                    <button type="submit" class="cart-qty-btn" disabled="@(item.Quantity <= 1)">−</button>
+                                </form>
+                                <span style="min-width: 1.5rem; text-align: center;">@item.Quantity</span>
+                                <form asp-action="Update" method="post" style="display: inline;">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <input type="hidden" name="direction" value="inc" />
+                                    <button type="submit" class="cart-qty-btn" disabled="@(sinStock || (p != null && item.Quantity >= p.Stock))">+</button>
+                                </form>
                                 <form asp-action="Remove" method="post" style="display: inline;">
                                     <input type="hidden" name="productId" value="@item.ProductId" />
                                     <button type="submit" class="btn btn-sm btn-outline-danger">✕</button>
@@ -58,7 +82,8 @@
                     <span>Total estimado</span>
                     <span>@PriceFormatter.Format((decimal)ViewBag.Total)</span>
                 </div>
-                <a asp-controller="Account" asp-action="Login" class="btn-admin btn-admin-primary" style="width: 100%; margin-top: 1rem; display: block; text-align: center;">Finalizar compra</a>
+                <button type="button" class="btn-admin btn-admin-primary" style="width: 100%; margin-top: 1rem; display: block; text-align: center;" disabled title="Disponible en la siguiente fase">Confirmar pedido</button>
+                <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--cart-sub); text-align: center;">Disponible en la siguiente fase</div>
             </div>
         </div>
     </div>
