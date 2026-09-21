@@ -1,0 +1,69 @@
+@model List<EcommerceApp.Models.Order>
+@{
+    Layout = "_AdminLayout";
+    var statuses = new[] { "Pendiente", "Entregado", "Cancelado" };
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Pedidos</h1>
+        <p>@Model.Count pedido(s) @(ViewBag.StatusFilter != null ? $"con estado \"{ViewBag.StatusFilter}\"" : "en total").</p>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Listado de pedidos</h2>
+        <form method="get" asp-action="Orders" style="display:flex; gap:0.5rem;">
+            <select name="status" class="admin-search" onchange="this.form.submit()">
+                <option value="">Todos los estados</option>
+                @foreach (var s in statuses)
+                {
+                    <option value="@s" selected="@(ViewBag.StatusFilter == s)">@s</option>
+                }
+            </select>
+        </form>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.6 12.2a2 2 0 01-2 1.8H7.1a2 2 0 01-2-1.8L3.5 7z"/></svg>
+            <h3>No hay pedidos</h3>
+            <p>Todavía no se registraron pedidos con este filtro.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@(o.User?.FullName ?? "Usuario")</strong>
+                                <div class="cell-muted" style="font-size:0.76rem;">@(o.User?.Email ?? o.UserId)</div>
+                            </td>
+                            <td class="cell-muted">@o.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><strong>@PriceFormatter.Format(o.Total)</strong></td>
+                            <td>@o.Status</td>
+                            <td>
+                                <a asp-action="OrderDetails" asp-route-id="@o.Id" class="btn btn-sm btn-outline-primary">Ver detalle</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

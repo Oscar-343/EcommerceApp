@@ -1,0 +1,54 @@
+@model EcommerceApp.Models.Order
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = $"Pedido #{Model.Id}";
+}
+<link rel="stylesheet" href="~/css/carrito.css" asp-append-version="true" />
+
+<div class="container cart-page" style="padding: 2rem 0;">
+    <section class="cart-hero">
+        <h1 class="cart-title">Pedido #@Model.Id</h1>
+        <p class="cart-sub">Hecho el @Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") &middot; Estado: @Model.Status</p>
+    </section>
+
+    <div style="margin-top: 1rem;">
+        <a asp-action="Index" style="color: var(--cart-sand);">&larr; Volver a mis pedidos</a>
+    </div>
+
+    <div class="row" style="margin-top: 1.5rem;">
+        <div class="col-md-8">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                @foreach (var item in Model.Items)
+                {
+                    <div style="display: flex; gap: 1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.8rem; padding: 1rem; align-items: center;">
+                        <div style="flex: 1;">
+                            <h4 style="color: var(--sand); font-family: 'Outfit'; margin: 0;">@item.ProductName</h4>
+                            <div style="color: var(--text-secondary); font-size: 0.85rem;">@item.ProductCategory</div>
+                            <div style="margin-top: 0.3rem; font-weight: 600; color: #fff;">@PriceFormatter.Format(item.UnitPrice) c/u &middot; Cantidad: @item.Quantity &middot; Subtotal: @PriceFormatter.Format(item.UnitPrice * item.Quantity)</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); position: sticky; top: 1rem;">
+                <h3 style="font-family: 'Outfit'; color: var(--sand);">Resumen</h3>
+                <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; color: #fff; margin: 0.5rem 0;">
+                    <span>Total</span>
+                    <span>@PriceFormatter.Format(Model.Total)</span>
+                </div>
+                <div style="margin: 0.5rem 0; color: var(--text-secondary);">Estado: <strong>@Model.Status</strong></div>
+                @if (Model.DeliveredAt.HasValue)
+                {
+                    <div style="color: var(--text-secondary); font-size: 0.85rem;">Entregado el @Model.DeliveredAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+                }
+                @if (Model.Status == "Pendiente")
+                {
+                    <form asp-action="Cancel" asp-route-id="@Model.Id" method="post" style="margin-top: 1rem;">
+                        <button type="submit" class="btn btn-outline-danger" style="width: 100%;" onclick="return confirm('¿Cancelar este pedido?')">Cancelar pedido</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

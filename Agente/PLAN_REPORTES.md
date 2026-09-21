@@ -65,22 +65,22 @@ Este plan **reemplaza** las restricciones del plan anterior ("no implementes res
 
 ## Fase 2 — Pedidos (migración, confirmar antes de crearla)
 
-- [ ] `Models/Order.cs`: `Id`, `UserId`, `CreatedAt`, `Status` (`Pendiente|Entregado|Cancelado`), `Total` (snapshot calculado en servidor), `DeliveredAt` (`DateTime?`).
-- [ ] `Models/OrderItem.cs`: `Id`, `OrderId`, `ProductId` (`int?`, FK con `SetNull` para que borrar un producto no rompa el historial), `ProductName`, `ProductCategory`, `UnitPrice`, `Quantity`. Los tres primeros datos son **snapshot** del momento del pedido.
-- [ ] `ApplicationDbContext`: `DbSet<Order>`, `DbSet<OrderItem>`, precisión `(18,2)`, FKs. Índice **único** `(UserId, ProductId)` en `CartItems`. Si ya hay duplicados, avísame antes.
-- [ ] `OrdersController` (`[Authorize]`):
+- [x] `Models/Order.cs`: `Id`, `UserId`, `CreatedAt`, `Status` (`Pendiente|Entregado|Cancelado`), `Total` (snapshot calculado en servidor), `DeliveredAt` (`DateTime?`).
+- [x] `Models/OrderItem.cs`: `Id`, `OrderId`, `ProductId` (`int?`, FK con `SetNull` para que borrar un producto no rompa el historial), `ProductName`, `ProductCategory`, `UnitPrice`, `Quantity`. Los tres primeros datos son **snapshot** del momento del pedido.
+- [x] `ApplicationDbContext`: `DbSet<Order>`, `DbSet<OrderItem>`, precisión `(18,2)`, FKs. Índice **único** `(UserId, ProductId)` en `CartItems`. Si ya hay duplicados, avísame antes.
+- [x] `OrdersController` (`[Authorize]`):
   - `Checkout` (POST): en **una transacción**, revalida stock, crea `Order` + `OrderItem`s con precio vigente, descuenta stock y vacía el carrito.
   - `Index`: "Mis pedidos".
   - `Details`: detalle de un pedido propio (verificar que sea del usuario).
   - `Cancel`: solo si está `Pendiente`; devuelve el stock.
-- [ ] Activar el botón "Confirmar pedido" del carrito. Vistas `Views/Orders/` con el mismo estilo y layout público. Enlace "Mis pedidos" en la navbar.
-- [ ] `AdminController.Orders.cs`: listado con filtro por estado, detalle y cambio de estado.
+- [x] Activar el botón "Confirmar pedido" del carrito. Vistas `Views/Orders/` con el mismo estilo y layout público. Enlace "Mis pedidos" en la navbar.
+- [x] `AdminController.Orders.cs`: listado con filtro por estado, detalle y cambio de estado.
   - `Pendiente → Entregado` guarda `DeliveredAt = DateTime.UtcNow`.
   - `Pendiente → Cancelado` devuelve el stock.
   - No permitir salir de un estado final.
   - Badge de "Pedidos pendientes" en el sidebar y contador en el dashboard.
-- [ ] `ProductDelete` en admin debe seguir funcionando con pedidos existentes (por el `SetNull`).
-- [ ] Genera la migración, **muéstrame el SQL y detente**. No la apliques.
+- [x] `ProductDelete` en admin debe seguir funcionando con pedidos existentes (por el `SetNull`).
+- [x] Genera la migración, **muéstrame el SQL y detente**. No la apliques.
 
 ## Fase 3 — Reservas reales (migración, confirmar antes de crearla)
 

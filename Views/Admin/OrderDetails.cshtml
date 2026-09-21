@@ -1,0 +1,69 @@
+@model EcommerceApp.Models.Order
+@{
+    Layout = "_AdminLayout";
+    // Solo se ofrecen las transiciones válidas desde el estado actual (el controller también las valida).
+    var opcionesEstado = Model.Status == "Pendiente" ? new[] { "Pendiente", "Entregado", "Cancelado" } : new[] { Model.Status };
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Pedido #@Model.Id</h1>
+        <p>@(Model.User?.FullName ?? Model.User?.Email ?? Model.UserId) &middot; @Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+    <a asp-action="Orders" class="btn-admin">&larr; Volver a pedidos</a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Líneas del pedido</h2>
+    </div>
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Cantidad</th>
+                    <th>Precio unitario</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.ProductName</td>
+                        <td class="cell-muted">@item.ProductCategory</td>
+                        <td>@item.Quantity</td>
+                        <td class="cell-muted">@PriceFormatter.Format(item.UnitPrice)</td>
+                        <td><strong>@PriceFormatter.Format(item.UnitPrice * item.Quantity)</strong></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Estado y total</h2>
+    </div>
+    <div style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div><strong>Total:</strong> @PriceFormatter.Format(Model.Total)</div>
+            @if (Model.DeliveredAt.HasValue)
+            {
+                <div class="cell-muted">Entregado el @Model.DeliveredAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+            }
+        </div>
+        <form asp-action="OrderUpdateStatus" method="post" style="display:flex; gap:0.5rem; align-items:center;">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <select name="status" class="form-select" style="min-width:150px;" onchange="this.form.submit()" disabled="@(Model.Status != "Pendiente")">
+                @foreach (var s in opcionesEstado)
+                {
+                    <option value="@s" selected="@(Model.Status == s)">@s</option>
+                }
+            </select>
+        </form>
+    </div>
+</div>

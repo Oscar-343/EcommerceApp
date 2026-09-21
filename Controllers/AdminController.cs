@@ -99,6 +99,15 @@ namespace EcommerceApp.Controllers
                 ViewBag.PendingReservations = 0;
             }
 
+            try
+            {
+                ViewBag.PendingOrders = await context.Orders.CountAsync(o => o.Status == "Pendiente");
+            }
+            catch
+            {
+                ViewBag.PendingOrders = 0;
+            }
+
             await next();
         }
 
@@ -116,6 +125,7 @@ namespace EcommerceApp.Controllers
             ViewBag.TransportCount = await context.Transports.CountAsync(t => t.IsActive);
             ViewBag.ReservationCount = await context.Reservations.CountAsync();
             ViewBag.LowStockCount = await context.Products.CountAsync(p => p.Stock <= 5);
+            ViewBag.OrderCount = await context.Orders.CountAsync();
 
             ViewBag.RecentReservations = await context.Reservations
                 .AsNoTracking()

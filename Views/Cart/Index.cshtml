@@ -2,6 +2,8 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Tu carrito";
+    var hayProblemaDeStock = Model.Any(i => i.Product == null || i.Product.Stock <= 0 || i.Quantity > i.Product.Stock);
+    var puedeConfirmar = Model.Any() && !hayProblemaDeStock;
 }
 <link rel="stylesheet" href="~/css/carrito.css" asp-append-version="true" />
 
@@ -82,8 +84,13 @@
                     <span>Total estimado</span>
                     <span>@PriceFormatter.Format((decimal)ViewBag.Total)</span>
                 </div>
-                <button type="button" class="btn-admin btn-admin-primary" style="width: 100%; margin-top: 1rem; display: block; text-align: center;" disabled title="Disponible en la siguiente fase">Confirmar pedido</button>
-                <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--cart-sub); text-align: center;">Disponible en la siguiente fase</div>
+                <form asp-controller="Orders" asp-action="Checkout" method="post">
+                    <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; margin-top: 1rem; display: block; text-align: center;" disabled="@(!puedeConfirmar)">Confirmar pedido</button>
+                </form>
+                @if (hayProblemaDeStock)
+                {
+                    <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #e07a7a; text-align: center;">Corrige los productos sin stock suficiente para continuar.</div>
+                }
             </div>
         </div>
     </div>

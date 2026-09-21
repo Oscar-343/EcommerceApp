@@ -16,6 +16,8 @@ namespace EcommerceApp.Data
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<FavoriteItem> FavoriteItems { get; set; }
         public DbSet<ServiceProduct> ServiceProducts { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -71,6 +73,41 @@ namespace EcommerceApp.Data
                     .HasForeignKey(x => x.ProductId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
+
+            // Un pedido no puede tener dos líneas para el mismo producto ni quedar
+            // huérfano si se borra el usuario; el usuario nunca se borra desde la app.
+            modelBuilder.Entity<Order>(o =>
+            {
+                o.Property(x => x.Total).HasPrecision(18, 2);
+
+                o.HasOne(x => x.User)
+                    .WithMany()
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Snapshot del producto al momento de comprar: si el producto se borra,
+            // la línea del pedido conserva su nombre (ProductId queda en null).
+            modelBuilder.Entity<OrderItem>(oi =>
+            {
+                oi.Property(x => x.UnitPrice).HasPrecision(18, 2);
+
+                oi.HasOne(x => x.Order)
+                    .WithMany(x => x.Items)
+                    .HasForeignKey(x => x.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                oi.HasOne(x => x.Product)
+                    .WithMany()
+                    .HasForeignKey(x => x.ProductId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Una sola línea de carrito por usuario y producto (Add ya evita duplicados en código;
+            // esto lo garantiza también a nivel de base de datos).
+            modelBuilder.Entity<CartItem>()
+                .HasIndex(c => new { c.UserId, c.ProductId })
+                .IsUnique();
         }
     }
 }
