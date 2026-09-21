@@ -450,6 +450,16 @@
                             <img src="@Model.SecondaryImageUrl" alt="@Model.Name en uso" />
                         </div>
                     }
+
+                    @if (!string.IsNullOrEmpty(Model.GalleryImages))
+                    {
+                        @foreach (var img in Model.GalleryImages.Split('|', StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            <div class="producto-galeria__thumb" onclick="cambiarImagen('@img.Trim()', this)">
+                                <img src="@img.Trim()" alt="@Model.Name" />
+                            </div>
+                        }
+                    }
                 </div>
             </div>
 

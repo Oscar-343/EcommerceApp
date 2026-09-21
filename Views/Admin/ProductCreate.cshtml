@@ -88,6 +88,15 @@
                     </div>
                     <div class="img-preview-box" id="secImgPreview"><span>Vista previa</span></div>
                 </div>
+                <div class="form-field form-span-2">
+                    <label asp-for="GalleryImages">Galería (URLs separadas por "|")</label>
+                    <input asp-for="GalleryImages" class="form-control" id="galleryImg" placeholder="https://img1.jpg|https://img2.jpg" />
+                    <div style="display:flex; align-items:center; gap:0.6rem; margin-top:0.4rem;">
+                        <input type="file" name="galleryFiles" id="galleryImgFile" accept="image/png,image/jpeg,image/webp,image/gif" multiple class="form-control" style="padding:0.35rem;" />
+                        <span id="galleryImgFileStatus" class="hint"></span>
+                    </div>
+                    <span class="hint">Puedes seleccionar varias imágenes a la vez (producto en uso, detalle, contexto). Se subirán a Supabase y se agregarán a la galería al guardar.</span>
+                </div>
             </div>
         </div>
 

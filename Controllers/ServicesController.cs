@@ -193,14 +193,11 @@ namespace EcommerceApp.Controllers
                 _ => "⚪"
             };
 
-            // TODO: Obtener productos recomendados relacionados con esta ruta (relación real en Fase 5)
-            var equipmentCategories = new[] { "Mochilas", "Calzado de trekking", "Tiendas de campaña", "Iluminación" };
-            var recommendedProducts = await context.Products.AsNoTracking()
-                .Where(p => p.Stock > 0 && p.Category != null && equipmentCategories.Contains(p.Category))
-                .OrderByDescending(p => p.IsBestSeller)
-                .ThenByDescending(p => p.IsFeatured)
-                .ThenByDescending(p => p.CreatedAt)
-                .Take(4)
+            // Equipamiento recomendado: productos asignados a esta ruta (tabla ServiceProduct).
+            var recommendedProducts = await context.ServiceProducts.AsNoTracking()
+                .Include(sp => sp.Product)
+                .Where(sp => sp.ServiceId == id && sp.Product != null && sp.Product.Stock > 0)
+                .Select(sp => sp.Product!)
                 .ToListAsync();
 
             var model = new ServicioDetalleViewModel

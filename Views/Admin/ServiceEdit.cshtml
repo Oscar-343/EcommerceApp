@@ -3,6 +3,8 @@
     Layout = "_AdminLayout";
     var guides = ViewBag.Guides as List<EcommerceApp.Models.Guide> ?? new();
     var transports = ViewBag.Transports as List<EcommerceApp.Models.Transport> ?? new();
+    var products = ViewBag.Products as List<EcommerceApp.Models.Product> ?? new();
+    var selectedProductIds = ViewBag.SelectedProductIds as List<int> ?? new();
 }
 
 <div class="admin-breadcrumb"><a asp-action="Services">Rutas / Servicios</a> / Editar</div>
@@ -166,6 +168,26 @@
                         <span class="hint">No hay transportes activos. <a asp-action="TransportCreate" style="color:var(--sand);">Crea uno primero</a>.</span>
                     }
                 </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Equipamiento recomendado</h3>
+            <div class="form-field">
+                <label for="productIds">Productos que se muestran en el detalle de la ruta</label>
+                <select name="productIds" id="productIds" class="form-select" multiple size="8">
+                    @foreach (var product in products)
+                    {
+                        <option value="@product.Id" selected="@(selectedProductIds.Contains(product.Id) ? "selected" : null)">
+                            @product.Name @(product.Category != null ? $"— {product.Category}" : "")
+                        </option>
+                    }
+                </select>
+                <span class="hint">Ctrl/Cmd + clic para elegir varios. Se muestran en "Equipamiento recomendado" del detalle de la ruta.</span>
+                @if (!products.Any())
+                {
+                    <span class="hint">No hay productos cargados todavía.</span>
+                }
             </div>
         </div>
 

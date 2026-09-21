@@ -32,6 +32,10 @@ namespace EcommerceApp.Models
         // Segunda imagen: producto en uso / contexto real
         public string? SecondaryImageUrl { get; set; }
 
+        // Galería de imágenes adicionales (separadas por pipe |), igual que en Service.
+        [MaxLength(2000)]
+        public string? GalleryImages { get; set; }
+
         // Marca del producto
         [MaxLength(100)]
         public string? Brand { get; set; }

@@ -138,10 +138,43 @@
 
 Solo crear migraciones, **nunca aplicarlas**. Al terminar, muéstrame el SQL con `dotnet ef migrations script`.
 
-- [ ] **Relación ruta → equipamiento:** tabla puente `ServiceProduct` (`ServiceId`, `ProductId`, clave compuesta). En el formulario admin de la ruta, un multi-select de productos. En `Services/Details` mostrar solo los productos asignados y ocultar la sección si no hay. Quitar la consulta genérica y el `// TODO`.
-- [ ] **Galería de producto:** campo `GalleryImages` en `Product`, separado por `|` como en `Service`. Campo en el formulario admin y miniaturas en `Products/Details` (producto, en uso, detalle, contexto).
-- [ ] **No tocar** la clave primaria de `Reservation` ni implementar reservas reales todavía. Solo déjalo anotado en `TASKS.md`: la PK `(UserId, ServiceId)` permite una sola reserva por ruta y no hay fecha de salida.
-- [ ] **No borres** la migración vacía `AddCartAndFavorites2`: puede estar registrada en `__EFMigrationsHistory`.
+- [x] **Relación ruta → equipamiento:** tabla puente `ServiceProduct` (`ServiceId`, `ProductId`, clave compuesta). En el formulario admin de la ruta, un multi-select de productos. En `Services/Details` mostrar solo los productos asignados y ocultar la sección si no hay. Quitar la consulta genérica y el `// TODO`.
+  - `Models/ServiceProduct.cs` nuevo. FKs con `OnDelete(DeleteBehavior.Cascade)` en `ApplicationDbContext`: si se borra la ruta o el producto, el vínculo desaparece solo (no hace falta borrarlo a mano, a diferencia de `FavoriteItem` que no tiene FK real).
+  - `AdminController.LoadServiceLookupsAsync` ahora también carga `ViewBag.Products`; `ServiceCreate`/`ServiceEdit` (GET y POST) manejan un nuevo parámetro `List<int>? productIds` y sincronizan `ServiceProducts` (en Edit: borra los vínculos existentes y crea los nuevos, mismo patrón que ya usaba el borrado de favoritos).
+  - `ServiceCreate.cshtml`/`ServiceEdit.cshtml`: sección nueva "Equipamiento recomendado" con `<select multiple>` de productos (sin JS adicional, mismo estilo simple que Guía/Transporte).
+  - `ServicesController.Details`: reemplazada la consulta por categorías fijas (`Mochilas`, `Calzado de trekking`...) por la relación real vía `context.ServiceProducts`. Se quitó el `// TODO`. La vista (`Services/Details.cshtml`) ya ocultaba la sección si `RecommendedProducts` estaba vacío, así que no necesitó cambios.
+- [x] **Galería de producto:** campo `GalleryImages` en `Product`, separado por `|` como en `Service`. Campo en el formulario admin y miniaturas en `Products/Details` (producto, en uso, detalle, contexto).
+  - Reutilizados los helpers existentes `UploadGalleryAsync`/`AppendPipeSeparated` (ya usados por Service) en `ProductCreate`/`ProductEdit` del `AdminController`.
+- [x] **No tocar** la clave primaria de `Reservation` ni implementar reservas reales todavía. Anotado en `Agente/.agent/TASKS.md` (nuevo): la PK `(UserId, ServiceId)` permite una sola reserva por ruta y no hay fecha de salida.
+- [x] **No borrar** la migración vacía `AddCartAndFavorites2`: no se tocó.
+  - Migración creada: `20260921053404_AddProductGalleryAndServiceProducts` (una sola migración: EF Core calculó ambos cambios juntos porque no hay ninguna aplicada desde la última). SQL completo abajo.
+  - **No se ejecutó `dotnet ef database update`** ni ninguna operación de escritura sobre la BD de producción. `dotnet ef migrations remove`/`add`/`script` sí hacen una consulta de solo lectura a `__EFMigrationsHistory` para saber qué migraciones ya están aplicadas (comportamiento estándar de la herramienta, no fue una acción explícita); no se modificó ni se leyó ningún otro dato.
+
+**SQL de la migración nueva** (`dotnet ef migrations script AddCartAndFavorites2 AddProductGalleryAndServiceProducts`):
+
+```sql
+START TRANSACTION;
+ALTER TABLE "Products" ADD "GalleryImages" character varying(2000);
+
+CREATE TABLE "ServiceProducts" (
+    "ServiceId" integer NOT NULL,
+    "ProductId" integer NOT NULL,
+    CONSTRAINT "PK_ServiceProducts" PRIMARY KEY ("ServiceId", "ProductId"),
+    CONSTRAINT "FK_ServiceProducts_Products_ProductId" FOREIGN KEY ("ProductId") REFERENCES "Products" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_ServiceProducts_Services_ServiceId" FOREIGN KEY ("ServiceId") REFERENCES "Services" ("Id") ON DELETE CASCADE
+);
+
+CREATE INDEX "IX_ServiceProducts_ProductId" ON "ServiceProducts" ("ProductId");
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20260921053404_AddProductGalleryAndServiceProducts', '10.0.0');
+
+COMMIT;
+```
+
+**Build:** `dotnet build --no-incremental` → 0 errores (mismos 5 warnings preexistentes, no tocados).
+
+**Importante — no se probó en el navegador esta fase.** La migración solo existe como archivo, no se aplicó a la BD de producción (regla 5). Como el código ya consulta la columna `Products.GalleryImages` y la tabla `ServiceProducts` en cada página que carga productos o el detalle de una ruta, **cualquier intento de correr la app contra la BD actual va a fallar** (columna/tabla inexistente) hasta que corras tú `dotnet ef database update`. Una vez aplicada la migración, probar: Productos (listado y detalle), Rutas (detalle, ver equipamiento recomendado), Admin → Productos (crear/editar, campo de galería) y Admin → Rutas (crear/editar, selector de equipamiento).
 
 ## Fase 6 — Limpieza de archivos (**muestra la lista y espera mi "sí"**)
 

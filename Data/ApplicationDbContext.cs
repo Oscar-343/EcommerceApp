@@ -15,6 +15,7 @@ namespace EcommerceApp.Data
         public DbSet<Transport> Transports { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<FavoriteItem> FavoriteItems { get; set; }
+        public DbSet<ServiceProduct> ServiceProducts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,6 +54,23 @@ namespace EcommerceApp.Data
             modelBuilder.Entity<Transport>()
                 .Property(t => t.PricePerKm)
                 .HasPrecision(18, 2);
+
+            // Clave compuesta (ServiceId, ProductId): equipamiento recomendado por ruta.
+            // Cascade: si se borra la ruta o el producto, desaparece el vínculo (no el otro lado).
+            modelBuilder.Entity<ServiceProduct>(sp =>
+            {
+                sp.HasKey(x => new { x.ServiceId, x.ProductId });
+
+                sp.HasOne(x => x.Service)
+                    .WithMany()
+                    .HasForeignKey(x => x.ServiceId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                sp.HasOne(x => x.Product)
+                    .WithMany()
+                    .HasForeignKey(x => x.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
         }
     }
 }

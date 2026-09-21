@@ -160,7 +160,8 @@ namespace EcommerceApp.Controllers
         public async Task<IActionResult> ProductCreate(
             Product product,
             IFormFile? imageFile,
-            IFormFile? secondaryImageFile)
+            IFormFile? secondaryImageFile,
+            List<IFormFile>? galleryFiles)
         {
             ViewData["Title"] = "Nuevo producto";
             ViewData["Subtitle"] = "Productos";
@@ -172,6 +173,10 @@ namespace EcommerceApp.Controllers
 
                 if (secondaryImageFile != null && secondaryImageFile.Length > 0)
                     product.SecondaryImageUrl = await UploadAdminImageAsync(secondaryImageFile, "products");
+
+                var galleryUrls = await UploadGalleryAsync(galleryFiles, "products/gallery");
+                if (!string.IsNullOrWhiteSpace(galleryUrls))
+                    product.GalleryImages = AppendPipeSeparated(product.GalleryImages, galleryUrls);
 
                 if (!ModelState.IsValid)
                     return View(product);
@@ -205,7 +210,8 @@ namespace EcommerceApp.Controllers
             int id,
             Product product,
             IFormFile? imageFile,
-            IFormFile? secondaryImageFile)
+            IFormFile? secondaryImageFile,
+            List<IFormFile>? galleryFiles)
         {
             ViewData["Title"] = "Editar producto";
             ViewData["Subtitle"] = "Productos";
@@ -219,6 +225,10 @@ namespace EcommerceApp.Controllers
 
                 if (secondaryImageFile != null && secondaryImageFile.Length > 0)
                     product.SecondaryImageUrl = await UploadAdminImageAsync(secondaryImageFile, "products");
+
+                var galleryUrls = await UploadGalleryAsync(galleryFiles, "products/gallery");
+                if (!string.IsNullOrWhiteSpace(galleryUrls))
+                    product.GalleryImages = AppendPipeSeparated(product.GalleryImages, galleryUrls);
 
                 if (!ModelState.IsValid)
                     return View(product);
@@ -281,6 +291,7 @@ namespace EcommerceApp.Controllers
         {
             ViewBag.Guides = await context.Guides.AsNoTracking().Where(g => g.IsActive).OrderBy(g => g.Name).ToListAsync();
             ViewBag.Transports = await context.Transports.AsNoTracking().Where(t => t.IsActive).OrderBy(t => t.Name).ToListAsync();
+            ViewBag.Products = await context.Products.AsNoTracking().OrderBy(p => p.Category).ThenBy(p => p.Name).ToListAsync();
         }
 
         public async Task<IActionResult> ServiceCreate()
@@ -288,6 +299,7 @@ namespace EcommerceApp.Controllers
             ViewData["Title"] = "Nueva ruta";
             ViewData["Subtitle"] = "Rutas / Servicios";
             await LoadServiceLookupsAsync();
+            ViewBag.SelectedProductIds = new List<int>();
             return View(new Service());
         }
 
@@ -298,7 +310,8 @@ namespace EcommerceApp.Controllers
             Service service,
             IFormFile? imageFile,
             IFormFile? secondaryImageFile,
-            List<IFormFile>? galleryFiles)
+            List<IFormFile>? galleryFiles,
+            List<int>? productIds)
         {
             ViewData["Title"] = "Nueva ruta";
             ViewData["Subtitle"] = "Rutas / Servicios";
@@ -318,11 +331,19 @@ namespace EcommerceApp.Controllers
                 if (!ModelState.IsValid)
                 {
                     await LoadServiceLookupsAsync();
+                    ViewBag.SelectedProductIds = productIds ?? new List<int>();
                     return View(service);
                 }
 
                 context.Services.Add(service);
                 await context.SaveChangesAsync();
+
+                if (productIds != null && productIds.Count > 0)
+                {
+                    context.ServiceProducts.AddRange(
+                        productIds.Distinct().Select(pid => new ServiceProduct { ServiceId = service.Id, ProductId = pid }));
+                    await context.SaveChangesAsync();
+                }
 
                 TempData["Success"] = $"Ruta \"{service.Name}\" creada correctamente.";
                 return RedirectToAction(nameof(Services));
@@ -331,6 +352,7 @@ namespace EcommerceApp.Controllers
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 await LoadServiceLookupsAsync();
+                ViewBag.SelectedProductIds = productIds ?? new List<int>();
                 return View(service);
             }
         }
@@ -342,6 +364,10 @@ namespace EcommerceApp.Controllers
             var service = await context.Services.FindAsync(id);
             if (service == null) return NotFound();
             await LoadServiceLookupsAsync();
+            ViewBag.SelectedProductIds = await context.ServiceProducts.AsNoTracking()
+                .Where(sp => sp.ServiceId == id)
+                .Select(sp => sp.ProductId)
+                .ToListAsync();
             return View(service);
         }
 
@@ -353,7 +379,8 @@ namespace EcommerceApp.Controllers
             Service service,
             IFormFile? imageFile,
             IFormFile? secondaryImageFile,
-            List<IFormFile>? galleryFiles)
+            List<IFormFile>? galleryFiles,
+            List<int>? productIds)
         {
             ViewData["Title"] = "Editar ruta";
             ViewData["Subtitle"] = "Rutas / Servicios";
@@ -375,6 +402,7 @@ namespace EcommerceApp.Controllers
                 if (!ModelState.IsValid)
                 {
                     await LoadServiceLookupsAsync();
+                    ViewBag.SelectedProductIds = productIds ?? new List<int>();
                     return View(service);
                 }
 
@@ -382,6 +410,16 @@ namespace EcommerceApp.Controllers
                 context.Services.Update(service);
                 // Update() marca toda la entidad como modificada; CreatedAt no debe pisarse con el valor del formulario.
                 context.Entry(service).Property(s => s.CreatedAt).IsModified = false;
+
+                // Reemplaza el equipamiento asignado: se borra lo anterior y se agrega lo elegido ahora.
+                var existingLinks = context.ServiceProducts.Where(sp => sp.ServiceId == id);
+                context.ServiceProducts.RemoveRange(existingLinks);
+                if (productIds != null && productIds.Count > 0)
+                {
+                    context.ServiceProducts.AddRange(
+                        productIds.Distinct().Select(pid => new ServiceProduct { ServiceId = id, ProductId = pid }));
+                }
+
                 await context.SaveChangesAsync();
 
                 TempData["Success"] = $"Ruta \"{service.Name}\" actualizada.";
@@ -391,6 +429,7 @@ namespace EcommerceApp.Controllers
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 await LoadServiceLookupsAsync();
+                ViewBag.SelectedProductIds = productIds ?? new List<int>();
                 return View(service);
             }
         }
