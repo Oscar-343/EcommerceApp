@@ -29,14 +29,26 @@ namespace EcommerceApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(int productId, int quantity = 1)
         {
+            var esAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
             var product = await context.Products.FindAsync(productId);
             if (product == null) return NotFound();
 
+            if (product.Stock <= 0)
+            {
+                if (esAjax) return Json(new { success = false, message = "Sin stock disponible." });
+                TempData["Success"] = "Sin stock disponible.";
+                return RedirectToAction("Index", "Cart");
+            }
+
+            // La cantidad nunca puede superar el stock disponible ni el tope de 100 por línea de carrito.
+            var limite = Math.Min(product.Stock, 100);
+            quantity = Math.Clamp(quantity, 1, limite);
+
             var existing = await context.CartItems.FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
             if (existing != null)
             {
-                existing.Quantity += quantity;
+                existing.Quantity = Math.Clamp(existing.Quantity + quantity, 1, limite);
             }
             else
             {
@@ -49,6 +61,8 @@ namespace EcommerceApp.Controllers
                 });
             }
             await context.SaveChangesAsync();
+
+            if (esAjax) return Json(new { success = true, message = "Producto agregado al carrito." });
             TempData["Success"] = "Producto agregado al carrito.";
             return RedirectToAction("Index", "Cart");
         }

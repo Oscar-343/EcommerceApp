@@ -16,8 +16,8 @@
         @if (!Model.Any())
         {
             <div class="fav-empty-state" style="width: 100%;">
-                <h3 style="color: var(--fav-sand); font-family: 'Outfit'; font-weight: 700;">Aún no tenés favoritos</h3>
-                <p>Explorá productos o rutas y hacé clic en el corazón para guardarlos.</p>
+                <h3 style="color: var(--fav-sand); font-family: 'Outfit'; font-weight: 700;">Aún no tienes favoritos</h3>
+                <p>Explora productos o rutas y haz clic en el corazón para guardarlos.</p>
                 <a asp-controller="Products" asp-action="Index" class="cart-btn-primary" style="margin-top: 1rem; display: inline-block; width: auto;">Ver tienda</a>
             </div>
         }
@@ -34,7 +34,7 @@
                             <img src="@(p.ImageUrl ?? "/images/default-product.jpg")" alt="" />
                             <h4>@p.Name</h4>
                             <div class="meta">@p.Category</div>
-                            <div class="price">@p.Price.ToString("C")</div>
+                            <div class="price">@PriceFormatter.Format(p.Price)</div>
                             <form asp-action="Toggle" method="post">
                                 <input type="hidden" name="type" value="Product" />
                                 <input type="hidden" name="itemId" value="@p.Id" />
@@ -52,7 +52,7 @@
                             <img src="@(s.ImageUrl ?? "/images/default-product.jpg")" alt="" />
                             <h4>@s.Name</h4>
                             <div class="meta">@s.Category · @s.Region</div>
-                            <div class="price">@s.Price.ToString("C")</div>
+                            <div class="price">@PriceFormatter.Format(s.Price)</div>
                             <form asp-action="Toggle" method="post">
                                 <input type="hidden" name="type" value="Service" />
                                 <input type="hidden" name="itemId" value="@s.Id" />

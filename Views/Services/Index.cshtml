@@ -200,7 +200,7 @@
                                             <span class="servicios-route-block__info-item">📍 @route.DistanceKm km</span>
                                         }
                                     </div>
-                                    <p class="servicios-route-block__price">Desde Bs. @route.Price.ToString("0") / persona</p>
+                                    <p class="servicios-route-block__price">Desde @PriceFormatter.Format(route.Price) / persona</p>
                                     <div class="servicios-route-block__actions" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
                                         <a asp-controller="Services" asp-action="Details" asp-route-id="@route.Id" class="servicios-route-block__cta">DESCUBRIR RUTA →</a>
                                         <form asp-controller="Favorites" asp-action="Toggle" method="post" style="display: inline;">

@@ -1,4 +1,7 @@
 @model EcommerceApp.Models.Product
+@{
+    var esFavorito = ViewData["IsFavorite"] as bool? ?? false;
+}
 
 <div class="producto-card">
     <!-- Imagen del producto -->
@@ -34,10 +37,10 @@
         </div>
 
         <!-- Favorito -->
-        <button class="producto-card__favorite" 
-                data-product-id="@Model.Id" 
+        <button class="producto-card__favorite @(esFavorito ? "active" : "")"
+                data-product-id="@Model.Id"
                 aria-label="Agregar a favoritos">
-            ♡
+            @(esFavorito ? "♥" : "♡")
         </button>
     </div>
 
@@ -58,12 +61,12 @@
         <div class="producto-card__price">
             @if (Model.PromotionalPrice.HasValue && Model.PromotionalPrice < Model.Price)
             {
-                <span class="producto-card__price-current">@Model.PromotionalPrice.Value.ToString("C")</span>
-                <span class="producto-card__price-original">@Model.Price.ToString("C")</span>
+                <span class="producto-card__price-current">@PriceFormatter.Format(Model.PromotionalPrice)</span>
+                <span class="producto-card__price-original">@PriceFormatter.Format(Model.Price)</span>
             }
             else
             {
-                <span class="producto-card__price-current">@Model.Price.ToString("C")</span>
+                <span class="producto-card__price-current">@PriceFormatter.Format(Model.Price)</span>
             }
         </div>
 

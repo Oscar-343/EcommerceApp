@@ -7,7 +7,7 @@
 <div class="admin-page-header">
     <div>
         <h1>Nuevo producto</h1>
-        <p>Completá los datos para agregarlo al catálogo de la tienda.</p>
+        <p>Completa los datos para agregarlo al catálogo de la tienda.</p>
     </div>
 </div>
 
@@ -55,7 +55,7 @@
                 </div>
                 <div class="form-field">
                     <label asp-for="PromotionalPrice">Precio de oferta</label>
-                    <input asp-for="PromotionalPrice" class="form-control" type="number" step="0.01" min="0.01" placeholder="Dejalo vacío si no está en oferta" />
+                    <input asp-for="PromotionalPrice" class="form-control" type="number" step="0.01" min="0.01" placeholder="Déjalo vacío si no está en oferta" />
                     <span asp-validation-for="PromotionalPrice" class="text-danger"></span>
                 </div>
                 <div class="form-field">
@@ -76,7 +76,7 @@
                         <input type="file" name="imageFile" id="mainImgFile" accept="image/png,image/jpeg,image/webp,image/gif" class="form-control" style="padding:0.35rem;" />
                         <span id="mainImgFileStatus" class="hint"></span>
                     </div>
-                    <span class="hint">Elegí una imagen de tu equipo o pegá una URL. El archivo se subirá a Supabase al guardar.</span>
+                    <span class="hint">Elige una imagen de tu equipo o pega una URL. El archivo se subirá a Supabase al guardar.</span>
                     <div class="img-preview-box" id="mainImgPreview"><span>Vista previa</span></div>
                 </div>
                 <div class="form-field">

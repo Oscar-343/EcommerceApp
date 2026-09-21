@@ -37,15 +37,32 @@ namespace EcommerceApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Toggle(string type, int itemId)
         {
+            var esAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+
+            if (type != "Product" && type != "Service")
+            {
+                return esAjax ? BadRequest(new { success = false, message = "Tipo inválido." }) : BadRequest();
+            }
+
+            var existeItem = type == "Product"
+                ? await context.Products.AnyAsync(p => p.Id == itemId)
+                : await context.Services.AnyAsync(s => s.Id == itemId);
+            if (!existeItem)
+            {
+                return esAjax ? NotFound(new { success = false, message = "No existe." }) : NotFound();
+            }
+
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
             var existing = await context.FavoriteItems
                 .FirstOrDefaultAsync(f => f.UserId == userId && f.Type == type && f.ItemId == itemId);
 
+            bool esFavoritoAhora;
             if (existing != null)
             {
                 context.FavoriteItems.Remove(existing);
                 await context.SaveChangesAsync();
                 TempData["Success"] = "Eliminado de favoritos.";
+                esFavoritoAhora = false;
             }
             else
             {
@@ -57,7 +74,10 @@ namespace EcommerceApp.Controllers
                 });
                 await context.SaveChangesAsync();
                 TempData["Success"] = "Agregado a favoritos.";
+                esFavoritoAhora = true;
             }
+
+            if (esAjax) return Json(new { success = true, isFavorite = esFavoritoAhora });
             return RedirectToAction(nameof(Index));
         }
     }

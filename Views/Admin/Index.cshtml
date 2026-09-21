@@ -108,7 +108,7 @@
                             <td>@(r.Service?.Name ?? "—")</td>
                             <td class="cell-muted">@r.BookingDate.ToLocalTime().ToString("dd/MM/yyyy")</td>
                             <td>@r.PeopleCount</td>
-                            <td>@r.TotalPrice.ToString("C")</td>
+                            <td>@PriceFormatter.Format(r.TotalPrice)</td>
                             <td>
                                 @{
                                     var pill = r.Status switch

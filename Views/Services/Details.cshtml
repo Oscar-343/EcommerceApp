@@ -367,7 +367,7 @@
                                 <h4 class="ruta-product-card__name">@product.Name</h4>
                                 <p class="ruta-product-card__category">@product.Category</p>
                                 <div class="ruta-product-card__price">
-                                    Bs. @product.Price
+                                    @PriceFormatter.Format(product.Price)
                                 </div>
                                 <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" 
                                    class="ruta-product-card__link">
@@ -386,12 +386,12 @@
                 <div class="ruta-cta-info">
                     <h2 class="ruta-cta-title">¿Listo para esta aventura?</h2>
                     <p class="ruta-cta-subtitle">
-                        Desde <strong>Bs. @Model.Service.Price / persona</strong>
+                        Desde <strong>@PriceFormatter.Format(Model.Service.Price) / persona</strong>
                     </p>
                 </div>
-                
-                <button class="ruta-cta-button" onclick="alert('Sistema de reservas en desarrollo')">
-                    RESERVAR RUTA
+
+                <button class="ruta-cta-button" disabled title="Próximamente">
+                    Reservas próximamente
                 </button>
             </div>
         </section>

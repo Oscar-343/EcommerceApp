@@ -24,7 +24,7 @@
         <div class="empty-state">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 8l-8-5-8 5v8l8 5 8-5V8z"/><path d="M4 8l8 5 8-5"/></svg>
             <h3>Sin resultados</h3>
-            <p>No hay productos que coincidan con la búsqueda. <a asp-action="ProductCreate" style="color:var(--sand);">Creá uno nuevo</a>.</p>
+            <p>No hay productos que coincidan con la búsqueda. <a asp-action="ProductCreate" style="color:var(--sand);">Crea uno nuevo</a>.</p>
         </div>
     }
     else
@@ -67,12 +67,12 @@
                             <td>
                                 @if (product.PromotionalPrice.HasValue && product.PromotionalPrice < product.Price)
                                 {
-                                    <span class="cell-muted" style="text-decoration:line-through;">@product.Price.ToString("C")</span>
-                                    <br /><span style="color:#f4897e; font-weight:700;">@product.PromotionalPrice.Value.ToString("C")</span>
+                                    <span class="cell-muted" style="text-decoration:line-through;">@PriceFormatter.Format(product.Price)</span>
+                                    <br /><span style="color:#f4897e; font-weight:700;">@PriceFormatter.Format(product.PromotionalPrice)</span>
                                 }
                                 else
                                 {
-                                    @product.Price.ToString("C")
+                                    @PriceFormatter.Format(product.Price)
                                 }
                             </td>
                             <td>

@@ -24,7 +24,7 @@
         <div class="empty-state">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
             <h3>Sin resultados</h3>
-            <p>No hay rutas que coincidan con la búsqueda. <a asp-action="ServiceCreate" style="color:var(--sand);">Creá una nueva</a>.</p>
+            <p>No hay rutas que coincidan con la búsqueda. <a asp-action="ServiceCreate" style="color:var(--sand);">Crea una nueva</a>.</p>
         </div>
     }
     else
@@ -78,7 +78,7 @@
                                 }
                                 <span class="pill @diffPill">@diffLabel</span>
                             </td>
-                            <td>@service.Price.ToString("C")</td>
+                            <td>@PriceFormatter.Format(service.Price)</td>
                             <td class="cell-muted">@(service.Guide?.Name ?? "Sin asignar")</td>
                             <td class="cell-muted">@(service.Transport?.Name ?? "Sin asignar")</td>
                             <td>

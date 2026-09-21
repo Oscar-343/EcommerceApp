@@ -53,22 +53,24 @@
 
 ## Fase 2 — Errores funcionales (sin cambiar el modelo de datos)
 
-- [ ] **Botón "AGREGAR" del catálogo falso** (`wwwroot/js/productos.js`, `agregarAlCarrito`): hoy solo cambia el texto y hace `console.log`. Debe hacer POST real a `Cart/Add` con el token antiforgery.
+- [x] **Botón "AGREGAR" del catálogo falso** (`wwwroot/js/productos.js`, `agregarAlCarrito`): hoy solo cambia el texto y hace `console.log`. Debe hacer POST real a `Cart/Add` con el token antiforgery.
   - Mostrar "✓ AGREGADO" solo si el servidor confirma.
   - Si el usuario no ha iniciado sesión, redirigir al login.
   - Sin contador en la navbar (evita complejidad): basta el feedback del botón.
-- [ ] **Favoritos del catálogo** (`productos.js`): hoy usa `localStorage`. Cambiar a `FavoritesController.Toggle` y pintar el estado inicial con `FavoriteProductIds`, que ya llega a la vista. Eliminar el código de `localStorage`.
-- [ ] `Views/Products/Details.cshtml`: el input `#cantidad` está fuera del `<form>`, así que siempre se agrega 1. Ponerlo dentro del form como `name="quantity"`. Borrar las funciones JS muertas (`agregarAlCarrito`, `comprarAhora`, `toggleFavorito`).
-- [ ] `CartController.Add`: validar `quantity` (mínimo 1, máximo el stock disponible y 100), que el producto exista y tenga stock.
-- [ ] `FavoritesController.Toggle`: validar que `type` sea `Product` o `Service` y que el ítem exista.
-- [ ] Al borrar un producto o ruta, borrar también sus favoritos (`RemoveRange`).
-- [ ] **`CreatedAt` se pisa al editar** (`AdminController` `ProductEdit` y `ServiceEdit`): marcar `CreatedAt` como no modificado (`Entry(x).Property(p => p.CreatedAt).IsModified = false`).
-- [ ] **`AdminController.cs` tiene texto corrupto** (`Gu├¡a`, `administraci├│n`, unas 30 líneas). Corregir los textos a UTF-8 correcto y verificar con `grep -n "├\|┬"` que no queda ninguno.
-- [ ] `AdminController.ServiceDelete`: si la ruta tiene reservas, mostrar un mensaje en vez de lanzar excepción (FK `Restrict`). Sigue el patrón de guías y transportes.
-- [ ] `AdminController.ReservationUpdateStatus`: validar que `status` sea uno de `Pendiente|Recorrido|Acabado|Cancelado`.
-- [ ] **Moneda única:** crear un helper mínimo (por ejemplo `Helpers/PriceFormatter.cs`) que formatee `Bs. ` + número con `InvariantCulture`. Reemplazar todos los `ToString("C")` y los `"Bs."` sueltos en vistas. `ToString("C")` depende de la cultura del servidor y en Render sale con `$` o `¤`.
-- [ ] `Views/Services/Details.cshtml`: reemplazar `onclick="alert('Sistema de reservas en desarrollo')"` por un botón deshabilitado "Reservas próximamente". **No implementes reservas.**
-- [ ] Voseo → tuteo en textos de usuario: buscar "Hacé", "Definí", "AHORRÁS" y similares.
+  - Detección de sesión no autenticada resuelta solo en JS (`response.redirected` → `window.location.href = response.url`), sin tocar `Program.cs`.
+- [x] **Favoritos del catálogo** (`productos.js`): hoy usa `localStorage`. Cambiar a `FavoritesController.Toggle` y pintar el estado inicial con `FavoriteProductIds`, que ya llega a la vista. Eliminar el código de `localStorage`.
+- [x] `Views/Products/Details.cshtml`: el input `#cantidad` está fuera del `<form>`, así que siempre se agrega 1. Ponerlo dentro del form como `name="quantity"`. Borrar las funciones JS muertas (`agregarAlCarrito`, `comprarAhora`, `toggleFavorito`).
+- [x] `CartController.Add`: validar `quantity` (mínimo 1, máximo el stock disponible y 100), que el producto exista y tenga stock.
+- [x] `FavoritesController.Toggle`: validar que `type` sea `Product` o `Service` y que el ítem exista.
+- [x] Al borrar un producto o ruta, borrar también sus favoritos (`RemoveRange`).
+- [x] **`CreatedAt` se pisa al editar** (`AdminController` `ProductEdit` y `ServiceEdit`): marcar `CreatedAt` como no modificado (`Entry(x).Property(p => p.CreatedAt).IsModified = false`).
+  - **Nota:** `GuideEdit`/`TransportEdit` tienen el mismo bug (mismo patrón `Update(entity)` completo) pero no se tocaron: el plan solo menciona Product/Service. Queda pendiente si se quiere corregir en otra fase.
+- [x] **`AdminController.cs` tenía texto corrupto** (`Gu├¡a`, `administraci├│n`, ~30 líneas). Corregido a UTF-8 correcto; verificado con `grep -n "├\|┬"` sin resultados.
+- [x] `AdminController.ServiceDelete`: si la ruta tiene reservas, muestra un mensaje (`TempData["Success"]`, único toast wired en el layout admin) en vez de lanzar excepción, y no borra. `Service` no tiene `IsActive` como Guide/Transport, así que no se "desactiva": se bloquea el borrado.
+- [x] `AdminController.ReservationUpdateStatus`: valida que `status` sea uno de `Pendiente|Recorrido|Acabado|Cancelado`.
+- [x] **Moneda única:** creado `Helpers/PriceFormatter.cs` (`Format(decimal)`/`Format(decimal?)`) que formatea `"Bs. " + N2` con `InvariantCulture`. Reemplazados todos los `ToString("C")` y `"Bs."` sueltos en vistas vivas (se dejaron sin tocar `Views/Products/_ProductCard.cshtml` y `Views/Shared/_ServiceCardLarge.cshtml`: código muerto, candidatos a borrado en Fase 6).
+- [x] `Views/Services/Details.cshtml`: reemplazado `onclick="alert('Sistema de reservas en desarrollo')"` por un botón deshabilitado "Reservas próximamente".
+- [x] Voseo → tuteo en textos de usuario: corregido en vistas públicas y también en el panel Admin (decisión confirmada con el usuario: incluir Admin).
 
 ## Fase 3 — Un solo layout y estilos (visual: yo pruebo en el navegador)
 

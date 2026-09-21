@@ -17,7 +17,7 @@
             {
                 <div class="cart-empty-state">
                     <h3 style="color: var(--cart-sand); font-family: 'Outfit'; font-weight: 700;">Tu carrito está vacío</h3>
-                    <p>Explorá nuestra tienda y agregá productos de senderismo.</p>
+                    <p>Explora nuestra tienda y agrega productos de senderismo.</p>
                     <a asp-controller="Products" asp-action="Index" class="cart-btn-primary" style="margin-top: 1rem; display: inline-block; width: auto;">Ver tienda</a>
                 </div>
             }
@@ -32,7 +32,7 @@
                             <div style="flex: 1;">
                                 <h4 style="color: var(--sand); font-family: 'Outfit'; margin: 0;">@p?.Name</h4>
                                 <div style="color: var(--text-secondary); font-size: 0.85rem;">@p?.Category</div>
-                                <div style="margin-top: 0.3rem; font-weight: 600; color: #fff;">@item.UnitPrice.ToString("C") c/u</div>
+                                <div style="margin-top: 0.3rem; font-weight: 600; color: #fff;">@PriceFormatter.Format(item.UnitPrice) c/u</div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <span>@item.Quantity</span>
@@ -51,12 +51,12 @@
                 <h3 style="font-family: 'Outfit'; color: var(--sand);">Resumen</h3>
                 <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
                     <span>Subtotal</span>
-                    <strong>@ViewBag.Total.ToString("C")</strong>
+                    <strong>@PriceFormatter.Format((decimal)ViewBag.Total)</strong>
                 </div>
                 <hr style="border-color: rgba(255,255,255,0.1);" />
                 <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; color: #fff;">
                     <span>Total estimado</span>
-                    <span>@ViewBag.Total.ToString("C")</span>
+                    <span>@PriceFormatter.Format((decimal)ViewBag.Total)</span>
                 </div>
                 <a asp-controller="Account" asp-action="Login" class="btn-admin btn-admin-primary" style="width: 100%; margin-top: 1rem; display: block; text-align: center;">Finalizar compra</a>
             </div>

@@ -284,12 +284,12 @@
                                 <div class="product-curated-price">
                                     @if (product.PromotionalPrice.HasValue && product.PromotionalPrice < product.Price)
                                     {
-                                        <span class="price-original">Bs. @product.Price.ToString("0")</span>
-                                        <span class="price-current">Bs. @product.PromotionalPrice.Value.ToString("0")</span>
+                                        <span class="price-original">@PriceFormatter.Format(product.Price)</span>
+                                        <span class="price-current">@PriceFormatter.Format(product.PromotionalPrice)</span>
                                     }
                                     else
                                     {
-                                        <span class="price-current">Bs. @product.Price.ToString("0")</span>
+                                        <span class="price-current">@PriceFormatter.Format(product.Price)</span>
                                     }
                                 </div>
                             </div>

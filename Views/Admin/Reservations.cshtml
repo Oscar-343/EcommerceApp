@@ -63,8 +63,8 @@
                             <td>@(r.Service?.Name ?? "Ruta eliminada")</td>
                             <td class="cell-muted">@r.BookingDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                             <td>@r.PeopleCount</td>
-                            <td class="cell-muted">@r.UnitPrice.ToString("C")</td>
-                            <td><strong>@r.TotalPrice.ToString("C")</strong></td>
+                            <td class="cell-muted">@PriceFormatter.Format(r.UnitPrice)</td>
+                            <td><strong>@PriceFormatter.Format(r.TotalPrice)</strong></td>
                             <td>
                                 <form asp-action="ReservationUpdateStatus" method="post" style="display:flex; gap:0.4rem; align-items:center;">
                                     <input type="hidden" name="userId" value="@r.UserId" />

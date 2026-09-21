@@ -43,7 +43,15 @@ function initFiltersToggle() {
 }
 
 /**
- * Inicializar funcionalidad de favoritos
+ * Token antiforgery presente en la página (@Html.AntiForgeryToken() en Products/Index).
+ */
+function getAntiForgeryToken() {
+    const input = document.querySelector('input[name="__RequestVerificationToken"]');
+    return input ? input.value : null;
+}
+
+/**
+ * Inicializar funcionalidad de favoritos (sincronizado con el servidor vía Favorites/Toggle)
  */
 function initFavorites() {
     const favoriteButtons = document.querySelectorAll('.producto-card__favorite');
@@ -54,70 +62,71 @@ function initFavorites() {
             e.stopPropagation();
 
             const productId = this.getAttribute('data-product-id');
-            this.classList.toggle('active');
-            this.innerHTML = this.classList.contains('active') ? '♥' : '♡';
+            const boton = this;
+            const formData = new FormData();
+            formData.append('type', 'Product');
+            formData.append('itemId', productId);
+            const token = getAntiForgeryToken();
+            if (token) formData.append('__RequestVerificationToken', token);
 
-            // Guardar en localStorage (persistencia local)
-            saveFavorite(productId, this.classList.contains('active'));
-
-            // TODO: Sincronizar con servidor cuando esté implementado
+            fetch('/Favorites/Toggle', {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                        return null;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data || !data.success) return;
+                    boton.classList.toggle('active', data.isFavorite);
+                    boton.innerHTML = data.isFavorite ? '♥' : '♡';
+                });
         });
-
-        // Restaurar favoritos desde localStorage
-        const productId = btn.getAttribute('data-product-id');
-        if (isFavorite(productId)) {
-            btn.classList.add('active');
-            btn.innerHTML = '♥';
-        }
     });
 }
 
 /**
- * Guardar favorito en localStorage
- */
-function saveFavorite(productId, isFav) {
-    const favorites = JSON.parse(localStorage.getItem('productos-favoritos') || '[]');
-
-    if (isFav) {
-        if (!favorites.includes(productId)) {
-            favorites.push(productId);
-        }
-    } else {
-        const index = favorites.indexOf(productId);
-        if (index > -1) {
-            favorites.splice(index, 1);
-        }
-    }
-
-    localStorage.setItem('productos-favoritos', JSON.stringify(favorites));
-}
-
-/**
- * Verificar si un producto es favorito
- */
-function isFavorite(productId) {
-    const favorites = JSON.parse(localStorage.getItem('productos-favoritos') || '[]');
-    return favorites.includes(productId);
-}
-
-/**
- * Agregar al carrito (placeholder)
+ * Agregar al carrito: POST real a Cart/Add.
  */
 function agregarAlCarrito(productId) {
-    if (event && event.target) {
-        const btn = event.target;
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '✓ AGREGADO';
-        btn.style.backgroundColor = '#4F8063';
+    const btn = event && event.target ? event.target : null;
+    const formData = new FormData();
+    formData.append('productId', productId);
+    formData.append('quantity', 1);
+    const token = getAntiForgeryToken();
+    if (token) formData.append('__RequestVerificationToken', token);
 
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.style.backgroundColor = '';
-        }, 1500);
-    }
-
-    // TODO: Implementar lógica real del carrito
-    console.log('Producto agregado al carrito:', productId);
+    fetch('/Cart/Add', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+    })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+                return null;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data) return;
+            if (data.success && btn) {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✓ AGREGADO';
+                btn.style.backgroundColor = '#4F8063';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.backgroundColor = '';
+                }, 1500);
+            } else if (!data.success) {
+                alert(data.message || 'No se pudo agregar el producto.');
+            }
+        });
 }
 
 /**
@@ -177,7 +186,5 @@ window.productosModule = {
         if (btn) {
             btn.click();
         }
-    },
-    isFavorite,
-    saveFavorite
+    }
 };

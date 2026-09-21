@@ -9,7 +9,7 @@
 <div class="admin-page-header">
     <div>
         <h1>Nueva ruta</h1>
-        <p>Cargá los datos de la ruta de senderismo o aventura.</p>
+        <p>Carga los datos de la ruta de senderismo o aventura.</p>
     </div>
 </div>
 
@@ -148,7 +148,7 @@
                     </select>
                     @if (!guides.Any())
                     {
-                        <span class="hint">No hay guías activos. <a asp-action="GuideCreate" style="color:var(--sand);">Creá uno primero</a>.</span>
+                        <span class="hint">No hay guías activos. <a asp-action="GuideCreate" style="color:var(--sand);">Crea uno primero</a>.</span>
                     }
                 </div>
                 <div class="form-field">
@@ -162,7 +162,7 @@
                     </select>
                     @if (!transports.Any())
                     {
-                        <span class="hint">No hay transportes activos. <a asp-action="TransportCreate" style="color:var(--sand);">Creá uno primero</a>.</span>
+                        <span class="hint">No hay transportes activos. <a asp-action="TransportCreate" style="color:var(--sand);">Crea uno primero</a>.</span>
                     }
                 </div>
             </div>
@@ -178,7 +178,7 @@
                         <input type="file" name="imageFile" id="mainImgFile" accept="image/png,image/jpeg,image/webp,image/gif" class="form-control" style="padding:0.35rem;" />
                         <span id="mainImgFileStatus" class="hint"></span>
                     </div>
-                    <span class="hint">Elegí una imagen de tu equipo o pegá una URL. El archivo se subirá a Supabase al guardar.</span>
+                    <span class="hint">Elige una imagen de tu equipo o pega una URL. El archivo se subirá a Supabase al guardar.</span>
                     <div class="img-preview-box" id="mainImgPreview"><span>Vista previa</span></div>
                 </div>
                 <div class="form-field">
@@ -197,7 +197,7 @@
                         <input type="file" name="galleryFiles" id="galleryImgFile" accept="image/png,image/jpeg,image/webp,image/gif" multiple class="form-control" style="padding:0.35rem;" />
                         <span id="galleryImgFileStatus" class="hint"></span>
                     </div>
-                    <span class="hint">Podés seleccionar varias imágenes a la vez. Se subirán a Supabase y se agregarán a la galería al guardar.</span>
+                    <span class="hint">Puedes seleccionar varias imágenes a la vez. Se subirán a Supabase y se agregarán a la galería al guardar.</span>
                 </div>
             </div>
         </div>
