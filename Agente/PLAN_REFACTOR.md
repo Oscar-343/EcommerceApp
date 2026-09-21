@@ -196,12 +196,15 @@ Antes de borrar cada archivo, haz `grep` y muéstrame que nadie lo referencia.
 
 ## Fase 7 — Orden interno y material de estudio
 
-- [ ] Dividir `AdminController` (34 KB) en **clases parciales por entidad**: `AdminController.cs` (base, dashboard, subida de imágenes), `AdminController.Products.cs`, `.Services.cs`, `.Guides.cs`, `.Transports.cs`, `.Reservations.cs`. Misma clase y mismas rutas; solo se separan archivos.
-- [ ] Crear `GUIA_DE_ESTUDIO.md` (máximo 2 páginas, en español):
+- [x] Dividir `AdminController` (34 KB) en **clases parciales por entidad**: `AdminController.cs` (base, dashboard, subida de imágenes), `AdminController.Products.cs`, `.Services.cs`, `.Guides.cs`, `.Transports.cs`, `.Reservations.cs`. Misma clase y mismas rutas; solo se separan archivos.
+  - El constructor primario (`context`, `imageStorage`) queda solo en `AdminController.cs`; las demás partes son `partial class AdminController` sin parámetros (válido en C# con constructores primarios + partial classes). `dotnet build` → 0 errores, mismos 5 warnings preexistentes.
+- [x] Crear `GUIA_DE_ESTUDIO.md` (máximo 2 páginas, en español):
   - Qué hace cada carpeta.
   - Diagrama de texto de las entidades y sus relaciones.
   - Flujo de una petición: ruta → controlador → vista, con un ejemplo real (catálogo de productos).
   - Cómo funciona el login (Identity, roles, Google/GitHub).
   - Cómo correr el proyecto y cómo se despliega en Render, con **nombres** de variables de entorno, nunca valores.
-- [ ] Actualizar `Agente/.agent/PROJECT_STATE.md`, `TASKS.md` y `MEMORY.md` con el estado real: 7 migraciones, sin AJAX, un solo layout, etc. Corregir "Argentina" → Bolivia. No incluyas correos ni credenciales en esos `.md`.
-- [ ] Revisión final: `dotnet build` con 0 errores, `git status` limpio, y un resumen de todo lo que quedó pendiente.
+  - Creado en `Agente/GUIA_DE_ESTUDIO.md`.
+- [x] Actualizar `Agente/.agent/PROJECT_STATE.md`, `TASKS.md` y `MEMORY.md` con el estado real: 8 migraciones (no 7; se contaron los archivos reales en `Migrations/`), sin AJAX, un solo layout, etc. Corregir "Argentina" → Bolivia. No incluyas correos ni credenciales en esos `.md`.
+  - `PROJECT_STATE.md` y `MEMORY.md` no existían (solo `TASKS.md`, creado en Fase 5); se crearon ambos. `TASKS.md` seguía vigente, no se modificó. No había ningún texto real con "Argentina" en el repo (la corrección del plan era preventiva); se verificó con `grep -rn Argentina` antes de escribir los `.md` nuevos.
+- [x] Revisión final: `dotnet build` con 0 errores, `git status` limpio, y un resumen de todo lo que quedó pendiente.
