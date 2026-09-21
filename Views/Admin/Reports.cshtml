@@ -5,7 +5,7 @@
 <div class="admin-page-header">
     <div>
         <h1>Reportes</h1>
-        <p>Reportes calculados sobre los pedidos, reservas y el catálogo actuales.</p>
+        <p>Reportes calculados sobre los pedidos, reservas, el catálogo, favoritos, carritos y usuarios actuales.</p>
     </div>
 </div>
 
@@ -48,5 +48,35 @@
         </div>
         <div class="stat-card-value" style="font-size:1.15rem;">Inventario</div>
         <div class="stat-card-label">Stock bajo, agotados, valor del inventario y productos en oferta.</div>
+    </a>
+
+    <a asp-action="ReportDemand" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value" style="font-size:1.15rem;">Demanda</div>
+        <div class="stat-card-label">Productos y rutas más guardados en favoritos, y productos en carritos actuales.</div>
+    </a>
+
+    <a asp-action="ReportUsers" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value" style="font-size:1.15rem;">Usuarios</div>
+        <div class="stat-card-label">Registros de usuarios por mes.</div>
+    </a>
+
+    <a asp-action="ReportGuidesTransport" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M16 10h4l3 3v5h-7"/><circle cx="6.5" cy="18.5" r="1.8"/><circle cx="18" cy="18.5" r="1.8"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value" style="font-size:1.15rem;">Guías y transportes</div>
+        <div class="stat-card-label">Rutas asignadas a cada uno y reservas Acabado por guía.</div>
     </a>
 </div>

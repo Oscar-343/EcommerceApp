@@ -1,0 +1,72 @@
+@using EcommerceApp.Models.Reports
+@model UsersReportViewModel
+@{
+    Layout = "_AdminLayout";
+    string[] meses = { "", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Usuarios</h1>
+        <p>Registros de cuentas por mes, según la fecha de creación.</p>
+    </div>
+</div>
+
+<div class="admin-card" style="margin-bottom:1.8rem;">
+    <form method="get" asp-action="ReportUsers" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:end; padding:1.2rem 1.4rem;">
+        <div class="form-field">
+            <label>Desde</label>
+            <input type="date" name="desde" class="form-control" value="@Model.Desde.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="form-field">
+            <label>Hasta</label>
+            <input type="date" name="hasta" class="form-control" value="@Model.Hasta.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="form-field">
+            <button type="submit" class="btn-admin btn-admin-primary">Filtrar</button>
+        </div>
+    </form>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-card-value">@Model.TotalRegistrados</div>
+        <div class="stat-card-label">Registros en el rango</div>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Por mes</h2>
+    </div>
+    @if (Model.PorMes.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <h3>Sin registros en este rango</h3>
+            <p>No se crearon cuentas entre @Model.Desde.ToString("dd/MM/yyyy") y @Model.Hasta.ToString("dd/MM/yyyy").</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Mes</th>
+                        <th>Registros</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in Model.PorMes)
+                    {
+                        <tr>
+                            <td>@meses[m.Month] @m.Year</td>
+                            <td>@m.Cantidad</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

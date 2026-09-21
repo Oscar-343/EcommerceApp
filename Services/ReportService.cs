@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceApp.Services
 {
-    // Calcula los reportes del panel admin (Ingresos, Reservas, Ventas de productos, Inventario)
-    // a partir de los datos ya existentes (Order/OrderItem/Reservation/Product/Service). Solo lectura.
+    // Calcula los reportes del panel admin (Ingresos, Reservas, Ventas de productos, Inventario,
+    // Demanda, Usuarios, Guías y transportes) a partir de los datos ya existentes. Solo lectura.
     public class ReportService(ApplicationDbContext context)
     {
         // Bolivia es UTC-4 sin horario de verano; se resta a mano en vez de usar TimeZoneInfo
@@ -251,6 +251,150 @@ namespace EcommerceApp.Services
                 PorCategoria = porCategoria,
                 PorMarca = porMarca,
                 EnOferta = enOferta
+            };
+        }
+
+        // ---------------------------------------------------------------
+        // DEMANDA (sin filtro de fecha): favoritos y presencia en carritos actuales
+        // ---------------------------------------------------------------
+        public async Task<DemandReportViewModel> GetDemandReportAsync()
+        {
+            var favoritos = await context.FavoriteItems.AsNoTracking()
+                .GroupBy(f => new { f.Type, f.ItemId })
+                .Select(g => new { g.Key.Type, g.Key.ItemId, Cantidad = g.Count() })
+                .ToListAsync();
+
+            var productoIds = favoritos.Where(f => f.Type == "Product").Select(f => f.ItemId).ToList();
+            var serviceIds = favoritos.Where(f => f.Type == "Service").Select(f => f.ItemId).ToList();
+
+            var productNames = await context.Products.AsNoTracking()
+                .Where(p => productoIds.Contains(p.Id))
+                .ToDictionaryAsync(p => p.Id, p => p.Name);
+            var serviceNames = await context.Services.AsNoTracking()
+                .Where(s => serviceIds.Contains(s.Id))
+                .ToDictionaryAsync(s => s.Id, s => s.Name);
+
+            var productosFavoritos = favoritos.Where(f => f.Type == "Product")
+                .Select(f => new FavoriteCountRow
+                {
+                    Nombre = productNames.TryGetValue(f.ItemId, out var nombre) ? nombre : "(producto eliminado)",
+                    Cantidad = f.Cantidad
+                })
+                .OrderByDescending(r => r.Cantidad)
+                .ToList();
+
+            var rutasFavoritas = favoritos.Where(f => f.Type == "Service")
+                .Select(f => new FavoriteCountRow
+                {
+                    Nombre = serviceNames.TryGetValue(f.ItemId, out var nombre) ? nombre : "(ruta eliminada)",
+                    Cantidad = f.Cantidad
+                })
+                .OrderByDescending(r => r.Cantidad)
+                .ToList();
+
+            // Se agrupa en memoria porque hace falta contar UserId distintos dentro de cada grupo.
+            var cartDetalle = await context.CartItems.AsNoTracking()
+                .Select(c => new { c.ProductId, c.UserId, c.Quantity })
+                .ToListAsync();
+
+            var cartProductIds = cartDetalle.Select(c => c.ProductId).Distinct().ToList();
+            var cartProductNames = await context.Products.AsNoTracking()
+                .Where(p => cartProductIds.Contains(p.Id))
+                .ToDictionaryAsync(p => p.Id, p => p.Name);
+
+            var productosEnCarrito = cartDetalle
+                .GroupBy(c => c.ProductId)
+                .Select(g => new CartDemandRow
+                {
+                    ProductName = cartProductNames.TryGetValue(g.Key, out var nombre) ? nombre : "(producto eliminado)",
+                    CantidadTotal = g.Sum(x => x.Quantity),
+                    CarritosDistintos = g.Select(x => x.UserId).Distinct().Count()
+                })
+                .OrderByDescending(r => r.CantidadTotal)
+                .ToList();
+
+            return new DemandReportViewModel
+            {
+                ProductosFavoritos = productosFavoritos,
+                RutasFavoritas = rutasFavoritas,
+                ProductosEnCarrito = productosEnCarrito
+            };
+        }
+
+        // ---------------------------------------------------------------
+        // USUARIOS
+        // ---------------------------------------------------------------
+        public async Task<UsersReportViewModel> GetUsersReportAsync(DateOnly desde, DateOnly hasta)
+        {
+            var (desdeUtc, hastaUtc) = RangeUtc(desde, hasta);
+
+            var registros = await context.Users.AsNoTracking()
+                .Where(u => u.CreatedAt >= desdeUtc && u.CreatedAt < hastaUtc)
+                .Select(u => u.CreatedAt)
+                .ToListAsync();
+
+            var porMes = registros
+                .Select(ToLocal)
+                .GroupBy(f => new { f.Year, f.Month })
+                .Select(g => new UserMonthRow { Year = g.Key.Year, Month = g.Key.Month, Cantidad = g.Count() })
+                .OrderBy(r => r.Year).ThenBy(r => r.Month)
+                .ToList();
+
+            return new UsersReportViewModel
+            {
+                Desde = desde,
+                Hasta = hasta,
+                TotalRegistrados = registros.Count,
+                PorMes = porMes
+            };
+        }
+
+        // ---------------------------------------------------------------
+        // GUÍAS Y TRANSPORTES
+        // ---------------------------------------------------------------
+        public async Task<GuidesTransportReportViewModel> GetGuidesTransportReportAsync(DateOnly desde, DateOnly hasta)
+        {
+            // Rutas activas asignadas por guía y por transporte: estado actual, sin fecha.
+            var rutasPorGuia = await context.Services.AsNoTracking()
+                .Where(s => s.GuideId != null && s.Status == "Active")
+                .GroupBy(s => s.Guide!.Name)
+                .Select(g => new GuideRouteRow { GuideName = g.Key, CantidadRutas = g.Count() })
+                .OrderByDescending(r => r.CantidadRutas)
+                .ToListAsync();
+
+            var rutasPorTransporte = await context.Services.AsNoTracking()
+                .Where(s => s.TransportId != null && s.Status == "Active")
+                .GroupBy(s => s.Transport!.Name)
+                .Select(g => new TransportRouteRow { TransportName = g.Key, CantidadRutas = g.Count() })
+                .OrderByDescending(r => r.CantidadRutas)
+                .ToListAsync();
+
+            // Reservas Acabado en el rango (por fecha de salida), agrupadas por guía.
+            var detalle = await context.Reservations.AsNoTracking()
+                .Where(r => r.Status == "Acabado" && r.TripDate >= desde && r.TripDate <= hasta
+                    && r.Service != null && r.Service.GuideId != null)
+                .Select(r => new { GuideName = r.Service!.Guide!.Name, r.PeopleCount, r.TotalPrice })
+                .ToListAsync();
+
+            var reservasPorGuia = detalle
+                .GroupBy(r => r.GuideName)
+                .Select(g => new GuideReservationRow
+                {
+                    GuideName = g.Key,
+                    Cantidad = g.Count(),
+                    Personas = g.Sum(x => x.PeopleCount),
+                    Monto = g.Sum(x => x.TotalPrice)
+                })
+                .OrderByDescending(r => r.Monto)
+                .ToList();
+
+            return new GuidesTransportReportViewModel
+            {
+                Desde = desde,
+                Hasta = hasta,
+                RutasPorGuia = rutasPorGuia,
+                RutasPorTransporte = rutasPorTransporte,
+                ReservasPorGuia = reservasPorGuia
             };
         }
     }

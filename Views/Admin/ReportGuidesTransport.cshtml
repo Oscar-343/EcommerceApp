@@ -1,0 +1,122 @@
+@using EcommerceApp.Models.Reports
+@model GuidesTransportReportViewModel
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Guías y transportes</h1>
+        <p>Rutas asignadas (estado actual) y reservas Acabado por guía, filtradas por fecha de salida.</p>
+    </div>
+</div>
+
+<div class="admin-card" style="margin-bottom:1.8rem;">
+    <form method="get" asp-action="ReportGuidesTransport" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:end; padding:1.2rem 1.4rem;">
+        <div class="form-field">
+            <label>Desde</label>
+            <input type="date" name="desde" class="form-control" value="@Model.Desde.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="form-field">
+            <label>Hasta</label>
+            <input type="date" name="hasta" class="form-control" value="@Model.Hasta.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="form-field">
+            <button type="submit" class="btn-admin btn-admin-primary">Filtrar</button>
+        </div>
+    </form>
+    <p class="cell-muted" style="padding:0 1.4rem 1rem;">El filtro de fechas solo afecta la tabla de reservas Acabado por guía; las tablas de rutas asignadas muestran el estado actual.</p>
+</div>
+
+<div class="admin-card" style="margin-bottom:1.8rem;">
+    <div class="admin-card-header">
+        <h2>Rutas por guía y por transporte</h2>
+    </div>
+    @if (Model.RutasPorGuia.Count == 0 && Model.RutasPorTransporte.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M16 10h4l3 3v5h-7"/></svg>
+            <h3>Sin asignaciones</h3>
+            <p>Ninguna ruta activa tiene guía o transporte asignado.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap" style="display:flex; flex-wrap:wrap; gap:1.5rem; padding:1rem 1.4rem;">
+            <table class="admin-table" style="flex:1; min-width:260px;">
+                <thead>
+                    <tr>
+                        <th>Guía</th>
+                        <th>Rutas asignadas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var g in Model.RutasPorGuia)
+                    {
+                        <tr>
+                            <td>@g.GuideName</td>
+                            <td>@g.CantidadRutas</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <table class="admin-table" style="flex:1; min-width:260px;">
+                <thead>
+                    <tr>
+                        <th>Transporte</th>
+                        <th>Rutas asignadas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.RutasPorTransporte)
+                    {
+                        <tr>
+                            <td>@t.TransportName</td>
+                            <td>@t.CantidadRutas</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Reservas Acabado por guía</h2>
+    </div>
+    @if (Model.ReservasPorGuia.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/></svg>
+            <h3>Sin reservas Acabado en este rango</h3>
+            <p>No hay reservas finalizadas de rutas con guía asignado entre @Model.Desde.ToString("dd/MM/yyyy") y @Model.Hasta.ToString("dd/MM/yyyy").</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Guía</th>
+                        <th>Cantidad</th>
+                        <th>Personas</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.ReservasPorGuia)
+                    {
+                        <tr>
+                            <td>@r.GuideName</td>
+                            <td>@r.Cantidad</td>
+                            <td>@r.Personas</td>
+                            <td>@PriceFormatter.Format(r.Monto)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

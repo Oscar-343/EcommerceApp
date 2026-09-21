@@ -116,9 +116,9 @@ Problemas de hoy: la clave `(UserId, ServiceId)` permite una sola reserva por ru
 
 ## Fase 5 — Reportes de apoyo
 
-- [ ] **Demanda:** productos y rutas más guardados en favoritos (`FavoriteItems`, cruzando por `Type` + `ItemId`) y productos más presentes en carritos actuales. Aclara en pantalla que los carritos muestran interés, no compras.
-- [ ] **Usuarios:** registros por mes (`ApplicationUser.CreatedAt`, con la resta de 4 horas).
-- [ ] **Guías y transportes:** rutas asignadas a cada uno y reservas `Acabado` por guía.
+- [x] **Demanda:** productos y rutas más guardados en favoritos (`FavoriteItems`, cruzando por `Type` + `ItemId`) y productos más presentes en carritos actuales. Aclara en pantalla que los carritos muestran interés, no compras.
+- [x] **Usuarios:** registros por mes (`ApplicationUser.CreatedAt`, con la resta de 4 horas).
+- [x] **Guías y transportes:** rutas asignadas a cada uno y reservas `Acabado` por guía.
 
 ## Fase 6 — Exportar e imprimir
 

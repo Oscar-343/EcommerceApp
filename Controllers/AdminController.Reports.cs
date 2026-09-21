@@ -10,7 +10,7 @@ namespace EcommerceApp.Controllers
         public IActionResult Reports()
         {
             ViewData["Title"] = "Reportes";
-            ViewData["Subtitle"] = "Ingresos, reservas, ventas e inventario";
+            ViewData["Subtitle"] = "Ingresos, reservas, ventas, inventario, demanda, usuarios y guías/transportes";
             return View();
         }
 
@@ -47,6 +47,32 @@ namespace EcommerceApp.Controllers
             ViewData["Title"] = "Inventario";
             ViewData["Subtitle"] = "Reportes";
             var vm = await reportService.GetInventoryReportAsync();
+            return View(vm);
+        }
+
+        public async Task<IActionResult> ReportDemand([FromServices] ReportService reportService)
+        {
+            ViewData["Title"] = "Demanda";
+            ViewData["Subtitle"] = "Reportes";
+            var vm = await reportService.GetDemandReportAsync();
+            return View(vm);
+        }
+
+        public async Task<IActionResult> ReportUsers([FromServices] ReportService reportService, DateOnly? desde, DateOnly? hasta)
+        {
+            var (d, h) = ReportService.DefaultRange(desde, hasta);
+            ViewData["Title"] = "Usuarios";
+            ViewData["Subtitle"] = "Reportes";
+            var vm = await reportService.GetUsersReportAsync(d, h);
+            return View(vm);
+        }
+
+        public async Task<IActionResult> ReportGuidesTransport([FromServices] ReportService reportService, DateOnly? desde, DateOnly? hasta)
+        {
+            var (d, h) = ReportService.DefaultRange(desde, hasta);
+            ViewData["Title"] = "Guías y transportes";
+            ViewData["Subtitle"] = "Reportes";
+            var vm = await reportService.GetGuidesTransportReportAsync(d, h);
             return View(vm);
         }
     }

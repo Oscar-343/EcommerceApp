@@ -1,0 +1,125 @@
+@using EcommerceApp.Models.Reports
+@model DemandReportViewModel
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Demanda</h1>
+        <p>Foto actual de favoritos y carritos, sin filtro de fecha.</p>
+    </div>
+</div>
+
+<div class="admin-card" style="margin-bottom:1.8rem;">
+    <div class="admin-card-header">
+        <h2>Productos más favoritos</h2>
+    </div>
+    @if (Model.ProductosFavoritos.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
+            <h3>Sin favoritos aún</h3>
+            <p>Ningún usuario guardó productos como favoritos.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Veces guardado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.ProductosFavoritos)
+                    {
+                        <tr>
+                            <td>@p.Nombre</td>
+                            <td>@p.Cantidad</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="admin-card" style="margin-bottom:1.8rem;">
+    <div class="admin-card-header">
+        <h2>Rutas más favoritas</h2>
+    </div>
+    @if (Model.RutasFavoritas.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+            <h3>Sin favoritos aún</h3>
+            <p>Ningún usuario guardó rutas como favoritas.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Ruta</th>
+                        <th>Veces guardada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.RutasFavoritas)
+                    {
+                        <tr>
+                            <td>@r.Nombre</td>
+                            <td>@r.Cantidad</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Productos en carritos actuales</h2>
+    </div>
+    <p class="cell-muted" style="padding:0 1.4rem 1rem;">
+        Los carritos reflejan interés, no compras confirmadas: el producto puede quedar sin comprarse.
+    </p>
+    @if (Model.ProductosEnCarrito.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg>
+            <h3>No hay productos en carritos</h3>
+            <p>Ningún usuario tiene productos en su carrito en este momento.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad total</th>
+                        <th>Carritos distintos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model.ProductosEnCarrito)
+                    {
+                        <tr>
+                            <td>@c.ProductName</td>
+                            <td>@c.CantidadTotal</td>
+                            <td>@c.CarritosDistintos</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
