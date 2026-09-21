@@ -9,6 +9,10 @@
         <h1>Inventario</h1>
         <p>Foto del catálogo actual, sin filtro de fecha.</p>
     </div>
+    <div class="no-print" style="display:flex; gap:.6rem; align-items:flex-start;">
+        <a class="btn-admin btn-admin-outline btn-admin-sm" asp-action="ReportInventoryCsv">Exportar CSV</a>
+        <button type="button" class="btn-admin btn-admin-outline btn-admin-sm" onclick="window.print()">Imprimir / Guardar como PDF</button>
+    </div>
 </div>
 
 <div class="stat-grid">

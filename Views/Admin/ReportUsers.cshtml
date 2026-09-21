@@ -10,6 +10,11 @@
         <h1>Usuarios</h1>
         <p>Registros de cuentas por mes, según la fecha de creación.</p>
     </div>
+    <div class="no-print" style="display:flex; gap:.6rem; align-items:flex-start;">
+        <a class="btn-admin btn-admin-outline btn-admin-sm" asp-action="ReportUsersCsv"
+           asp-route-desde="@Model.Desde.ToString("yyyy-MM-dd")" asp-route-hasta="@Model.Hasta.ToString("yyyy-MM-dd")">Exportar CSV</a>
+        <button type="button" class="btn-admin btn-admin-outline btn-admin-sm" onclick="window.print()">Imprimir / Guardar como PDF</button>
+    </div>
 </div>
 
 <div class="admin-card" style="margin-bottom:1.8rem;">

@@ -122,9 +122,9 @@ Problemas de hoy: la clave `(UserId, ServiceId)` permite una sola reserva por ru
 
 ## Fase 6 — Exportar e imprimir
 
-- [ ] **CSV** por reporte, sin paquetes: `StringBuilder` + `File(...)`, separador `;` y UTF-8 con BOM (para que Excel en español lo abra bien). Si una celda empieza con `=`, `+`, `-` o `@`, anteponer `'` para evitar fórmulas.
-- [ ] **Imprimir / PDF:** `@media print` (sin sidebar ni botones, fondo claro) y botón "Imprimir / Guardar como PDF". No agregues librerías de PDF.
-- [ ] **Gráficos (opcional, pregúntame antes):** Chart.js por CDN, un gráfico por reporte con los datos ya en la vista. Sin llamadas AJAX.
+- [x] **CSV** por reporte, sin paquetes: `StringBuilder` + `File(...)`, separador `;` y UTF-8 con BOM (para que Excel en español lo abra bien). Si una celda empieza con `=`, `+`, `-` o `@`, anteponer `'` para evitar fórmulas.
+- [x] **Imprimir / PDF:** `@media print` (sin sidebar ni botones, fondo claro) y botón "Imprimir / Guardar como PDF". No agregues librerías de PDF.
+- [ ] **Gráficos (opcional, pregúntame antes):** Chart.js por CDN, un gráfico por reporte con los datos ya en la vista. Sin llamadas AJAX. — **Omitido por decisión del usuario**, se puede pedir después si hace falta.
 
 ## Fase 7 — Cierre
 

@@ -1061,3 +1061,79 @@ input[type="file"].form-control::file-selector-button {
         margin: .45rem 0 0;
     }
 }
+
+/* ---------- Impresión (reportes) ----------
+   El tema del panel es oscuro; en papel se fuerza fondo blanco y texto oscuro,
+   se oculta todo lo que no es dato (sidebar, topbar, filtros, botones). */
+@media print {
+    .no-print,
+    .admin-sidebar,
+    .admin-topbar {
+        display: none !important;
+    }
+
+    .admin-shell {
+        display: block;
+        min-height: auto;
+    }
+
+    .admin-main {
+        display: block;
+    }
+
+    .admin-body,
+    .admin-content {
+        background: #ffffff !important;
+        color: #14201a !important;
+        padding: 0;
+        min-height: auto;
+    }
+
+    .admin-page-header h1,
+    .admin-card-header h2 {
+        color: #14201a !important;
+    }
+
+    .admin-page-header p,
+    .cell-muted {
+        color: #4a544e !important;
+    }
+
+    form {
+        display: none !important;
+    }
+
+    .admin-card {
+        background: #ffffff !important;
+        border: 1px solid #ccc;
+        box-shadow: none !important;
+        break-inside: avoid;
+        margin-bottom: 1rem !important;
+    }
+
+    .stat-card {
+        background: #ffffff !important;
+        border: 1px solid #ccc;
+        box-shadow: none !important;
+    }
+
+    .stat-card-value {
+        color: #14201a !important;
+    }
+
+    .admin-table thead th {
+        background: #eef1ee !important;
+        color: #14201a !important;
+    }
+
+    .admin-table tbody td {
+        color: #14201a !important;
+        border-color: #ddd !important;
+    }
+
+    .pill {
+        border: 1px solid #999;
+        background: none !important;
+        color: #14201a !important;
+    }
+}

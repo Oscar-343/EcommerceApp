@@ -9,6 +9,10 @@
         <h1>Demanda</h1>
         <p>Foto actual de favoritos y carritos, sin filtro de fecha.</p>
     </div>
+    <div class="no-print" style="display:flex; gap:.6rem; align-items:flex-start;">
+        <a class="btn-admin btn-admin-outline btn-admin-sm" asp-action="ReportDemandCsv">Exportar CSV</a>
+        <button type="button" class="btn-admin btn-admin-outline btn-admin-sm" onclick="window.print()">Imprimir / Guardar como PDF</button>
+    </div>
 </div>
 
 <div class="admin-card" style="margin-bottom:1.8rem;">
