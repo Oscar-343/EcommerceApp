@@ -4,16 +4,17 @@
    ============================================ */
 
 :root {
-  --fav-bg: #080d0b;
+  /* Apuntan a wwwroot/css/tokens.css: paleta única del sitio */
+  --fav-bg: var(--color-bg);
   --fav-card: rgba(23, 61, 45, 0.55);
   --fav-card-border: rgba(79, 138, 104, 0.35);
   --fav-glass: rgba(11, 16, 14, 0.65);
-  --fav-text: #f2f1ea;
-  --fav-sub: #a8b0aa;
+  --fav-text: var(--color-text);
+  --fav-sub: var(--color-text-secondary);
   --fav-sand: #d8c9a8;
-  --fav-forest: #2e6b4d;
+  --fav-forest: var(--color-green);
   --fav-forest-deep: #173d2d;
-  --fav-tierra: #7C7058;
+  --fav-tierra: var(--color-tierra);
 }
 
 .fav-page {

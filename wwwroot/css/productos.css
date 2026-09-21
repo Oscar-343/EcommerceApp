@@ -4,14 +4,15 @@
 
 /* === PALETA DE COLORES === */
 :root {
-    --productos-bg: #0D1210;
-    --productos-section: #111815;
-    --productos-card: #171E1B;
-    --productos-border: #303936;
-    --productos-text: #F2F4F2;
-    --productos-text-secondary: #A9B2AD;
-    --productos-green: #2F5D46;
-    --productos-green-hover: #4F8063;
+    /* Apuntan a wwwroot/css/tokens.css: paleta única del sitio */
+    --productos-bg: var(--color-bg);
+    --productos-section: var(--color-section);
+    --productos-card: var(--color-card);
+    --productos-border: var(--color-border);
+    --productos-text: var(--color-text);
+    --productos-text-secondary: var(--color-text-secondary);
+    --productos-green: var(--color-green);
+    --productos-green-hover: var(--color-green-accent);
     --productos-green-light: #7FA58C;
     --productos-overlay: rgba(13, 18, 16, 0.85);
 }

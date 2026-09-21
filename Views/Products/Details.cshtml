@@ -1,15 +1,11 @@
 ﻿@model EcommerceApp.Models.Product
 @{
     ViewData["Title"] = Model.Name + " - Equipamiento Outdoor";
-    Layout = null;
+    // No tiene hero a pantalla completa: usa el espaciado normal del layout
+    // para que el navbar fijo no tape el breadcrumb.
 }
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+@section Styles {
     <link rel="stylesheet" href="~/css/productos.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
@@ -419,42 +415,8 @@
         }
     }
 </style>
-</head>
-<!-- === NAVBAR CINEMATOGRÁFICA (idéntica a Home / Servicios) === -->
-    <nav id="mainNav" class="navbar-cinematic">
-        <div class="nav-container">
-            <a class="nav-logo" asp-controller="Home" asp-action="Index">
-                <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg" alt="Tren al Sur">
-            </a>
+}
 
-            <ul class="nav-menu">
-                <li><a class="nav-link" asp-controller="Home" asp-action="Index">INICIO</a></li>
-                <li><a class="nav-link" asp-controller="Services" asp-action="Index">RUTAS</a></li>
-                <li><a class="nav-link active" asp-controller="Products" asp-action="Index">PRODUCTOS</a></li>
-                <li><a class="nav-link" href="#nosotros">NOSOTROS</a></li>
-            </ul>
-
-            <div class="nav-actions">
-                <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
-                <a asp-controller="Favorites" asp-action="Index" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
-                <a asp-controller="Cart" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
-                <div class="nav-user">
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <a href="#profile" class="nav-action-icon" title="Perfil"><i class="far fa-user"></i></a>
-                    }
-                    else
-                    {
-                        <a asp-controller="Account" asp-action="Login" class="nav-action-icon" title="Iniciar sesión"><i class="far fa-user"></i></a>
-                    }
-                </div>
-            </div>
-
-            <button class="nav-toggle" id="navToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </nav>
 <div class="producto-detalle">
     <div class="producto-detalle__container">
         <!-- Breadcrumb -->
@@ -472,14 +434,14 @@
             <!-- === GALERÍA === -->
             <div class="producto-galeria">
                 <div class="producto-galeria__main">
-                    <img id="mainImage" 
-                         src="@(Model.ImageUrl ?? "https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=800&h=800&fit=crop")" 
+                    <img id="mainImage"
+                         src="@(Model.ImageUrl ?? "/images/default-product.svg")"
                          alt="@Model.Name" />
                 </div>
 
                 <div class="producto-galeria__thumbs">
-                    <div class="producto-galeria__thumb active" onclick="cambiarImagen('@(Model.ImageUrl ?? "https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=800&h=800&fit=crop")', this)">
-                        <img src="@(Model.ImageUrl ?? "https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=800&h=800&fit=crop")" alt="@Model.Name" />
+                    <div class="producto-galeria__thumb active" onclick="cambiarImagen('@(Model.ImageUrl ?? "/images/default-product.svg")', this)">
+                        <img src="@(Model.ImageUrl ?? "/images/default-product.svg")" alt="@Model.Name" />
                     </div>
 
                     @if (!string.IsNullOrEmpty(Model.SecondaryImageUrl))
@@ -595,35 +557,29 @@
         </div>
     </div>
 </div>
-<script>
-    //Cambiar imagen principal
-    function cambiarImagen(src, thumb) {
-        document.getElementById('mainImage').src = src;
-        
-        // Actualizar thumbnails activos
-        document.querySelectorAll('.producto-galeria__thumb').forEach(t => t.classList.remove('active'));
-        if (thumb) {
-            thumb.classList.add('active');
-        }
-    }
 
-    // Control de cantidad
-    function cambiarCantidad(delta) {
-        const input = document.getElementById('cantidad');
-        const newValue = parseInt(input.value) + delta;
-        const max = parseInt(input.max);
-        
-        if (newValue >= 1 && newValue <= max) {
-            input.value = newValue;
-        }
-    }
-
-</script>
+@section Scripts {
     <script>
-        document.getElementById('mainNav')?.classList; // ya existe
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('mainNav');
-            if (nav) nav.classList.toggle('scrolled', window.pageYOffset > 50);
-        }, { passive: true });
+        //Cambiar imagen principal
+        function cambiarImagen(src, thumb) {
+            document.getElementById('mainImage').src = src;
+
+            // Actualizar thumbnails activos
+            document.querySelectorAll('.producto-galeria__thumb').forEach(t => t.classList.remove('active'));
+            if (thumb) {
+                thumb.classList.add('active');
+            }
+        }
+
+        // Control de cantidad
+        function cambiarCantidad(delta) {
+            const input = document.getElementById('cantidad');
+            const newValue = parseInt(input.value) + delta;
+            const max = parseInt(input.max);
+
+            if (newValue >= 1 && newValue <= max) {
+                input.value = newValue;
+            }
+        }
     </script>
-</html>
+}

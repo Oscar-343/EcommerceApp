@@ -4,14 +4,15 @@
    hero, productos, servicios) para mantener consistencia.
    ========================================================= */
 :root {
-    --bg-primary: #080d0b;
-    --bg-secondary: #111a16;
+    /* Apuntan a wwwroot/css/tokens.css: paleta única del sitio */
+    --bg-primary: var(--color-bg);
+    --bg-secondary: var(--color-section);
     --forest-deep: #173d2d;
-    --forest-main: #2e6b4d;
-    --forest-light: #4f8a68;
+    --forest-main: var(--color-green);
+    --forest-light: var(--color-green-accent);
     --sand: #d8c9a8;
-    --warm-white: #f2f1ea;
-    --text-secondary: #a8b0aa;
+    --warm-white: var(--color-text);
+    --text-secondary: var(--color-text-secondary);
     --radius-lg: 20px;
     --radius-sm: 10px;
     --ease-cinematic: cubic-bezier(0.65, 0, 0.35, 1);

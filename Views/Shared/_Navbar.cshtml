@@ -1,0 +1,43 @@
+@{
+    // Controlador actual, para marcar el link activo del menú.
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<nav id="mainNav" class="navbar-cinematic">
+    <div class="nav-container">
+        <a class="nav-logo" asp-area="" asp-controller="Home" asp-action="Index">
+            <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg" alt="Tren al Sur" />
+            <span>Tren al Sur</span>
+        </a>
+
+        <ul class="nav-menu">
+            <li><a class="nav-link @(currentController == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a></li>
+            <li><a class="nav-link @(currentController == "Services" ? "active" : "")" asp-controller="Services" asp-action="Index">Rutas</a></li>
+            <li><a class="nav-link @(currentController == "Products" ? "active" : "")" asp-controller="Products" asp-action="Index">Productos</a></li>
+            <li><a class="nav-link @(currentController == "Favorites" ? "active" : "")" asp-controller="Favorites" asp-action="Index">Favoritos</a></li>
+            <li><a class="nav-link @(currentController == "Cart" ? "active" : "")" asp-controller="Cart" asp-action="Index">Carrito</a></li>
+            @if (User.IsInRole("Admin"))
+            {
+                <li><a class="nav-link @(currentController == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="Index">Panel admin</a></li>
+            }
+        </ul>
+
+        <div class="nav-user">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <span class="nav-user__greeting">Hola, @User.Identity.Name</span>
+                <form asp-controller="Account" asp-action="Logout" method="post" class="nav-user__logout-form">
+                    <button type="submit" class="nav-user__logout">Cerrar sesión</button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="nav-user__link">Iniciar sesión</a>
+                <a asp-controller="Account" asp-action="Register" class="nav-user__link nav-user__link--primary">Registrarse</a>
+            }
+        </div>
+
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir menú">
+            ☰
+        </button>
+    </div>
+</nav>

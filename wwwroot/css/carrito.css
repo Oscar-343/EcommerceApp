@@ -4,14 +4,15 @@
    ============================================ */
 
 :root {
-  --cart-bg: #080d0b;
+  /* Apuntan a wwwroot/css/tokens.css: paleta única del sitio */
+  --cart-bg: var(--color-bg);
   --cart-card: rgba(23, 61, 45, 0.55);
   --cart-card-border: rgba(79, 138, 104, 0.35);
   --cart-glass: rgba(11, 16, 14, 0.7);
-  --cart-text: #f2f1ea;
-  --cart-sub: #a8b0aa;
+  --cart-text: var(--color-text);
+  --cart-sub: var(--color-text-secondary);
   --cart-sand: #d8c9a8;
-  --cart-forest: #2e6b4d;
+  --cart-forest: var(--color-green);
   --cart-forest-deep: #173d2d;
 }
 

@@ -1,0 +1,28 @@
+/* =========================================================
+   TREN AL SUR — Tokens de diseño (paleta oficial única)
+   Fuente única de verdad para los colores del sitio. Los demás
+   CSS (productos, carrito, favoritos, tren-al-sur) apuntan sus
+   variables locales a estas para no tener paletas parecidas
+   pero distintas.
+   ========================================================= */
+:root {
+    --color-bg: #0B100E;
+    --color-section: #111713;
+    --color-card: #171E1A;
+    --color-border: #303832;
+    --color-text: #F1F3F1;
+    --color-text-secondary: #A8B0AA;
+    --color-green: #315D45;
+    --color-green-accent: #557F63;
+    --color-tierra: #7C7058;
+}
+
+/* Respeta la preferencia del sistema de reducir animaciones */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

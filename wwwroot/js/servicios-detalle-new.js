@@ -3,45 +3,13 @@
    Animaciones e interactividad
    ========================================================= */
 
+// El scroll y el menú móvil de la navbar ahora viven en site.js,
+// compartidos por todas las páginas.
 document.addEventListener('DOMContentLoaded', function() {
-    initNavbarScroll();
-    initMobileMenu();
     initScrollAnimations();
     initGalleryInteractions();
     initSmoothScroll();
 });
-
-/* === NAVBAR: cambiar estilo al hacer scroll (igual que Home) === */
-function initNavbarScroll() {
-    const navbar = document.getElementById('mainNav');
-    if (!navbar) return;
-
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    }, { passive: true });
-}
-
-/* === NAVBAR: menú móvil toggle (igual que Home) === */
-function initMobileMenu() {
-    const toggle = document.getElementById('navToggle');
-    const menu = document.querySelector('.nav-menu');
-
-    if (!toggle || !menu) return;
-
-    toggle.addEventListener('click', function () {
-        menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-    });
-
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function () {
-            menu.style.display = 'none';
-        });
-    });
-}
 
 /* === ANIMACIONES CON INTERSECTION OBSERVER === */
 function initScrollAnimations() {

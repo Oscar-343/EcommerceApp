@@ -2,67 +2,21 @@
 @using EcommerceApp.Models
 @{
     ViewData["Title"] = "Rutas - Experiencias de Aventura";
-    Layout = null;
+    ViewData["FullBleed"] = true; // El hero ocupa toda la pantalla, detrás del navbar transparente
 }
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+@section Styles {
     <link rel="stylesheet" href="~/css/servicios-new.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            html, body {
-                width: 100%;
-                max-width: 100%;
-                overflow-x: hidden;
-                background-color: #0B100E;
-                color: #F1F3F1;
-                font-family: 'Inter', sans-serif;
-            }
+        body {
+            background-color: #0B100E;
+            color: #F1F3F1;
+            font-family: 'Inter', sans-serif;
+        }
     </style>
-</head>
-<body>
-
-    <!-- === NAVBAR CINEMATOGRÁFICA (idéntica a Home) === -->
-    <nav id="mainNav" class="navbar-cinematic">
-        <div class="nav-container">
-            <a class="nav-logo" asp-controller="Home" asp-action="Index">
-                <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg" alt="Tren al Sur">
-            </a>
-
-            <ul class="nav-menu">
-                <li><a class="nav-link" asp-controller="Home" asp-action="Index">INICIO</a></li>
-                <li><a class="nav-link active" asp-controller="Services" asp-action="Index">RUTAS</a></li>
-                <li><a class="nav-link" asp-controller="Products" asp-action="Index">PRODUCTOS</a></li>
-                <li><a class="nav-link" href="#nosotros">NOSOTROS</a></li>
-            </ul>
-
-            <div class="nav-actions">
-                <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
-                <a asp-controller="Favorites" asp-action="Index" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
-                <a asp-controller="Cart" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
-                <div class="nav-user">
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <a href="#profile" class="nav-action-icon" title="Perfil"><i class="far fa-user"></i></a>
-                    }
-                    else
-                    {
-                        <a asp-controller="Account" asp-action="Login" class="nav-action-icon" title="Iniciar sesión"><i class="far fa-user"></i></a>
-                    }
-                </div>
-            </div>
-
-            <button class="nav-toggle" id="navToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </nav>
+}
 
     <div class="servicios-page">
         <!-- HERO -->
@@ -178,7 +132,7 @@
 
                             <div class="servicios-route-block @(alt ? "servicios-route-block--alt" : "")">
                                 <div class="servicios-route-block__image">
-                                    <img src="@(route.SecondaryImageUrl ?? route.ImageUrl ?? "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=800&fit=crop")" alt="@route.Name">
+                                    <img src="@(route.SecondaryImageUrl ?? route.ImageUrl ?? "/images/default-product.svg")" alt="@route.Name">
                                     <div class="servicios-route-block__overlay"></div>
                                 </div>
                                 <div class="servicios-route-block__content">
@@ -223,6 +177,6 @@
         </section>
     </div>
 
+@section Scripts {
     <script src="~/js/servicios-new.js" asp-append-version="true"></script>
-</body>
-</html>
+}

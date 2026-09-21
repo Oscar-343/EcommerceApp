@@ -3,47 +3,11 @@
  * JavaScript para interactividad y efectos suaves
  */
 
+// El scroll y el menú móvil de la navbar ahora viven en site.js,
+// compartidos por todas las páginas.
 document.addEventListener('DOMContentLoaded', function () {
-    initNavbarScroll();
     initAnimations();
-    initMobileMenu();
 });
-
-/**
- * Menú móvil toggle (Reutilizado del Home)
- */
-function initMobileMenu() {
-    const toggle = document.getElementById('navToggle');
-    const menu = document.querySelector('.nav-menu');
-
-    if (!toggle || !menu) return;
-
-    toggle.addEventListener('click', function () {
-        menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-    });
-
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function () {
-            menu.style.display = 'none';
-        });
-    });
-}
-
-/**
- * Cambiar estilo navbar al hacer scroll (Reutilizado del Home)
- */
-function initNavbarScroll() {
-    const navbar = document.getElementById('mainNav');
-    if (!navbar) return;
-
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    }, { passive: true });
-}
 
 /**
  * Animaciones de entrada con IntersectionObserver

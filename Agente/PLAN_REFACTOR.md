@@ -74,17 +74,21 @@
 
 ## Fase 3 — Un solo layout y estilos (visual: yo pruebo en el navegador)
 
-- [ ] `Views/Shared/_Layout.cshtml` único para la parte pública, con `lang="es"`, título "Tren al Sur", navbar y footer. Eliminar `<script type="importmap">` y las referencias a "EcommerceApp".
+- [x] `Views/Shared/_Layout.cshtml` único para la parte pública, con `lang="es"`, título "Tren al Sur", navbar y footer. Eliminar `<script type="importmap">` y las referencias a "EcommerceApp".
   - Navbar en un parcial `_Navbar.cshtml`. Enlaces: Inicio, Rutas, Productos, Favoritos, Carrito.
   - Usuario autenticado: "Hola, nombre" + botón "Cerrar sesión" (POST). Anónimo: "Iniciar sesión" y "Registrarse". Admin: enlace al panel.
   - **No** envolver `@RenderBody()` en `.container` (las secciones son a ancho completo).
   - Secciones `Styles` y `Scripts` para el CSS/JS de cada página.
-- [ ] Quitar `Layout = null` y el HTML/navbar copiado de: `Home/Index`, `Products/Index`, `Products/Details`, `Services/Index`, `Services/Details`. Cada vista queda solo con su contenido.
-- [ ] `Products/Details.cshtml` no tiene `<body>`; se resuelve con el layout.
-- [ ] Mover a `wwwroot/js/site.js` (una sola vez) el JS de scroll de la navbar y el menú móvil, hoy repetido en línea en cada vista.
-- [ ] **Enlaces muertos:** eliminar los íconos `#search` y `#profile`; `#nosotros` solo si no existe esa sección.
-- [ ] Cargar `home-new.css` solo en el Home (hoy se carga en todo el sitio desde `_Layout`).
-- [ ] Crear `wwwroot/css/tokens.css` con la paleta oficial y cargarlo primero en el layout:
+  - **Nota:** se dejó el `<link>` a `~/EcommerceApp.styles.css` (bundle de CSS aislado que genera el propio SDK a partir de `_Layout.cshtml.css`, atado al nombre del `.csproj`, no es una marca visible); solo se quitó el texto "EcommerceApp" del `<title>`. El navbar es `position: fixed`, así que `<main>` tiene `padding-top` por defecto en `site.css`; las páginas con hero a pantalla completa (Home, Productos/Index, Servicios/Index, Servicios/Details) marcan `ViewData["FullBleed"] = true` para que el navbar transparente flote sobre su propio hero, igual que antes.
+- [x] Quitar `Layout = null` y el HTML/navbar copiado de: `Home/Index`, `Products/Index`, `Products/Details`, `Services/Index`, `Services/Details`. Cada vista queda solo con su contenido.
+  - De paso, en `Home/Index.cshtml` se quitó el `<footer class="footer-cinematic">` propio (duplicaba el footer del layout y tenía ~10 enlaces muertos: `#servicios`, `#contacto`, `#faq`, `#terminos`, `#privacidad`, redes sociales) y se corrigió el ítem "Carrito" de la barra móvil inferior, que apuntaba a `Products` en vez de `Cart`.
+- [x] `Products/Details.cshtml` no tiene `<body>`; se resuelve con el layout. Esta vista no tiene hero a pantalla completa, así que no usa `FullBleed` (usa el espaciado normal para que el navbar no tape el breadcrumb).
+- [x] Mover a `wwwroot/js/site.js` (una sola vez) el JS de scroll de la navbar y el menú móvil, hoy repetido en línea en cada vista.
+  - Quitado de `home-new.js`, `servicios-new.js`, `servicios-detalle-new.js` y del script inline de `Products/Index.cshtml`/`Products/Details.cshtml`.
+- [x] **Enlaces muertos:** eliminar los íconos `#search` y `#profile`; `#nosotros` solo si no existe esa sección.
+  - Los tres desaparecieron junto con el navbar viejo (ninguna página tenía una sección `id="nosotros"` real). Se dejó sin tocar el `#profile` de la barra móvil inferior de Home (funcionalidad aparte, no mencionada en esta tarea, e inofensiva: no hay página de perfil todavía).
+- [x] Cargar `home-new.css` solo en el Home (hoy se carga en todo el sitio desde `_Layout`).
+- [x] Crear `wwwroot/css/tokens.css` con la paleta oficial y cargarlo primero en el layout:
 
   | Variable | Color |
   |---|---|
@@ -99,8 +103,15 @@
   | tierra | `#7C7058` |
 
   En `productos.css`, `carrito.css`, `favoritos.css` y `tren-al-sur.css`, apuntar sus variables locales a estas (`--productos-bg: var(--color-bg)`). Hoy usan valores parecidos pero distintos, como `#0D1210` o `#080d0b`. Edición mínima, sin reescribir los CSS.
-- [ ] Añadir `@media (prefers-reduced-motion: reduce)` para desactivar animaciones, y `preload="metadata"` en el video del Home.
-- [ ] Imagen por defecto: crear `wwwroot/images/default-product.svg` (SVG simple con el logo o un ícono de montaña) y usarla como único fallback. Reemplazar `/images/default-product.jpg` (no existe), `via.placeholder.com` y las URLs de Unsplash usadas como fallback.
+  - **Nota:** `home-new.css`, `servicios-new.css` y `servicios-detalle-new.css` no se tocaron porque sus variables ya usaban exactamente estos valores (por eso no estaban en la lista de la tarea). `tren-al-sur.css` se carga desde `_AuthLayout.cshtml` (login/registro), que no cargaba ningún CSS de paleta; se le agregó el `<link>` a `tokens.css` para que sus `var(--color-*)` funcionen.
+- [x] Añadir `@media (prefers-reduced-motion: reduce)` para desactivar animaciones, y `preload="metadata"` en el video del Home.
+  - La regla quedó una sola vez en `tokens.css` (se carga en todas las páginas), en vez de repetirla en cada CSS.
+- [x] Imagen por defecto: crear `wwwroot/images/default-product.svg` (SVG simple con el logo o un ícono de montaña) y usarla como único fallback. Reemplazar `/images/default-product.jpg` (no existe), `via.placeholder.com` y las URLs de Unsplash usadas como fallback.
+  - Reemplazado en `Cart/Index`, `Favorites/Index`, `Home/Index`, `Products/Details`, `Products/_ProductoCard`, `Services/Index` y `Services/Details`.
+  - **No** se tocaron `Views/Products/_ProductCard.cshtml` ni `Views/Shared/_ServiceCardLarge.cshtml`: son código muerto (nunca se renderizan, ver nota de Fase 2), candidatos a borrado en Fase 6.
+  - **No** se tocó el arreglo `discoverPlaceholders` de `Home/Index` (rutas "PRÓXIMAMENTE" sin ruta real todavía): no es un fallback de imagen rota, es contenido decorativo para slots vacíos del carrusel.
+
+**Build:** `dotnet build` → 0 errores (mismos 5 warnings preexistentes de Fase 0, no tocados). Probado también con `dotnet run` + `curl` sobre Home, Productos, Servicios, Cart, Favoritos, Login, `Products/Details/{id}` y `Services/Details/{id}`: todas devuelven 200 (Cart/Favoritos 302 a Login, es lo esperado sin sesión) y todos los CSS/JS/SVG nuevos resuelven con 200.
 
 ## Fase 4 — Categorías, ofertas y datos
 

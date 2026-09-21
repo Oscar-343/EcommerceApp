@@ -31,7 +31,7 @@
                     if (p != null)
                     {
                         <div class="fav-card">
-                            <img src="@(p.ImageUrl ?? "/images/default-product.jpg")" alt="" />
+                            <img src="@(p.ImageUrl ?? "/images/default-product.svg")" alt="" />
                             <h4>@p.Name</h4>
                             <div class="meta">@p.Category</div>
                             <div class="price">@PriceFormatter.Format(p.Price)</div>
@@ -49,7 +49,7 @@
                     if (s != null)
                     {
                         <div class="fav-card">
-                            <img src="@(s.ImageUrl ?? "/images/default-product.jpg")" alt="" />
+                            <img src="@(s.ImageUrl ?? "/images/default-product.svg")" alt="" />
                             <h4>@s.Name</h4>
                             <div class="meta">@s.Category · @s.Region</div>
                             <div class="price">@PriceFormatter.Format(s.Price)</div>

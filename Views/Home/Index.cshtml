@@ -1,78 +1,29 @@
 ﻿@model EcommerceApp.Models.HomeViewModel
 @{
     ViewData["Title"] = "Tren al Sur - Plataforma de Aventuras Outdoor";
-    Layout = null; // Controlamos todo el HTML manualmente
+    ViewData["FullBleed"] = true; // El hero ocupa toda la pantalla, detrás del navbar transparente
 }
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+@section Styles {
     <link rel="stylesheet" href="~/css/home-new.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS inline mínimo para estructura base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html, body {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden;
+        body {
             background-color: #0B100E;
             color: #F1F3F1;
             font-family: 'Open Sans', sans-serif;
         }
     </style>
-</head>
-<body>
-    <!-- === NAVBAR CINEMATOGRÁFICA === -->
-    <nav id="mainNav" class="navbar-cinematic">
-        <div class="nav-container">
-            <a class="nav-logo" asp-controller="Home" asp-action="Index">
-                <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg"alt="Logo Tren al Sur">
-            </a>            
-            <ul class="nav-menu">
-                <li><a class="nav-link active" asp-controller="Home" asp-action="Index">INICIO</a></li>
-                <li><a class="nav-link" asp-controller="Services" asp-action="Index">RUTAS</a></li>
-                <li><a class="nav-link" asp-controller="Products" asp-action="Index">PRODUCTOS</a></li>
-                <li><a class="nav-link" href="#nosotros">NOSOTROS</a></li>
-            </ul>
-            
-            <div class="nav-actions">
-                <a href="#search" class="nav-action-icon" title="Buscar"><i class="fas fa-search"></i></a>
-                <a asp-controller="Favorites" asp-action="Index" class="nav-action-icon" title="Favoritos"><i class="far fa-heart"></i></a>
-                <a asp-controller="Cart" asp-action="Index" class="nav-action-icon" title="Carrito"><i class="fas fa-shopping-cart"></i></a>
-                <div class="nav-user">
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <a href="#profile" class="nav-action-icon" title="Perfil"><i class="far fa-user"></i></a>
-                    }
-                    else
-                    {
-                        <a asp-controller="Account" asp-action="Login" class="nav-action-icon" title="Iniciar sesión"><i class="far fa-user"></i></a>
-                    }
-                </div>
-            </div>
-            
-            <button class="nav-toggle" id="navToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </nav>
+}
+
 <!-- === HERO FULLSCREEN CON VIDEO === -->
 <section class="hero-fullscreen">
 
     <div class="hero-video-container">
-        <video class="hero-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture> <source src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/Video%20Project.mp4" type="video/mp4"> </video>
+        <video class="hero-video" autoplay muted loop playsinline preload="metadata" disablepictureinpicture> <source src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/Video%20Project.mp4" type="video/mp4"> </video>
 
         <div class="hero-overlay"></div>
 
@@ -261,7 +212,7 @@
                         <!-- PRODUCTO CURADO: Imagen de producto real -->
                         <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="product-curated-card">
                             <div class="product-image-wrapper">
-                                <img src="@(product.ImageUrl ?? "https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=600&h=600&fit=crop")"
+                                <img src="@(product.ImageUrl ?? "/images/default-product.svg")"
                                      alt="@product.Name"
                                      class="product-curated-image"
                                      loading="lazy">
@@ -316,50 +267,6 @@
         </div>
     </section>
 
-    <!-- === FOOTER === -->
-    <footer class="footer-cinematic">
-        <div class="footer-container">
-            <div class="footer-grid">
-                <div class="footer-column">
-                    <h4 class="footer-title">NAVEGACIÓN</h4>
-                    <a asp-controller="Home" asp-action="Index" class="footer-link">Inicio</a>
-                    <a asp-controller="Services" asp-action="Index" class="footer-link">Rutas</a>
-                    <a asp-controller="Products" asp-action="Index" class="footer-link">Productos</a>
-                    <a href="#servicios" class="footer-link">Servicios</a>
-                    <a href="#nosotros" class="footer-link">Nosotros</a>
-                </div>
-                <div class="footer-column">
-                    <h4 class="footer-title">AYUDA</h4>
-                    <a href="#contacto" class="footer-link">Contacto</a>
-                    <a href="#faq" class="footer-link">Preguntas Frecuentes</a>
-                    <a href="#terminos" class="footer-link">Términos y Condiciones</a>
-                    <a href="#privacidad" class="footer-link">Política de Privacidad</a>
-                </div>
-                <div class="footer-column">
-                    <h4 class="footer-title">CONTACTO</h4>
-                    <p class="footer-contact"><i class="fas fa-envelope"></i> info@trenalsur.com</p>
-                    <p class="footer-contact"><i class="fas fa-phone"></i> +591 123 456 789</p>
-                    <p class="footer-contact"><i class="fas fa-map-marker-alt"></i> Cochabamba, Bolivia</p>
-                </div>
-                <div class="footer-column">
-                    <h4 class="footer-title">SÍGUENOS</h4>
-                    <div class="footer-socials">
-                        <a href="#facebook" class="social-icon" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#instagram" class="social-icon" title="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#youtube" class="social-icon" title="YouTube"><i class="fab fa-youtube"></i></a>
-                        <a href="#twitter" class="social-icon" title="Twitter"><i class="fab fa-twitter"></i></a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2026 Tren al Sur. Todos los derechos reservados. | 
-                <a href="#privacidad" class="footer-legal">Privacidad</a> | 
-                <a href="#terminos" class="footer-legal">Términos</a></p>
-            </div>
-        </div>
-    </footer>
-
     <!-- === BARRA INFERIOR MÓVIL === -->
     <nav class="mobile-bottom-nav">
         <a asp-controller="Home" asp-action="Index" class="mobile-nav-item active">
@@ -371,7 +278,7 @@
         <a asp-controller="Products" asp-action="Index" class="mobile-nav-item">
             <i class="fas fa-campground"></i><span>Productos</span>
         </a>
-        <a asp-controller="Products" asp-action="Index" class="mobile-nav-item">
+        <a asp-controller="Cart" asp-action="Index" class="mobile-nav-item">
             <i class="fas fa-shopping-cart"></i><span>Carrito</span>
         </a>
         @if (User.Identity?.IsAuthenticated == true)
@@ -384,6 +291,6 @@
         }
     </nav>
 
+@section Scripts {
     <script src="~/js/home-new.js" asp-append-version="true"></script>
-</body>
-</html>
+}

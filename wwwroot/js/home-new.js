@@ -3,30 +3,14 @@
  * JavaScript para interactividad y efectos suaves
  */
 
+// El scroll y el menú móvil de la navbar ahora viven en site.js
+// (initNavbarScroll / initMobileMenu), compartidos por todas las páginas.
 document.addEventListener('DOMContentLoaded', function () {
-    initNavbarScroll();
     initSmoothScroll();
     initAnimations();
     initMapMarkers();
-    initMobileMenu();
     initHeroVideo();
 });
-
-/**
- * Cambiar estilo navbar al hacer scroll
- */
-function initNavbarScroll() {
-    const navbar = document.getElementById('mainNav');
-    if (!navbar) return;
-
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    }, { passive: true });
-}
 
 /**
  * Scroll suave hacia secciones
@@ -112,41 +96,6 @@ function initMapMarkers() {
         });
     });
 }
-
-/**
- * Menú móvil toggle
- */
-function initMobileMenu() {
-    const toggle = document.getElementById('navToggle');
-    const menu = document.querySelector('.nav-menu');
-    
-    if (!toggle || !menu) return;
-    
-    toggle.addEventListener('click', function() {
-        menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-    });
-    
-    // Cerrar menú al hacer clic en un link
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function() {
-            menu.style.display = 'none';
-        });
-    });
-}
-
-/**
- * Placeholder para acciones navbar
- */
-document.querySelectorAll('.nav-action-icon').forEach(icon => {
-    icon.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (href === '#search' || href === '#favorites' || href === '#profile') {
-            e.preventDefault();
-            console.log('Acción:', href);
-            // TODO: Implementar modales
-        }
-    });
-});
 
 /**
  * Inicializar y forzar reproducción del video hero
