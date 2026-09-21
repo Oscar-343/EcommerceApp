@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using EcommerceApp.Data;
@@ -69,6 +70,19 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Render coloca la app detrás de un proxy inverso que no es loopback,
+// así que hay que vaciar KnownNetworks/KnownProxies para que ASP.NET
+// confíe en los headers X-Forwarded-* que manda ese proxy. Sin esto,
+// UseHttpsRedirection y las URLs generadas (login social, "olvidé mi
+// contraseña") no ven el esquema https real y salen con http.
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+forwardedHeadersOptions.KnownIPNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeadersOptions);
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
@@ -78,7 +92,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 // Crear roles por defecto solo si no existen (evita errores al reiniciar la app)
 using (var scope = app.Services.CreateScope())
 {

@@ -12,5 +12,7 @@ namespace EcommerceApp.Models
 
         [Display(Name = "Recordarme")]
         public bool RememberMe { get; set; }
+
+        public string? ReturnUrl { get; set; }
     }
 }

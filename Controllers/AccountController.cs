@@ -16,7 +16,7 @@ namespace EcommerceApp.Controllers
         IEmailSender emailSender) : Controller
     {
         [HttpGet]
-        public IActionResult Login() => View();
+        public IActionResult Login(string? returnUrl = null) => View(new LoginViewModel { ReturnUrl = returnUrl });
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -25,10 +25,14 @@ namespace EcommerceApp.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var result = await signInManager.PasswordSignInAsync(
-                model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
 
             if (result.Succeeded)
             {
+                // Solo se respeta returnUrl si es una ruta local (evita open redirect).
+                if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+                    return Redirect(model.ReturnUrl);
+
                 var user = await userManager.FindByEmailAsync(model.Email);
                 return RedirectForRole(user);
             }

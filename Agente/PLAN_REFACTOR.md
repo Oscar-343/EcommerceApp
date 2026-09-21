@@ -41,11 +41,15 @@
 
 ## Fase 1 — Seguridad y despliegue (Render)
 
-- [ ] `Data/AdminSeeder.cs`: quitar correo y contraseña del código. Leer `Admin:Email` y `Admin:Password` de configuración; si faltan, no crear nada. **No borres cuentas ya existentes** (puede ser la que usa el docente). Dime qué variables definir en Render (`Admin__Email`, `Admin__Password`) y en `user-secrets`.
-- [ ] `Program.cs`: agregar `UseForwardedHeaders` (X-Forwarded-For y X-Forwarded-Proto) antes de `UseHttpsRedirection`. En Render el proxy no es loopback, así que hay que limpiar `KnownNetworks` y `KnownProxies`; explícalo en un comentario. Sin esto, el login con Google/GitHub y los enlaces de "olvidé mi contraseña" salen con `http`.
-- [ ] `Program.cs`: ruta por defecto → `Home/Index` (hoy es `Account/Login`).
-- [ ] `AccountController.Login`: respetar `returnUrl` (solo si `Url.IsLocalUrl`) y usar `lockoutOnFailure: true`.
-- [ ] Crear `appsettings.Example.json` con las claves necesarias y valores vacíos. Confirmar que `.gitignore` excluye `appsettings.Development.json`.
+- [x] `Data/AdminSeeder.cs`: quitar correo y contraseña del código. Leer `Admin:Email` y `Admin:Password` de configuración; si faltan, no crear nada. **No borres cuentas ya existentes** (puede ser la que usa el docente). Dime qué variables definir en Render (`Admin__Email`, `Admin__Password`) y en `user-secrets`.
+  - Hecho en la tarea previa a este plan (commit `850cfac`). No borra cuentas existentes: si el email ya existe, solo asegura el rol Admin. Variables a definir: ver resumen de la fase.
+- [x] `Program.cs`: agregar `UseForwardedHeaders` (X-Forwarded-For y X-Forwarded-Proto) antes de `UseHttpsRedirection`. En Render el proxy no es loopback, así que hay que limpiar `KnownNetworks` y `KnownProxies`; explícalo en un comentario. Sin esto, el login con Google/GitHub y los enlaces de "olvidé mi contraseña" salen con `http`.
+  - Usé `KnownIPNetworks` en vez de `KnownNetworks` (esta última quedó obsoleta en net10.0, generaba warning `ASPDEPR005`).
+- [x] `Program.cs`: ruta por defecto → `Home/Index` (hoy es `Account/Login`).
+- [x] `AccountController.Login`: respetar `returnUrl` (solo si `Url.IsLocalUrl`) y usar `lockoutOnFailure: true`.
+  - Se agregó `ReturnUrl` a `LoginViewModel` y un campo hidden en `Login.cshtml` para que viaje del GET (querystring, cuando `[Authorize]` redirige) al POST.
+- [x] Crear `appsettings.Example.json` con las claves necesarias y valores vacíos. Confirmar que `.gitignore` excluye `appsettings.Development.json`.
+  - Se mantuvieron algunos valores no sensibles como referencia (`Port`, `LogLevel`, `Bucket`, `From`); todo lo que es credencial quedó vacío.
 
 ## Fase 2 — Errores funcionales (sin cambiar el modelo de datos)
 

@@ -21,6 +21,7 @@
             <!-- ===================== INICIAR SESIÓN (activo) ===================== -->
             <div class="auth-view" data-view="signin">
                 <form asp-action="Login" method="post" class="auth-form" novalidate>
+                    <input type="hidden" asp-for="ReturnUrl" />
                     <div asp-validation-summary="ModelOnly" class="auth-alert"></div>
 
                     <h1 class="auth-title">Iniciar sesión</h1>
