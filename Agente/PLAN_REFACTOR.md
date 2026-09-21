@@ -30,10 +30,14 @@
 
 ## Fase 0 — Preparación
 
-- [ ] Lee `Agente/AGENTS.md` y `Agente/.agent/*.md`; resume en 5 líneas lo que debes respetar.
-- [ ] `git status`: confirma árbol limpio y crea la rama `refactor-orden`.
-- [ ] `dotnet build` de referencia (anota errores o warnings previos).
-- [ ] `git ls-files`: confirma que no hay secretos versionados.
+- [x] Lee `Agente/AGENTS.md` y `Agente/.agent/*.md`; resume en 5 líneas lo que debes respetar.
+  - **Nota:** ninguno de esos archivos existe en el repo (solo está `Agente/PLAN_REFACTOR.md`). No hay nada que resumir; avisado al usuario.
+- [x] `git status`: confirma árbol limpio y crea la rama `refactor-orden`.
+  - El árbol tenía cambios pendientes (`Data/AdminSeeder.cs`, `Program.cs` de una tarea anterior, y `Agente/` sin trackear). Se commitearon en `mejoras-diagnostico` (2 commits) antes de crear `refactor-orden`.
+- [x] `dotnet build` de referencia (anota errores o warnings previos).
+  - **0 errores, 5 warnings** `CS8619` (nulabilidad `List<string>` vs `List<string?>`) en `Controllers/ServicesController.cs:117` y `Controllers/ProductsController.cs:121-122`. No se tocan en esta fase.
+- [x] `git ls-files`: confirma que no hay secretos versionados.
+  - No hay ningún `appsettings*.json` trackeado; `appsettings.Development.json` existe solo en disco y está en `.gitignore`.
 
 ## Fase 1 — Seguridad y despliegue (Render)
 
