@@ -1,14 +1,18 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using EcommerceApp.Models;
 
 namespace EcommerceApp.Data
 {
     public static class AdminSeeder
     {
-        public static async Task SeedAdminAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task SeedAdminAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
-            const string email = "juan@gmail.com";
-            const string password = "Juan_123";
+            var email = configuration["Admin:Email"];
+            var password = configuration["Admin:Password"];
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                return;
 
             var user = await userManager.FindByEmailAsync(email);
             if (user == null)

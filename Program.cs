@@ -97,7 +97,7 @@ using (var scope = app.Services.CreateScope())
 
     // Cuenta de administración
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    await AdminSeeder.SeedAdminAsync(userManager, roleManager);
+    await AdminSeeder.SeedAdminAsync(userManager, roleManager, builder.Configuration);
 }
 
 app.Run();
