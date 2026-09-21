@@ -180,12 +180,19 @@ COMMIT;
 
 Antes de borrar cada archivo, haz `grep` y muéstrame que nadie lo referencia.
 
-- [ ] `Dockerfile.cs` (una clase vacía creada por error) y la carpeta vacía `-Force/`.
-- [ ] `wwwroot/css/home.css`, `wwwroot/css/servicios.css`, `wwwroot/js/home.js`, `wwwroot/js/servicios.js`: versiones antiguas, hoy no referenciadas por ninguna vista.
-- [ ] `Views/Products/_ProductCard.cshtml` y `Views/Shared/_ServiceCardLarge.cshtml`: nunca se renderizan (solo se usa `_ProductoCard`).
-- [ ] Revisar `tren-al-sur.css` y `Views/Shared/_Layout.cshtml.css`: borrarlos solo si nada los usa tras la Fase 3.
-- [ ] Renombrar los `*-new` (`home-new.css`, `servicios-new.css`, `servicios-detalle-new.css`, `home-new.js`, `servicios-new.js`, `servicios-detalle-new.js`) quitando el sufijo, y actualizar las referencias.
-- [ ] Buscar y eliminar código comentado, `TODO` obsoletos y `using` sin uso.
+- [x] `Dockerfile.cs` (una clase vacía creada por error) y la carpeta vacía `-Force/`.
+  - Confirmado sin referencias en `.csproj`, `.cs` ni en el `Dockerfile` real (solo copia `*.csproj` y hace `dotnet publish`). `-Force/` estaba vacía. Ambos borrados.
+- [x] `wwwroot/css/home.css`, `wwwroot/css/servicios.css`, `wwwroot/js/home.js`, `wwwroot/js/servicios.js`: versiones antiguas, hoy no referenciadas por ninguna vista.
+  - Confirmado con `grep` de `<link>`/`<script src>` en todo `Views/`: 0 resultados. Borrados.
+- [x] `Views/Products/_ProductCard.cshtml` y `Views/Shared/_ServiceCardLarge.cshtml`: nunca se renderizan (solo se usa `_ProductoCard`).
+  - Confirmado: la única partial de producto usada es `_ProductoCard` (con "o"), en `Views/Products/Index.cshtml:166`. Cero `Html.Partial`/`<partial>`/`PartialView` apuntando a `_ProductCard` o `_ServiceCardLarge`. Borrados.
+- [x] Revisar `tren-al-sur.css` y `Views/Shared/_Layout.cshtml.css`: borrarlos solo si nada los usa tras la Fase 3.
+  - `tren-al-sur.css` **sigue en uso** (`Views/Shared/_AuthLayout.cshtml:12` y `Views/Admin/_AdminLayout.cshtml:32`): no se tocó.
+  - `Views/Shared/_Layout.cshtml.css` (scaffold de plantilla: `.navbar-brand`, `.btn-primary`, `.nav-pills`, `.footer`) ya no matchea ninguna clase del `_Layout.cshtml` actual (usa `_Navbar` con `.nav-logo`/`.nav-menu` y `<footer class="site-footer">`). Decisión confirmada con el usuario: se borró. **Pendiente que el usuario confirme visualmente** navbar/botones/footer en el navegador.
+- [x] Renombrar los `*-new` (`home-new.css`, `servicios-new.css`, `servicios-detalle-new.css`, `home-new.js`, `servicios-new.js`, `servicios-detalle-new.js`) quitando el sufijo, y actualizar las referencias.
+  - Renombrados con `git mv` a `home.css`, `servicios.css`, `servicios-detalle.css`, `home.js`, `servicios.js`, `servicios-detalle.js`. Actualizadas las 6 referencias en `Views/Home/Index.cshtml`, `Views/Services/Index.cshtml` y `Views/Services/Details.cshtml`.
+- [x] Buscar y eliminar código comentado, `TODO` obsoletos y `using` sin uso.
+  - Revisado `Controllers/*.cs` y `Program.cs`: sin bloques de código comentado (solo comentarios explicativos legítimos en español), sin `TODO`/`FIXME` reales, y build con analizador `IDE0005` (usings innecesarios) → 0 warnings. Nada que limpiar.
 
 ## Fase 7 — Orden interno y material de estudio
 

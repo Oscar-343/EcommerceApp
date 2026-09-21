@@ -1,41 +1,51 @@
 /**
- * HOME - PLATAFORMA OUTDOOR CINEMATOGRÁFICA
- * Funcionalidad de cliente para animaciones, interacciones y scroll effects
+ * HOME - CINEMATOGRÁFICO OUTDOOR PREMIUM
+ * JavaScript para interactividad y efectos suaves
  */
 
+// El scroll y el menú móvil de la navbar ahora viven en site.js
+// (initNavbarScroll / initMobileMenu), compartidos por todas las páginas.
 document.addEventListener('DOMContentLoaded', function () {
-    // === INICIALIZAR COMPONENTES ===
-    initNavbarScroll();
-    initAnimations();
     initSmoothScroll();
+    initAnimations();
+    initMapMarkers();
+    initHeroVideo();
 });
 
 /**
- * Cambiar navbar al hacer scroll
+ * Scroll suave hacia secciones
  */
-function initNavbarScroll() {
-    const navbar = document.querySelector('.navbar-outdoor');
-    
-    if (!navbar) return;
-
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    }, { passive: true });
+function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            
+            // Ignorar enlaces vacíos o especiales
+            if (href === '#' || href === '#search' || href === '#favorites' || href === '#profile') {
+                return;
+            }
+            
+            const target = document.querySelector(href);
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
 }
 
 /**
- * Inicializar animaciones de entrada
+ * Animaciones de entrada con IntersectionObserver
  */
 function initAnimations() {
-    const animatedElements = document.querySelectorAll('.home-animate');
-
     if (!('IntersectionObserver' in window)) {
         // Fallback para navegadores antiguos
-        animatedElements.forEach(el => el.style.opacity = '1');
+        document.querySelectorAll('.home-animate').forEach(el => {
+            el.style.opacity = '1';
+        });
         return;
     }
 
@@ -51,106 +61,95 @@ function initAnimations() {
         rootMargin: '0px 0px -50px 0px'
     });
 
-    animatedElements.forEach(el => {
+    document.querySelectorAll('.home-animate').forEach(el => {
         observer.observe(el);
     });
 }
 
 /**
- * Scroll suave hacia secciones
+ * Interactividad de marcadores del mapa
  */
-function initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            
-            // Ignorar enlaces vacíos
-            if (href === '#') return;
-            
-            const target = document.querySelector(href);
-            if (target) {
-                e.preventDefault();
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+function initMapMarkers() {
+    const markers = document.querySelectorAll('.map-marker');
+    
+    markers.forEach(marker => {
+        marker.addEventListener('click', function() {
+            const routeId = this.getAttribute('data-route-id');
+            console.log('Ruta seleccionada:', routeId);
+            // TODO: Navegar al detalle de la ruta
+        });
+        
+        marker.addEventListener('mouseenter', function() {
+            const tooltip = this.querySelector('.marker-tooltip');
+            if (tooltip) {
+                tooltip.style.opacity = '1';
+                tooltip.style.visibility = 'visible';
+            }
+        });
+        
+        marker.addEventListener('mouseleave', function() {
+            const tooltip = this.querySelector('.marker-tooltip');
+            if (tooltip) {
+                tooltip.style.opacity = '0';
+                tooltip.style.visibility = 'hidden';
             }
         });
     });
 }
 
 /**
- * Parallax effect sutil en el hero (opcional)
+ * Inicializar y forzar reproducción del video hero
  */
-function initParallax() {
-    const hero = document.querySelector('.hero-outdoor');
-    
-    if (!hero) return;
+function initHeroVideo() {
+    const video = document.querySelector('.hero-video');
 
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const heroHeight = hero.offsetHeight;
-        
-        if (scrolled < heroHeight) {
-            hero.style.transform = `translateY(${scrolled * 0.3}px)`;
-        }
-    }, { passive: true });
-}
+    if (!video) {
+        console.error('No se encontró el elemento .hero-video');
+        return;
+    }
 
-// Inicializar parallax
-window.addEventListener('load', initParallax);
+    // Configuración para autoplay
+    video.muted = true;
+    video.volume = 0;
+    video.autoplay = true;
+    video.loop = true;
+    video.playsInline = true;
 
-/**
- * Manejar clics en iconos navbar
- */
-document.querySelectorAll('.navbar-icon').forEach(icon => {
-    icon.addEventListener('click', function(e) {
-        // Los links normales funcionan naturalmente
-        // Los iconos especiales (#buscar, #favoritos, #perfil) pueden tener lógica adicional
-        const href = this.getAttribute('href');
-        
-        if (href === '#buscar') {
-            e.preventDefault();
-            openSearchModal();
-        } else if (href === '#favoritos') {
-            e.preventDefault();
-            openFavoritesModal();
-        } else if (href === '#perfil') {
-            e.preventDefault();
-            openProfileMenu();
-        }
+    // Información de carga
+    video.addEventListener('loadedmetadata', function () {
+        console.log('VIDEO: metadata cargada');
+        console.log('Duración:', video.duration);
+        console.log('Resolución:', video.videoWidth + 'x' + video.videoHeight);
     });
-});
 
-/**
- * Modal de búsqueda (placeholder)
- */
-function openSearchModal() {
-    console.log('Abriendo búsqueda global');
-    // TODO: Implementar modal de búsqueda
+    video.addEventListener('loadeddata', function () {
+        console.log('VIDEO: datos cargados');
+    });
+
+    video.addEventListener('canplay', function () {
+        console.log('VIDEO: listo para reproducirse');
+    });
+
+    video.addEventListener('playing', function () {
+        console.log('VIDEO: REPRODUCIÉNDOSE');
+    });
+
+    video.addEventListener('pause', function () {
+        console.log('VIDEO: pausado');
+    });
+
+    video.addEventListener('error', function () {
+        console.error('VIDEO: ERROR');
+        console.error(video.error);
+    });
+
+    // Intentar reproducir
+    video.play()
+        .then(function () {
+            console.log('VIDEO: autoplay iniciado correctamente');
+        })
+        .catch(function (error) {
+            console.error('VIDEO: no se pudo iniciar autoplay');
+            console.error(error);
+        });
 }
-
-/**
- * Modal de favoritos (placeholder)
- */
-function openFavoritesModal() {
-    console.log('Abriendo favoritos');
-    // TODO: Implementar modal de favoritos
-}
-
-/**
- * Menú de perfil (placeholder)
- */
-function openProfileMenu() {
-    console.log('Abriendo perfil');
-    // TODO: Implementar menú de perfil
-}
-
-/**
- * Exportar funciones para uso global
- */
-window.homeModule = {
-    openSearchModal,
-    openFavoritesModal,
-    openProfileMenu
-};
