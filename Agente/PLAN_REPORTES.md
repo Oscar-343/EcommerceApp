@@ -128,9 +128,9 @@ Problemas de hoy: la clave `(UserId, ServiceId)` permite una sola reserva por ru
 
 ## Fase 7 — Cierre
 
-- [ ] Actualizar `GUIA_DE_ESTUDIO.md`: nuevas entidades (`Order`, `OrderItem`, `Reservation` con `Id`), el flujo carrito → pedido, el flujo de reserva, la regla de ingresos (decisión 1) y cómo se calculan los reportes.
-- [ ] Actualizar `Agente/.agent/PROJECT_STATE.md`, `TASKS.md` y `MEMORY.md`. No incluyas correos ni credenciales.
-- [ ] Revisión final: `dotnet build` con 0 errores, `git status` limpio y resumen de pendientes.
+- [x] Actualizar `GUIA_DE_ESTUDIO.md`: nuevas entidades (`Order`, `OrderItem`, `Reservation` con `Id`), el flujo carrito → pedido, el flujo de reserva, la regla de ingresos (decisión 1) y cómo se calculan los reportes.
+- [x] Actualizar `Agente/.agent/PROJECT_STATE.md`, `TASKS.md` y `MEMORY.md`. No incluyas correos ni credenciales.
+- [x] Revisión final: `dotnet build` con 0 errores, `git status` limpio y resumen de pendientes.
 
 ---
 
