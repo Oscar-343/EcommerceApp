@@ -62,6 +62,9 @@ builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
 // Subida de imágenes a Supabase Storage (usado desde el panel de administración).
 builder.Services.AddHttpClient<IImageStorageService, SupabaseImageStorageService>();
 
+// Cálculo de los reportes del panel admin (ingresos, reservas, ventas, inventario).
+builder.Services.AddScoped<ReportService>();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

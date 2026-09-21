@@ -1,0 +1,52 @@
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Reportes</h1>
+        <p>Reportes calculados sobre los pedidos, reservas y el catálogo actuales.</p>
+    </div>
+</div>
+
+<div class="stat-grid">
+    <a asp-action="ReportIncome" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value" style="font-size:1.15rem;">Ingresos</div>
+        <div class="stat-card-label">Reservas Acabado + pedidos Entregado, por mes y "por confirmar".</div>
+    </a>
+
+    <a asp-action="ReportReservations" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value" style="font-size:1.15rem;">Reservas</div>
+        <div class="stat-card-label">Por estado, por ruta y por mes, con tasa de cancelación.</div>
+    </a>
+
+    <a asp-action="ReportProductSales" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.6 12.2a2 2 0 01-2 1.8H7.1a2 2 0 01-2-1.8L3.5 7z"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value" style="font-size:1.15rem;">Ventas de productos</div>
+        <div class="stat-card-label">Pedidos Entregado por producto y por categoría.</div>
+    </a>
+
+    <a asp-action="ReportInventory" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 8l-8-5-8 5v8l8 5 8-5V8z"/><path d="M4 8l8 5 8-5"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value" style="font-size:1.15rem;">Inventario</div>
+        <div class="stat-card-label">Stock bajo, agotados, valor del inventario y productos en oferta.</div>
+    </a>
+</div>

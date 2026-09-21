@@ -1,0 +1,115 @@
+@using EcommerceApp.Models.Reports
+@model ProductSalesReportViewModel
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Ventas de productos</h1>
+        <p>Pedidos <strong>Entregado</strong> en el rango, por su fecha de entrega.</p>
+    </div>
+</div>
+
+<div class="admin-card" style="margin-bottom:1.8rem;">
+    <form method="get" asp-action="ReportProductSales" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:end; padding:1.2rem 1.4rem;">
+        <div class="form-field">
+            <label>Desde</label>
+            <input type="date" name="desde" class="form-control" value="@Model.Desde.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="form-field">
+            <label>Hasta</label>
+            <input type="date" name="hasta" class="form-control" value="@Model.Hasta.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="form-field">
+            <button type="submit" class="btn-admin btn-admin-primary">Filtrar</button>
+        </div>
+    </form>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-card-value">@Model.TotalUnidades</div>
+        <div class="stat-card-label">Unidades vendidas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-value">@PriceFormatter.Format(Model.TotalMonto)</div>
+        <div class="stat-card-label">Monto total</div>
+    </div>
+</div>
+
+<div class="admin-card" style="margin-bottom:1.8rem;">
+    <div class="admin-card-header">
+        <h2>Por producto</h2>
+    </div>
+    @if (Model.PorProducto.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 8l-8-5-8 5v8l8 5 8-5V8z"/><path d="M4 8l8 5 8-5"/></svg>
+            <h3>Sin ventas en este rango</h3>
+            <p>No hay pedidos Entregado entre @Model.Desde.ToString("dd/MM/yyyy") y @Model.Hasta.ToString("dd/MM/yyyy").</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Unidades</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.PorProducto)
+                    {
+                        <tr>
+                            <td>@p.ProductName</td>
+                            <td>@p.Quantity</td>
+                            <td>@PriceFormatter.Format(p.Amount)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Por categoría</h2>
+    </div>
+    @if (Model.PorCategoria.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 8l-8-5-8 5v8l8 5 8-5V8z"/><path d="M4 8l8 5 8-5"/></svg>
+            <h3>Sin ventas en este rango</h3>
+            <p>No hay pedidos Entregado entre @Model.Desde.ToString("dd/MM/yyyy") y @Model.Hasta.ToString("dd/MM/yyyy").</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th>Unidades</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model.PorCategoria)
+                    {
+                        <tr>
+                            <td>@c.Category</td>
+                            <td>@c.Quantity</td>
+                            <td>@PriceFormatter.Format(c.Amount)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,165 @@
+@using EcommerceApp.Models.Reports
+@model InventoryReportViewModel
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Inventario</h1>
+        <p>Foto del catálogo actual, sin filtro de fecha.</p>
+    </div>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-card-value">@Model.StockBajo.Count</div>
+        <div class="stat-card-label">Productos con poco stock (≤ 5)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-value">@Model.Agotados.Count</div>
+        <div class="stat-card-label">Productos agotados</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-value">@PriceFormatter.Format(Model.ValorInventario)</div>
+        <div class="stat-card-label">Valor del inventario</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-value">@Model.EnOferta.Count</div>
+        <div class="stat-card-label">Productos en oferta</div>
+    </div>
+</div>
+
+<div class="admin-card" style="margin-bottom:1.8rem;">
+    <div class="admin-card-header">
+        <h2>Stock bajo y agotados</h2>
+    </div>
+    @{
+        var sinStock = Model.StockBajo.Concat(Model.Agotados).OrderBy(p => p.Stock).ToList();
+    }
+    @if (sinStock.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.5 18a1.8 1.8 0 001.5 2.7h16a1.8 1.8 0 001.5-2.7L13.7 3.9a1.8 1.8 0 00-3.4 0z"/></svg>
+            <h3>Todo el catálogo tiene stock suficiente</h3>
+            <p>Ningún producto está en 5 unidades o menos.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in sinStock)
+                    {
+                        <tr>
+                            <td>@p.Name</td>
+                            <td class="cell-muted">@(p.Category ?? "—")</td>
+                            <td>@p.Stock</td>
+                            <td>
+                                @if (p.Stock == 0)
+                                {
+                                    <span class="pill pill-red">Agotado</span>
+                                }
+                                else
+                                {
+                                    <span class="pill pill-yellow">Stock bajo</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="admin-card" style="margin-bottom:1.8rem;">
+    <div class="admin-card-header">
+        <h2>Por categoría y por marca</h2>
+    </div>
+    <div class="admin-table-wrap" style="display:flex; flex-wrap:wrap; gap:1.5rem; padding:1rem 1.4rem;">
+        <table class="admin-table" style="flex:1; min-width:260px;">
+            <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th>Productos</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model.PorCategoria)
+                {
+                    <tr>
+                        <td>@c.Category</td>
+                        <td>@c.Count</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <table class="admin-table" style="flex:1; min-width:260px;">
+            <thead>
+                <tr>
+                    <th>Marca</th>
+                    <th>Productos</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var b in Model.PorMarca)
+                {
+                    <tr>
+                        <td>@b.Brand</td>
+                        <td>@b.Count</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Productos en oferta</h2>
+    </div>
+    @if (Model.EnOferta.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 8l-8-5-8 5v8l8 5 8-5V8z"/><path d="M4 8l8 5 8-5"/></svg>
+            <h3>No hay productos en oferta</h3>
+            <p>Ningún producto tiene precio promocional activo.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio normal</th>
+                        <th>Precio de oferta</th>
+                        <th>Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.EnOferta)
+                    {
+                        <tr>
+                            <td>@p.Name</td>
+                            <td class="cell-muted">@PriceFormatter.Format(p.Price)</td>
+                            <td>@PriceFormatter.Format(p.PromotionalPrice)</td>
+                            <td>@p.Stock</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -100,19 +100,19 @@ Problemas de hoy: la clave `(UserId, ServiceId)` permite una sola reserva por ru
 
 ## Fase 4 — Base de reportes y los 4 reportes principales
 
-- [ ] `Services/ReportService.cs` registrado con `AddScoped`, con un método por reporte que devuelve un ViewModel simple en `Models/Reports/`. Consultas con `AsNoTracking()` y agrupación en la BD cuando sea posible; para agrupar por mes con la resta de 4 horas, filtra primero y agrupa en memoria.
-- [ ] `AdminController.Reports.cs` y ítem **"Reportes"** en el sidebar de `_AdminLayout`. Página índice con una tarjeta por reporte. Filtros comunes: `desde`, `hasta` (por defecto, el mes en curso).
-- [ ] **Ingresos:** filtrados por `CompletedAt` (reservas `Acabado`) y `DeliveredAt` (pedidos `Entregado`). Muestra:
+- [x] `Services/ReportService.cs` registrado con `AddScoped`, con un método por reporte que devuelve un ViewModel simple en `Models/Reports/`. Consultas con `AsNoTracking()` y agrupación en la BD cuando sea posible; para agrupar por mes con la resta de 4 horas, filtra primero y agrupa en memoria.
+- [x] `AdminController.Reports.cs` y ítem **"Reportes"** en el sidebar de `_AdminLayout`. Página índice con una tarjeta por reporte. Filtros comunes: `desde`, `hasta` (por defecto, el mes en curso).
+- [x] **Ingresos:** filtrados por `CompletedAt` (reservas `Acabado`) y `DeliveredAt` (pedidos `Entregado`). Muestra:
   - total de ingresos por reservas, por productos y total general;
   - tabla por mes;
   - caja aparte **"Por confirmar"**: reservas `Pendiente` y `Recorrido` más pedidos `Pendiente`, con su monto, **excluido** de los ingresos.
-- [ ] **Reservas:** filtros por rango de fecha de salida, estado y ruta. Muestra:
+- [x] **Reservas:** filtros por rango de fecha de salida, estado y ruta. Muestra:
   - total y cantidad por estado, y tasa de cancelación;
   - tabla por ruta (cantidad, personas, monto solo de `Acabado`);
   - tabla por mes.
-- [ ] **Ventas de productos:** pedidos `Entregado` en el rango por `DeliveredAt`. Tabla por producto (unidades y monto, usando `ProductName` del snapshot) y por categoría (`ProductCategory`).
-- [ ] **Inventario** (sin filtros de fecha): stock bajo (≤ 5, igual que el dashboard) y agotado, valor del inventario (`stock × precio vigente`), productos por categoría y marca, productos en oferta.
-- [ ] Cada reporte: tarjetas de totales arriba, tabla debajo, mensaje claro si no hay datos.
+- [x] **Ventas de productos:** pedidos `Entregado` en el rango por `DeliveredAt`. Tabla por producto (unidades y monto, usando `ProductName` del snapshot) y por categoría (`ProductCategory`).
+- [x] **Inventario** (sin filtros de fecha): stock bajo (≤ 5, igual que el dashboard) y agotado, valor del inventario (`stock × precio vigente`), productos por categoría y marca, productos en oferta.
+- [x] Cada reporte: tarjetas de totales arriba, tabla debajo, mensaje claro si no hay datos.
 
 ## Fase 5 — Reportes de apoyo
 

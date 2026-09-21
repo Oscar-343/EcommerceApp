@@ -1,0 +1,118 @@
+@using EcommerceApp.Models.Reports
+@model IncomeReportViewModel
+@{
+    Layout = "_AdminLayout";
+    // Nombres de mes fijos: evita depender de la cultura configurada en el servidor.
+    string[] meses = { "", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Ingresos</h1>
+        <p>Solo cuentan reservas <strong>Acabado</strong> y pedidos <strong>Entregado</strong>, por su fecha de finalización.</p>
+    </div>
+</div>
+
+<div class="admin-card" style="margin-bottom:1.8rem;">
+    <form method="get" asp-action="ReportIncome" class="form-grid" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:end; padding:1.2rem 1.4rem;">
+        <div class="form-field">
+            <label>Desde</label>
+            <input type="date" name="desde" class="form-control" value="@Model.Desde.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="form-field">
+            <label>Hasta</label>
+            <input type="date" name="hasta" class="form-control" value="@Model.Hasta.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="form-field">
+            <button type="submit" class="btn-admin btn-admin-primary">Filtrar</button>
+        </div>
+    </form>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-card-value">@PriceFormatter.Format(Model.TotalReservas)</div>
+        <div class="stat-card-label">Ingresos por reservas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-value">@PriceFormatter.Format(Model.TotalProductos)</div>
+        <div class="stat-card-label">Ingresos por productos</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-value">@PriceFormatter.Format(Model.TotalGeneral)</div>
+        <div class="stat-card-label">Total general</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-value">@PriceFormatter.Format(Model.PorConfirmarTotal)</div>
+        <div class="stat-card-label">Por confirmar (no incluido arriba)</div>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Por mes</h2>
+    </div>
+    @if (Model.PorMes.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            <h3>Sin ingresos en este rango</h3>
+            <p>No hay reservas Acabado ni pedidos Entregado entre @Model.Desde.ToString("dd/MM/yyyy") y @Model.Hasta.ToString("dd/MM/yyyy").</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Mes</th>
+                        <th>Reservas</th>
+                        <th>Productos</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in Model.PorMes)
+                    {
+                        <tr>
+                            <td>@meses[m.Month] @m.Year</td>
+                            <td>@PriceFormatter.Format(m.Reservas)</td>
+                            <td>@PriceFormatter.Format(m.Productos)</td>
+                            <td>@PriceFormatter.Format(m.Total)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="admin-card" style="margin-top:1.8rem;">
+    <div class="admin-card-header">
+        <h2>Por confirmar</h2>
+    </div>
+    <p class="cell-muted" style="padding:0 1.4rem 1rem;">
+        Reservas Pendiente/Recorrido y pedidos Pendiente: todavía no son ingreso, se muestran aparte y sin filtro de fecha.
+    </p>
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Origen</th>
+                    <th>Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Reservas (Pendiente / Recorrido)</td>
+                    <td>@PriceFormatter.Format(Model.PorConfirmarReservas)</td>
+                </tr>
+                <tr>
+                    <td>Pedidos (Pendiente)</td>
+                    <td>@PriceFormatter.Format(Model.PorConfirmarPedidos)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
