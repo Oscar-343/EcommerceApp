@@ -21,6 +21,9 @@ namespace EcommerceApp.Models
         // Marca seleccionada
         public string? SelectedBrand { get; set; }
 
+        // Filtro de ofertas activo (solo productos con precio promocional)
+        public bool OnlyOffers { get; set; }
+
         // Todas las categorías disponibles
         public List<string> AvailableCategories { get; set; } = new();
 

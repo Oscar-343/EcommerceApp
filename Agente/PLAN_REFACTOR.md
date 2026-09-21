@@ -117,14 +117,22 @@
 
 **Decisión ya tomada:** la lista canónica es la que **ya está en la BD** (seeders), para no tocar datos en producción.
 
-- [ ] `Models/ProductCategories.cs`: reemplazar la lista actual (Hombre, Mujer, Niños, Ropa de abrigo, Equipo de cocina…) por las 10 categorías del `ProductSeeder`: Tiendas de campaña, Calzado de trekking, Mochilas, Bastones de trekking, Ropa outdoor, Camping, Hidratación, Iluminación, Accesorios, Seguridad y orientación.
+- [x] `Models/ProductCategories.cs`: reemplazar la lista actual (Hombre, Mujer, Niños, Ropa de abrigo, Equipo de cocina…) por las 10 categorías del `ProductSeeder`: Tiendas de campaña, Calzado de trekking, Mochilas, Bastones de trekking, Ropa outdoor, Camping, Hidratación, Iluminación, Accesorios, Seguridad y orientación.
   - Mover ahí el diccionario categoría → imagen que hoy está dentro de `Products/Index.cshtml`.
-- [ ] `Models/Service.cs` → `RouteCategories.All`: dejar las categorías que usa `ServiceSeeder` (Senderismo, Trekking, Trekking con camping, Alta montaña, Caminatas de naturaleza). Corregir el comentario que dice "6" cuando hay otro número.
-- [ ] `ServicesController.Details`: mientras no exista la relación real (Fase 5), que "equipamiento recomendado" use las categorías correctas (`Mochilas`, `Calzado de trekking`, `Tiendas de campaña`, `Iluminación`). Hoy busca "Bolsos y mochilas" y "Equipamiento", que no existen en los datos.
-- [ ] **Filtro de ofertas** en `ProductsController.Index` y en `Products/Index.cshtml`: parámetro `onlyOffers` y casilla en el formulario de filtros. Oferta = `PromotionalPrice != null && PromotionalPrice < Price`.
-- [ ] **Eliminar `GetFilteredProducts` y los `GetFilterOptions`** de `ProductsController` y `ServicesController`: ningún JS los llama y `GetFilteredProducts` apunta a una vista inexistente (`_ProductGrid`). Con esto desaparece la duplicación de filtros.
-- [ ] `HomeController`: quitar los `CommunityPosts` inventados (`@montañista`, `@trekker`, fotos de Unsplash). En la vista, mostrar esa sección solo si la lista tiene elementos.
-- [ ] `Home/Index.cshtml`: los marcadores del mapa usan `data-route-id` fijos (1, 2, 3). Generarlos desde `Model.RouteMarkers` con los ids reales.
+  - **Nota:** el diccionario de imágenes que ya estaba en `Products/Index.cshtml` usaba exactamente estos 10 nombres (nadie lo había actualizado tras el cambio de categorías), así que se movió tal cual a `ProductCategories.Images` sin reescribirlo.
+- [x] `Models/Service.cs` → `RouteCategories.All`: dejar las categorías que usa `ServiceSeeder` (Senderismo, Trekking, Trekking con camping, Alta montaña, Caminatas de naturaleza). Corregir el comentario que dice "6" cuando hay otro número.
+  - De paso se actualizó el diccionario categoría→imagen de `Home/Index.cshtml` (usaba las 8 categorías viejas) para que coincida con las 5 nuevas.
+- [x] `ServicesController.Details`: mientras no exista la relación real (Fase 5), que "equipamiento recomendado" use las categorías correctas (`Mochilas`, `Calzado de trekking`, `Tiendas de campaña`, `Iluminación`). Hoy busca "Bolsos y mochilas" y "Equipamiento", que no existen en los datos.
+- [x] **Filtro de ofertas** en `ProductsController.Index` y en `Products/Index.cshtml`: parámetro `onlyOffers` y casilla en el formulario de filtros. Oferta = `PromotionalPrice != null && PromotionalPrice < Price`.
+  - Se reutilizó la clase CSS `.productos-filters__checkbox`, que ya existía en `productos.css` pero no se usaba en ningún lado.
+- [x] **Eliminar `GetFilteredProducts` y los `GetFilterOptions`** de `ProductsController` y `ServicesController`: ningún JS los llama y `GetFilteredProducts` apunta a una vista inexistente (`_ProductGrid`). Con esto desaparece la duplicación de filtros.
+  - Confirmado con `grep` sobre `.js`/`.cshtml`: cero referencias a `GetFilteredProducts`, `GetFilterOptions` o `_ProductGrid` antes de borrar.
+- [x] `HomeController`: quitar los `CommunityPosts` inventados (`@montañista`, `@trekker`, fotos de Unsplash). En la vista, mostrar esa sección solo si la lista tiene elementos.
+  - **Nota:** `Home/Index.cshtml` nunca renderizaba `Model.CommunityPosts` (no existe ninguna sección de comunidad en la vista); era una lista fabricada en el controlador que no se mostraba en ningún lado. Se quitó la fabricación; la propiedad `CommunityPosts` del ViewModel queda en su valor por defecto (lista vacía) para cuando exista contenido real. No había ninguna sección que "mostrar solo si tiene elementos": no hace falta tocar la vista.
+- [x] `Home/Index.cshtml`: los marcadores del mapa usan `data-route-id` fijos (1, 2, 3). Generarlos desde `Model.RouteMarkers` con los ids reales.
+  - Las posiciones (top/left %) siguen siendo fijas (el mapa es un placeholder visual, no hay coordenadas reales todavía, según el propio comentario del código: "preparada para integración con Leaflet/Google Maps"); se armó un arreglo de 10 posiciones que se recorre por índice para no repetir el layout anterior de 3 puntos fijos.
+
+**Build:** `dotnet build --no-incremental` → 0 errores (mismos 5 warnings preexistentes de Fase 0, no tocados). Probado con `dotnet run` (perfil `http`, puerto 5187) + `curl`: Home, Productos, Servicios, `Products/Details/{id real}`, `Services/Details/{id real}` devuelven 200; Cart/Favoritos 302 a Login (esperado sin sesión); `Products?onlyOffers=true` devuelve 200; el filtro de categorías de Productos ya muestra las 10 categorías nuevas y el mapa del Home ya muestra `data-route-id` con ids reales de la BD (no 1/2/3).
 
 ## Fase 5 — Base de datos (**pídeme confirmación antes de empezar**)
 

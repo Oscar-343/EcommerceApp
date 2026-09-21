@@ -116,19 +116,16 @@ namespace EcommerceApp.Models
         public DateTime? UpdatedAt { get; set; }
     }
 
-    // Categorías de rutas predefinidas (reducidas a 6 según especificación del usuario).
+    // Categorías de rutas predefinidas (5 en total). Coinciden con las que usa ServiceSeeder.
     public static class RouteCategories
     {
         public static readonly string[] All =
         {
             "Senderismo",
             "Trekking",
-            "Montañismo",
-            "Bosque y naturaleza",
-            "Volcanes y altura",
             "Trekking con camping",
-            "Aventuras extremas",
-            "Escalada"
+            "Alta montaña",
+            "Caminatas de naturaleza"
         };
     }
 

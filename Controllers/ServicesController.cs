@@ -193,8 +193,8 @@ namespace EcommerceApp.Controllers
                 _ => "⚪"
             };
 
-            // TODO: Obtener productos recomendados relacionados con esta ruta
-            var equipmentCategories = new[] { "Bolsos y mochilas", "Equipamiento", "Tiendas de campaña", "Ropa de abrigo" };
+            // TODO: Obtener productos recomendados relacionados con esta ruta (relación real en Fase 5)
+            var equipmentCategories = new[] { "Mochilas", "Calzado de trekking", "Tiendas de campaña", "Iluminación" };
             var recommendedProducts = await context.Products.AsNoTracking()
                 .Where(p => p.Stock > 0 && p.Category != null && equipmentCategories.Contains(p.Category))
                 .OrderByDescending(p => p.IsBestSeller)
@@ -219,34 +219,6 @@ namespace EcommerceApp.Controllers
             };
 
             return View(model);
-        }
-
-        // Endpoint para obtener opciones de filtros dinámicamente (AJAX)
-        [AllowAnonymous]
-        [HttpGet]
-        public async Task<JsonResult> GetFilterOptions()
-        {
-            var categories = await context.Services.AsNoTracking()
-                .Where(s => s.Status == "Active" && s.Category != null)
-                .Select(s => s.Category)
-                .Distinct()
-                .OrderBy(c => c)
-                .ToListAsync();
-
-            var regions = await context.Services.AsNoTracking()
-                .Where(s => s.Status == "Active" && s.Region != null)
-                .Select(s => s.Region)
-                .Distinct()
-                .OrderBy(r => r)
-                .ToListAsync();
-
-            var difficulties = RouteDifficulty.Labels.Select(d => new
-            {
-                Value = d.Key,
-                Label = d.Value
-            }).ToList();
-
-            return Json(new { categories, regions, difficulties });
         }
     }
 }

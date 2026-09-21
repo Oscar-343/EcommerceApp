@@ -69,32 +69,6 @@ namespace EcommerceApp.Controllers
                 .Take(10)
                 .ToListAsync();
 
-            // Publicaciones de comunidad (placeholder vacío por ahora)
-            var communityPosts = new List<CommunityPost>
-            {
-                new CommunityPost
-                {
-                    UserName = "@montañista",
-                    RouteName = "Parque Nacional Tunari",
-                    Location = "Cochabamba",
-                    ImageUrl = "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop"
-                },
-                new CommunityPost
-                {
-                    UserName = "@trekker",
-                    RouteName = "Choro Trek",
-                    Location = "La Paz",
-                    ImageUrl = "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=400&fit=crop"
-                },
-                new CommunityPost
-                {
-                    UserName = "@explorador",
-                    RouteName = "Camino Inca",
-                    Location = "Perú",
-                    ImageUrl = "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=400&h=400&fit=crop"
-                }
-            };
-
             var model = new HomeViewModel
             {
                 FeaturedRoutes = featuredRoutes,
@@ -104,7 +78,6 @@ namespace EcommerceApp.Controllers
                 TotalCategories = totalCategories,
                 OutdoorCategories = outdoorCategories,
                 RouteMarkers = routeMarkers,
-                CommunityPosts = communityPosts,
                 IsAuthenticated = User.Identity?.IsAuthenticated ?? false,
                 UserName = User.Identity?.Name
             };
