@@ -121,6 +121,43 @@
     }
 }
 
+/* -------- Ventana flotante con credenciales demo -------- */
+.auth-demo-hint {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 20;
+    max-width: 230px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.7rem 0.9rem;
+    background: rgba(17, 26, 22, 0.55);
+    border: 1px solid rgba(242, 241, 234, 0.18);
+    border-radius: var(--radius-sm);
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    color: var(--warm-white);
+}
+
+.auth-demo-hint-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--forest-light);
+    margin-bottom: 0.15rem;
+}
+
+.auth-demo-hint-row strong {
+    color: var(--sand);
+    font-weight: 600;
+}
+
 /* -------- Encabezado -------- */
 .auth-title {
     font-family: var(--font-display);
@@ -413,7 +450,18 @@
     }
 
 @media (max-width: 420px) {
+    .auth-page {
+        flex-direction: column;
+    }
+
     .auth-card {
         padding: 1.5rem 1.2rem;
+    }
+
+    .auth-demo-hint {
+        position: static;
+        margin-top: 1rem;
+        max-width: 100%;
+        width: 100%;
     }
 }
