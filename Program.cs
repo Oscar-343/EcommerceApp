@@ -103,18 +103,21 @@ using (var scope = app.Services.CreateScope())
     string[] roles = { "Admin", "User" };
     foreach (var role in roles)
     {
-        if (!await roleManager.RoleExistsAsync(role))
+            if (!await roleManager.RoleExistsAsync(role))
             await roleManager.CreateAsync(new IdentityRole(role));
     }
 
     // Seed de productos de ejemplo (solo si no hay productos)
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     await ProductSeeder.SeedProductsAsync(context);
     await ServiceSeeder.SeedServicesAsync(context);
 
     // Cuenta de administración
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     await AdminSeeder.SeedAdminAsync(userManager, roleManager, builder.Configuration);
+
+    // Seed de pedidos y reservas de prueba, para probar los reportes
+    await OrderReservationSeeder.SeedOrdersAndReservationsAsync(context, userManager);
 }
 
 app.Run();
