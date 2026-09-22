@@ -39,7 +39,10 @@
                 <div class="productos-categories__grid">
                     @{
                         var categories = Model.AvailableCategories ?? new List<string>();
-                        var featuredCategories = new[] { "Tiendas de campaña", "Mochilas", "Calzado de trekking", "Bastones de trekking" };
+                        // Patrón cíclico de tamaños para el efecto "mosaico" (cuadrados y
+                        // rectángulos de distinto tamaño), no depende del nombre de la categoría.
+                        var mosaicSizes = new[] { "productos-category--big", "productos-category--small", "productos-category--wide", "productos-category--tall", "productos-category--small", "productos-category--wide" };
+                        var i = 0;
 
                         foreach (var category in categories)
                         {
@@ -47,10 +50,11 @@
                                 ? ProductCategories.Images[category]
                                 : ProductCategories.DefaultImage;
 
-                            var isFeatured = featuredCategories.Contains(category);
+                            var sizeClass = mosaicSizes[i % mosaicSizes.Length];
+                            i++;
 
                             <a asp-action="Index" asp-route-category="@category"
-                               class="productos-category @(isFeatured ? "productos-category--featured" : "") productos-animate"
+                               class="productos-category @sizeClass productos-animate"
                                style="background-image: url('@imageSrc');">
                                 <img src="@imageSrc" alt="@category" class="productos-category__image" loading="lazy" />
                                 <div class="productos-category__overlay">

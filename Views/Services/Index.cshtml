@@ -8,7 +8,8 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/servicios.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body {
             background-color: #0B100E;
@@ -19,30 +20,91 @@
 }
 
     <div class="servicios-page">
-        <!-- HERO -->
-        <section class="servicios-hero" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&h=900&fit=crop');">
-            <div class="servicios-hero__overlay"></div>
-            <div class="servicios-hero__content">
-                <h1 class="servicios-hero__title">EL CAMINO TE ESTÁ ESPERANDO</h1>
-                <p class="servicios-hero__subtitle">Explora rutas de senderismo, conecta con la naturaleza y descubre nuevos caminos.</p>
-                <a href="#rutas" class="servicios-hero__cta">EXPLORAR RUTAS</a>
+        @{
+            // Rutas para el hero rotativo: las que tienen foto, ya vienen ordenadas
+            // "destacadas primero" desde el controlador.
+            var heroRoutes = Model.Services.Where(s => !string.IsNullOrEmpty(s.ImageUrl)).Take(5).ToList();
+        }
 
-                <div class="servicios-hero__stats">
-                    <div class="servicios-hero__stat">
-                        <span class="servicios-hero__stat-number">+@Model.TotalRoutes</span>
-                        <span class="servicios-hero__stat-label">Rutas</span>
-                    </div>
-                    <div class="servicios-hero__stat">
-                        <span class="servicios-hero__stat-number">@Model.TotalDifficulties</span>
-                        <span class="servicios-hero__stat-label">Niveles</span>
-                    </div>
-                    <div class="servicios-hero__stat">
-                        <span class="servicios-hero__stat-number">@Model.TotalWithGuide</span>
-                        <span class="servicios-hero__stat-label">Con Guía</span>
+        <!-- === HERO ROTATIVO DE RUTAS === -->
+        <section class="rutas-hero" id="rutasHero">
+            @if (heroRoutes.Any())
+            {
+                <div class="rutas-hero__slides">
+                    @for (int i = 0; i < heroRoutes.Count; i++)
+                    {
+                        <div class="rutas-hero__slide @(i == 0 ? "active" : "")" data-index="@i" style="background-image: url('@heroRoutes[i].ImageUrl')"></div>
+                    }
+                    <div class="rutas-hero__overlay"></div>
+                </div>
+
+                <div class="rutas-hero__content">
+                    @for (int i = 0; i < heroRoutes.Count; i++)
+                    {
+                        var route = heroRoutes[i];
+                        <div class="rutas-hero__info @(i == 0 ? "active" : "")" data-index="@i">
+                            <p class="rutas-hero__kicker">@(route.Region ?? route.Location ?? "Bolivia")</p>
+                            <h1 class="rutas-hero__title">@route.Name</h1>
+                            <p class="rutas-hero__subtitle">@(route.ShortDescription ?? route.Location)</p>
+                            <a asp-action="Details" asp-route-id="@route.Id" class="rutas-hero__cta">DESCUBRIR RUTA <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    }
+                </div>
+
+                <div class="rutas-hero__stack" id="rutasHeroStack">
+                    @for (int i = 0; i < heroRoutes.Count; i++)
+                    {
+                        var route = heroRoutes[i];
+                        <button type="button" class="rutas-hero__stack-item @(i == 0 ? "active" : "")" data-index="@i" style="background-image: url('@route.ImageUrl')">
+                            <span class="rutas-hero__stack-location">@(route.Location ?? route.Region)</span>
+                            <span class="rutas-hero__stack-name">@route.Name</span>
+                        </button>
+                    }
+                </div>
+
+                <div class="rutas-hero__controls">
+                    <button type="button" id="rutasHeroPrev" aria-label="Ruta anterior"><i class="fas fa-chevron-left"></i></button>
+                    <button type="button" id="rutasHeroPlay" aria-label="Pausar rotación"><i class="fas fa-pause"></i></button>
+                    <button type="button" id="rutasHeroNext" aria-label="Ruta siguiente"><i class="fas fa-chevron-right"></i></button>
+                    <span class="rutas-hero__counter"><span id="rutasHeroCounter">01</span> / @heroRoutes.Count.ToString("00")</span>
+                </div>
+            }
+            else
+            {
+                <div class="rutas-hero__slide active" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&h=900&fit=crop')"></div>
+                <div class="rutas-hero__overlay"></div>
+                <div class="rutas-hero__content">
+                    <div class="rutas-hero__info active">
+                        <h1 class="rutas-hero__title">EL CAMINO TE ESTÁ ESPERANDO</h1>
+                        <p class="rutas-hero__subtitle">Explora rutas de senderismo, conecta con la naturaleza y descubre nuevos caminos.</p>
+                        <a href="#rutas" class="rutas-hero__cta">EXPLORAR RUTAS <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
+            }
+        </section>
+
+        <!-- Barra de estadísticas, debajo del hero -->
+        <section class="rutas-stats-bar">
+            <div class="servicios-container rutas-stats-bar__grid">
+                <div class="rutas-stats-bar__item"><span>+@Model.TotalRoutes</span><small>Rutas</small></div>
+                <div class="rutas-stats-bar__item"><span>@Model.TotalDifficulties</span><small>Niveles</small></div>
+                <div class="rutas-stats-bar__item"><span>@Model.TotalWithGuide</span><small>Con guía</small></div>
             </div>
         </section>
+
+        <!-- === MAPA DE RUTAS (funcional, tonos oscuros) === -->
+        @{ var mapRoutes = Model.Services.Where(s => s.StartLatitude.HasValue && s.StartLongitude.HasValue).ToList(); }
+        @if (mapRoutes.Any())
+        {
+            <section class="rutas-map-section">
+                <div class="servicios-container">
+                    <div class="servicios-section-header">
+                        <h2 class="servicios-section-title">RUTAS EN EL MAPA</h2>
+                    </div>
+                    <div id="rutasMap" class="rutas-map" data-routes='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(mapRoutes.Select(r => new { id = r.Id, name = r.Name, location = r.Location, lat = r.StartLatitude, lng = r.StartLongitude })))'></div>
+                </div>
+            </section>
+        }
 
         <!-- EXPLORADOR / FILTROS -->
         <section class="servicios-filters-section" id="rutas">
@@ -155,12 +217,12 @@
                                         }
                                     </div>
                                     <p class="servicios-route-block__price">Desde @PriceFormatter.Format(route.Price) / persona</p>
-                                    <div class="servicios-route-block__actions" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <div class="servicios-route-block__actions">
                                         <a asp-controller="Services" asp-action="Details" asp-route-id="@route.Id" class="servicios-route-block__cta">DESCUBRIR RUTA →</a>
-                                        <form asp-controller="Favorites" asp-action="Toggle" method="post" style="display: inline;">
+                                        <form asp-controller="Favorites" asp-action="Toggle" method="post" class="servicios-route-block__fav-form">
                                             <input type="hidden" name="type" value="Service" />
                                             <input type="hidden" name="itemId" value="@route.Id" />
-                                            <button type="submit" class="btn btn-outline-danger btn-sm">❤️ Favorito</button>
+                                            <button type="submit" class="servicios-route-block__fav" aria-label="Agregar a favoritos"><i class="fas fa-heart"></i></button>
                                         </form>
                                     </div>
                                 </div>
@@ -178,5 +240,6 @@
     </div>
 
 @section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="~/js/servicios.js" asp-append-version="true"></script>
 }

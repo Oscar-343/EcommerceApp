@@ -426,10 +426,14 @@ html, body {
     color: var(--productos-text-secondary);
 }
 
+/* Grilla tipo "mosaico" (bento): columnas fijas + filas bajas, cada
+   categoría ocupa 1, 2 o 4 celdas según su clase de tamaño (asignada
+   en la vista con un patrón cíclico, no según el nombre de categoría). */
 .productos-categories__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: 130px;
+    gap: 1rem;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 2rem;
@@ -437,13 +441,19 @@ html, body {
 
 .productos-category {
     position: relative;
-    height: 210px;
-    border-radius: 8px;
+    grid-column: span 2;
+    grid-row: span 1;
+    border-radius: 10px;
     overflow: hidden;
     cursor: pointer;
     border: 1px solid var(--productos-border);
     transition: all 0.3s ease;
 }
+
+.productos-category--wide { grid-column: span 3; grid-row: span 1; }
+.productos-category--tall { grid-column: span 2; grid-row: span 2; }
+.productos-category--big  { grid-column: span 4; grid-row: span 2; }
+.productos-category--small{ grid-column: span 2; grid-row: span 1; }
 
 .productos-category:hover {
     border-color: var(--productos-green);
@@ -864,6 +874,48 @@ html, body {
     text-decoration: line-through;
 }
 
+/* Stepper de cantidad (+/-), simple y compacto, arriba de los botones */
+.producto-card__qty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    margin-bottom: 0.65rem;
+    padding: 0.35rem 0;
+    border: 1px solid var(--productos-border);
+    border-radius: 4px;
+}
+
+.producto-card__qty-btn {
+    background: none;
+    border: none;
+    color: var(--productos-text);
+    font-size: 1.1rem;
+    line-height: 1;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.producto-card__qty-btn:hover {
+    background: var(--productos-section);
+    color: var(--productos-green-light);
+}
+
+.producto-card__qty-value {
+    min-width: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--productos-text);
+}
+
+.producto-card__btn--added {
+    background-color: #4F8063 !important;
+}
+
 .producto-card__actions {
     display: flex;
     gap: 0.75rem;
@@ -993,8 +1045,13 @@ html, body {
         grid-template-columns: 1fr;
     }
 
-    .productos-category--featured {
-        grid-column: span 1;
+    .productos-category--featured,
+    .productos-category--wide,
+    .productos-category--tall,
+    .productos-category--big,
+    .productos-category--small {
+        grid-column: span 3;
+        grid-row: span 1;
     }
 
     .productos-grid {
@@ -1027,12 +1084,19 @@ html, body {
 
     .productos-categories__grid {
         grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 160px;
         gap: 1rem;
         padding: 0 1rem;
     }
 
-    .productos-category {
-        height: 200px;
+    .productos-category,
+    .productos-category--featured,
+    .productos-category--wide,
+    .productos-category--tall,
+    .productos-category--big,
+    .productos-category--small {
+        grid-column: span 1;
+        grid-row: span 1;
     }
 
     .productos-category__name {

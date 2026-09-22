@@ -8,7 +8,31 @@ document.addEventListener('DOMContentLoaded', function () {
     initFiltersToggle();
     initFavorites();
     initAnimations();
+    initQtyStepper();
 });
+
+/**
+ * Stepper +/- de cantidad en cada tarjeta de producto (no llama al servidor,
+ * solo ajusta el número local que se manda al agregar al carrito).
+ */
+function initQtyStepper() {
+    document.querySelectorAll('.producto-card__qty').forEach(function (qtyBox) {
+        const maxStock = Math.max(1, Math.min(parseInt(qtyBox.dataset.maxStock, 10) || 1, 99));
+        const valueEl = qtyBox.querySelector('[data-qty-value]');
+
+        qtyBox.querySelectorAll('[data-qty-action]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                let current = parseInt(valueEl.textContent, 10) || 1;
+                if (btn.dataset.qtyAction === 'inc') {
+                    current = Math.min(current + 1, maxStock);
+                } else {
+                    current = Math.max(current - 1, 1);
+                }
+                valueEl.textContent = current;
+            });
+        });
+    });
+}
 
 /**
  * Inicializar toggle de filtros en móvil
@@ -91,13 +115,17 @@ function initFavorites() {
 }
 
 /**
- * Agregar al carrito: POST real a Cart/Add.
+ * Agregar al carrito: POST real a Cart/Add, usando la cantidad elegida
+ * con el stepper +/- de la propia tarjeta (por defecto 1 si no hay stepper).
  */
-function agregarAlCarrito(productId) {
-    const btn = event && event.target ? event.target : null;
+function agregarAlCarritoConCantidad(btn, productId) {
+    const card = btn.closest('.producto-card');
+    const qtyEl = card ? card.querySelector('[data-qty-value]') : null;
+    const quantity = qtyEl ? (parseInt(qtyEl.textContent, 10) || 1) : 1;
+
     const formData = new FormData();
     formData.append('productId', productId);
-    formData.append('quantity', 1);
+    formData.append('quantity', quantity);
     const token = getAntiForgeryToken();
     if (token) formData.append('__RequestVerificationToken', token);
 
@@ -116,17 +144,22 @@ function agregarAlCarrito(productId) {
         .then(data => {
             if (!data) return;
             if (data.success && btn) {
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '✓ AGREGADO';
-                btn.style.backgroundColor = '#4F8063';
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> AGREGADO';
+                btn.classList.add('producto-card__btn--added');
                 setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.backgroundColor = '';
+                    btn.innerHTML = originalHtml;
+                    btn.classList.remove('producto-card__btn--added');
                 }, 1500);
             } else if (!data.success) {
                 alert(data.message || 'No se pudo agregar el producto.');
             }
         });
+}
+
+// Se mantiene por compatibilidad si algo externo todavía llama a este nombre.
+function agregarAlCarrito(productId) {
+    agregarAlCarritoConCantidad(event && event.target, productId);
 }
 
 /**

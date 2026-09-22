@@ -177,31 +177,33 @@ p, .section-subtitle, .hero-subtitle {
     cursor: pointer;
 }
 
-/* === HERO FULLSCREEN CON VIDEO - EXACTO === */
-.hero-fullscreen {
+
+/* ============================================================
+   HERO DE MARCA — Home v2 (video "clavado" en pantalla)
+   ============================================================ */
+.hero-brand {
     position: relative;
     width: 100%;
-    height: 100vh;
-    min-height: 600px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
     overflow: hidden;
     margin: 0;
     padding: 0;
     z-index: 0;
 }
 
-.hero-video-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=900&fit=crop&q=80');
-    background-size: cover;
-    background-position: center;
+/* El video queda fijo al viewport (no al hero), así que al hacer
+   scroll el contenido de las siguientes secciones "lo tapa" -
+   mismo efecto que el background-attachment: fixed de Productos,
+   adaptado para <video> (esa propiedad no aplica a video). */
+.hero-brand__media {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
 }
 
-.hero-video {
+.hero-brand__video {
     display: block;
     width: 100%;
     height: 100%;
@@ -209,112 +211,340 @@ p, .section-subtitle, .hero-subtitle {
     object-position: center;
 }
 
-.hero-overlay {
+.hero-brand__overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient( 180deg, rgba(11, 16, 14, 0.4) 0%, rgba(11, 16, 14, 0.7) 60%, rgba(11, 16, 14, 0.95) 100% );
-    z-index: 1;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(11,16,14,.95) 0%, rgba(11,16,14,.8) 32%, rgba(11,16,14,.4) 62%, rgba(11,16,14,.12) 100%),
+        linear-gradient(180deg, rgba(11,16,14,.25) 0%, rgba(11,16,14,.35) 70%, rgba(11,16,14,.95) 100%);
 }
 
-.hero-content {
+.hero-brand__contours {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    width: 100%;
-    max-width: 900px;
-    padding: 2rem;
+    left: -40px;
+    bottom: -20px;
+    width: 340px;
+    height: auto;
+    color: var(--home-text-secondary);
+    opacity: .18;
+    pointer-events: none;
+}
+
+.hero-brand__flourish {
+    position: absolute;
+    top: 7rem;
+    right: 3rem;
     z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+    transform: rotate(-4deg);
+    color: var(--home-text-secondary);
+    text-align: right;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap');
+    .hero-brand__flourish i { color: var(--home-green-hover); margin-top: .2rem; }
 
-.hero-title {
-    font-family: 'Caveat Brush', cursive;
-    font-size: clamp(2.75rem, 5vw, 5.25rem);
-    line-height: 1;
-    color: #f1f3f1;
-    text-shadow: 2px 2px 0 rgba(0,0,0,.15), 0 5px 20px rgba(0,0,0,.35);
-    -webkit-text-stroke: 0.4px rgba(255,255,255,.15);
-    margin:30px 0 30px 0;
-}
-
-    .hero-title span {
-        display: block;
-        color: #7FA58C;
-        margin-top: 0.15em;
-    }
-    .hero-subtitle {
-        font-size: 1.3rem;
-        color: var(--home-text-secondary);
-        margin-bottom: 3rem;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .hero-actions {
-        display: flex;
-        gap: 1.5rem;
-        justify-content: center;
-    }
-
-    .hero-btn {
-        padding: 1.25rem 3rem;
+    .hero-brand__flourish span {
         font-family: 'Montserrat', sans-serif;
+        font-size: .85rem;
+        font-weight: 600;
+        letter-spacing: .12em;
+        line-height: 1.5;
+    }
+
+.hero-brand__scrollcue {
+    position: absolute;
+    left: 2rem;
+    bottom: 3rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .75rem;
+}
+
+.hero-brand__scrollcue-text {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: .75rem;
+    letter-spacing: .3em;
+    color: var(--home-text-secondary);
+}
+
+.hero-brand__scrollcue-line {
+    position: relative;
+    width: 1px;
+    height: 60px;
+    background: var(--home-border);
+    overflow: visible;
+}
+
+.hero-brand__scrollcue-dot {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 7px;
+    height: 7px;
+    margin-left: -3px;
+    border-radius: 50%;
+    background: var(--home-green-hover);
+    animation: hero-scrollcue-move 2.2s ease-in-out infinite;
+}
+
+@keyframes hero-scrollcue-move {
+    0%   { top: 0; opacity: 1; }
+    85%  { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+}
+
+.hero-brand__content {
+    position: relative;
+    z-index: 2;
+    max-width: 640px;
+    padding: 0 3rem;
+}
+
+.hero-brand__kicker {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .2em;
+    color: var(--home-text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.hero-brand__kicker-line {
+    display: inline-block;
+    width: 36px;
+    height: 1px;
+    background: var(--home-green-hover);
+}
+
+.hero-brand__title {
+    font-family: 'Anton', sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    line-height: .92;
+    font-size: clamp(3rem, 6.5vw, 6rem);
+    margin: 0 0 1.5rem 0;
+}
+
+.hero-brand__title-line { display: block; }
+.hero-brand__title-line--light { color: var(--home-text); }
+.hero-brand__title-line--accent { color: var(--home-green-hover); }
+
+.hero-brand__subtitle {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--home-text-secondary);
+    max-width: 460px;
+    margin-bottom: 2.5rem;
+}
+
+.hero-brand__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.hero-brand__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .65rem;
+    padding: 1rem 1.75rem;
+    border-radius: 999px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+    text-decoration: none;
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-brand__btn--primary {
+    background: var(--home-green);
+    color: var(--home-text);
+    border: 1px solid var(--home-green-hover);
+}
+
+    .hero-brand__btn--primary:hover {
+        background: var(--home-green-hover);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(49, 93, 69, 0.45);
+    }
+
+.hero-brand__btn--outline {
+    background: transparent;
+    color: var(--home-text);
+    border: 1px solid var(--home-border);
+}
+
+    .hero-brand__btn--outline:hover {
+        border-color: var(--home-text);
+        transform: translateY(-3px);
+    }
+
+.hero-brand__stats {
+    position: relative;
+    z-index: 1;
+    background: var(--home-section);
+    border-top: 1px solid var(--home-border);
+    padding: 2.5rem 0;
+}
+
+.hero-brand__stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.hero-brand__stat {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0 1.5rem;
+    border-left: 1px solid var(--home-border);
+}
+
+    .hero-brand__stat:first-child { border-left: none; padding-left: 0; }
+    .hero-brand__stat i { font-size: 1.4rem; color: var(--home-green-hover); margin-top: .2rem; }
+
+    .hero-brand__stat h3 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: .85rem;
         font-weight: 700;
-        font-size: 1rem;
-        letter-spacing: 0.08em;
         text-transform: uppercase;
-        text-decoration: none;
-        border-radius: 4px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        display: inline-block;
-    }
-
-    .hero-btn-primary {
-        background-color: var(--home-green);
+        letter-spacing: .06em;
         color: var(--home-text);
-        border: none;
+        margin: 0 0 .35rem 0;
     }
 
-        .hero-btn-primary:hover {
-            background-color: var(--home-green-hover);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(49, 93, 69, 0.4);
-        }
+    .hero-brand__stat p {
+        font-family: 'Open Sans', sans-serif;
+        font-size: .85rem;
+        line-height: 1.4;
+        color: var(--home-text-secondary);
+        margin: 0;
+    }
 
-    .hero-btn-secondary {
-        background-color: transparent;
+/* ============================================================
+   MANIFIESTO
+   ============================================================ */
+.section-manifesto {
+    position: relative;
+    z-index: 1;
+    background: var(--home-bg);
+    padding: 7rem 0;
+    text-align: center;
+}
+
+.manifesto-kicker {
+    font-family: 'Montserrat', sans-serif;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .25em;
+    color: var(--home-green-hover);
+    margin-bottom: 1.5rem;
+}
+
+.manifesto-text {
+    max-width: 900px;
+    margin: 0 auto;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+    font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+    line-height: 1.55;
+    color: var(--home-text-secondary);
+}
+
+.manifesto-text span {
+    color: var(--home-text);
+    font-weight: 600;
+}
+
+/* ============================================================
+   CÓMO FUNCIONA
+   ============================================================ */
+.section-how {
+    position: relative;
+    z-index: 1;
+    background: var(--home-section);
+    padding: 5rem 0 6rem;
+    border-top: 1px solid var(--home-border);
+    border-bottom: 1px solid var(--home-border);
+}
+
+.how-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.how-step {
+    display: block;
+    text-decoration: none;
+    background: var(--home-block);
+    border: 1px solid var(--home-border);
+    border-radius: 14px;
+    padding: 2.25rem 2rem;
+    transition: all .3s ease;
+}
+
+    .how-step:hover {
+        transform: translateY(-6px);
+        border-color: var(--home-green-hover);
+        box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    }
+
+    .how-step__number {
+        display: block;
+        font-family: 'Anton', sans-serif;
+        font-size: 1.1rem;
+        color: var(--home-green-hover);
+        margin-bottom: 1rem;
+    }
+
+    .how-step i {
+        font-size: 1.8rem;
         color: var(--home-text);
-        border: 2px solid var(--home-text);
+        margin-bottom: 1rem;
+        display: block;
     }
 
-        .hero-btn-secondary:hover {
-            background-color: var(--home-text);
-            color: var(--home-bg);
-        }
-
-    .hero-scroll-indicator {
-        position: absolute;
-        bottom: 2rem;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 2;
-        animation: bounce 2s infinite;
+    .how-step h3 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--home-text);
+        margin-bottom: .6rem;
     }
 
-    .scroll-icon {
-        width: 24px;
-        height: 24px;
-        border-right: 2px solid var(--home-text-secondary);
-        border-bottom: 2px solid var(--home-text-secondary);
-        transform: rotate(45deg);
+    .how-step p {
+        font-family: 'Open Sans', sans-serif;
+        font-size: .92rem;
+        line-height: 1.5;
+        color: var(--home-text-secondary);
+        margin: 0;
     }
+
+@media (max-width: 991px) {
+    .hero-brand__flourish { display: none; }
+    .hero-brand__stats-grid { grid-template-columns: repeat(2, 1fr); row-gap: 1.75rem; }
+    .hero-brand__stat:nth-child(3) { border-left: none; padding-left: 0; }
+    .how-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+    .hero-brand { min-height: 92vh; }
+    .hero-brand__content { padding: 0 1.5rem; max-width: 100%; }
+    .hero-brand__scrollcue { display: none; }
+    .hero-brand__stats-grid { grid-template-columns: 1fr; row-gap: 1.5rem; }
+    .hero-brand__stat { border-left: none; padding-left: 0; }
+    .section-manifesto { padding: 4.5rem 0; }
+}
     /* === SECCIÓN: DESCUBRE TU PRÓXIMO CAMINO === */
     .section-discover {
         background-color: var(--home-bg);

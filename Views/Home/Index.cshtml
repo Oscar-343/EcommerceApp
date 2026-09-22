@@ -19,40 +19,138 @@
     </style>
 }
 
-<!-- === HERO FULLSCREEN CON VIDEO === -->
-<section class="hero-fullscreen">
+@* ============================================================
+   HERO DE MARCA — Home v2
+   El video queda "clavado" en pantalla (position: fixed en el CSS)
+   mientras el resto del contenido pasa por encima, igual que el
+   efecto de fondo fijo que ya usamos en Productos.
+   ============================================================ *@
+<section class="hero-brand">
 
-    <div class="hero-video-container">
-        <video class="hero-video" autoplay muted loop playsinline preload="metadata" disablepictureinpicture> <source src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/Video%20Project.mp4" type="video/mp4"> </video>
+    <div class="hero-brand__media">
+        <video class="hero-brand__video" autoplay muted loop playsinline preload="metadata" disablepictureinpicture>
+            <source src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/Video%20Project.mp4" type="video/mp4">
+        </video>
+        <div class="hero-brand__overlay"></div>
 
-        <div class="hero-overlay"></div>
-
+        <svg class="hero-brand__contours" viewBox="0 0 400 420" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M10 400C110 360 150 280 90 220C30 160 70 80 170 60" stroke="currentColor" stroke-width="1"/>
+            <path d="M45 400C160 355 190 270 130 205C70 140 110 55 220 40" stroke="currentColor" stroke-width="1"/>
+            <path d="M85 400C215 350 235 260 175 195C115 130 150 45 265 30" stroke="currentColor" stroke-width="1"/>
+        </svg>
     </div>
 
-    <div class="hero-content">
+    <div class="hero-brand__flourish" aria-hidden="true">
+        <i class="fas fa-dove"></i>
+        <span>NATURALEZA<br>AVENTURA<br>LIBERTAD</span>
+    </div>
 
-                    <h1 class="hero-title">
-            TU PRÓXIMA AVENTURA
-            <span>COMIENZA AQUÍ</span>
-        </h1>
+    <div class="hero-brand__scrollcue" aria-hidden="true">
+        <span class="hero-brand__scrollcue-text">SCROLL</span>
+        <span class="hero-brand__scrollcue-line"><span class="hero-brand__scrollcue-dot"></span></span>
+    </div>
 
-        <p class="hero-subtitle">
-            Descubre nuevos caminos, conecta con la naturaleza
-            y prepárate para salir de la rutina.
+    <div class="hero-brand__content">
+        <p class="hero-brand__kicker">
+            <span class="hero-brand__kicker-line"></span>
+            EQUIPAMIENTO · RUTAS · EXPERIENCIAS
         </p>
 
-        <div class="hero-actions">
+        <h1 class="hero-brand__title">
+            <span class="hero-brand__title-line hero-brand__title-line--light">EXPLORA</span>
+            <span class="hero-brand__title-line hero-brand__title-line--accent">BOLIVIA</span>
+        </h1>
 
-            <a asp-controller="Services"
-               asp-action="Index"
-               class="hero-btn hero-btn-primary">
-                EXPLORAR RUTAS
+        <p class="hero-brand__subtitle">
+            Descubre nuevos caminos, conecta con la naturaleza
+            y prepárate para vivir grandes aventuras.
+        </p>
+
+        <div class="hero-brand__actions">
+            <a asp-controller="Services" asp-action="Index" class="hero-brand__btn hero-brand__btn--primary">
+                <i class="fas fa-compass"></i>
+                <span>Explorar rutas</span>
+                <i class="fas fa-arrow-right"></i>
             </a>
-            <a asp-controller="Products"asp-action="Index" class="hero-btn hero-btn-secondary">EQUIPATE</a>
+            <a asp-controller="Products" asp-action="Index" class="hero-brand__btn hero-brand__btn--outline">
+                <i class="fas fa-backpack"></i>
+                <span>Ver productos</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
     </div>
-    <div class="hero-scroll-indicator">
-        <div class="scroll-icon"></div>
+</section>
+
+<section class="hero-brand__stats">
+    <div class="container-fluid">
+        <div class="hero-brand__stats-grid">
+            <div class="hero-brand__stat">
+                <i class="fas fa-mountain"></i>
+                <div>
+                    <h3>Rutas reales</h3>
+                    <p>Destinos seleccionados en Bolivia y más allá.</p>
+                </div>
+            </div>
+            <div class="hero-brand__stat">
+                <i class="fas fa-backpack"></i>
+                <div>
+                    <h3>Equipamiento de calidad</h3>
+                    <p>Las mejores marcas para tus aventuras.</p>
+                </div>
+            </div>
+            <div class="hero-brand__stat">
+                <i class="fas fa-campground"></i>
+                <div>
+                    <h3>Experiencias únicas</h3>
+                    <p>Senderismo, montañismo, camping y mucho más.</p>
+                </div>
+            </div>
+            <div class="hero-brand__stat">
+                <i class="fas fa-seedling"></i>
+                <div>
+                    <h3>Comunidad outdoor</h3>
+                    <p>Personas que comparten la misma pasión.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- === MANIFIESTO === -->
+<section class="section-manifesto" id="nosotros">
+    <div class="container-fluid">
+        <p class="manifesto-kicker">QUIÉNES SOMOS</p>
+        <h2 class="manifesto-text">
+            No vendemos equipo de montaña. <span>Vendemos la razón para salir a usarlo.</span>
+            Tren al Sur nace para que cada persona en Bolivia tenga el equipo correcto
+            y la ruta indicada para su próxima aventura.
+        </h2>
+    </div>
+</section>
+
+<!-- === CÓMO FUNCIONA === -->
+<section class="section-how">
+    <div class="container-fluid">
+        <div class="how-grid">
+            <a asp-controller="Services" asp-action="Index" class="how-step">
+                <span class="how-step__number">01</span>
+                <i class="fas fa-map-location-dot"></i>
+                <h3>Elige tu ruta</h3>
+                <p>Explorá rutas reales por dificultad, duración y región.</p>
+            </a>
+            <a asp-controller="Products" asp-action="Index" class="how-step">
+                <span class="how-step__number">02</span>
+                <i class="fas fa-backpack"></i>
+                <h3>Equípate</h3>
+                <p>Encontrá el equipo recomendado para esa aventura.</p>
+            </a>
+            <a asp-controller="Services" asp-action="Index" class="how-step">
+                <span class="how-step__number">03</span>
+                <i class="fas fa-person-hiking"></i>
+                <h3>Vive la experiencia</h3>
+                <p>Reservá y salí a caminar. Nosotros nos encargamos del resto.</p>
+            </a>
+        </div>
     </div>
 </section>
     <!-- === DESCUBRE TU PRÓXIMO CAMINO === -->
@@ -143,67 +241,6 @@
                         </div>
                     </a>
                 }
-            </div>
-        </div>
-    </section>
-
-    <!-- === ENCUENTRA TU PRÓXIMO CAMINO (MAPA) === -->
-    <section class="section-map-discovery">
-        <div class="container-fluid">
-            <div class="section-header">
-                <h2 class="section-title">ENCUENTRA TU PRÓXIMO CAMINO</h2>
-                <p class="section-subtitle">
-                    Localiza rutas en todo el mundo y descubre nuevas aventuras.
-                </p>
-            </div>
-
-            <div class="map-discovery-container">
-                <!-- MAPA DE RUTAS: Sección preparada para integración con Leaflet/Google Maps -->
-                <div class="map-visual" id="routeMap">
-                    <div class="map-placeholder-visual">
-                        @{
-                            // Posiciones fijas (%) para repartir los marcadores sobre el mapa placeholder.
-                            var markerPositions = new[]
-                            {
-                                (Top: "30%", Left: "25%"),
-                                (Top: "50%", Left: "50%"),
-                                (Top: "20%", Left: "70%"),
-                                (Top: "65%", Left: "20%"),
-                                (Top: "40%", Left: "80%"),
-                                (Top: "70%", Left: "55%"),
-                                (Top: "25%", Left: "45%"),
-                                (Top: "55%", Left: "30%"),
-                                (Top: "35%", Left: "60%"),
-                                (Top: "15%", Left: "50%")
-                            };
-                        }
-                        @for (var i = 0; i < Model.RouteMarkers.Count; i++)
-                        {
-                            var marker = Model.RouteMarkers[i];
-                            var pos = markerPositions[i % markerPositions.Length];
-                            var difficultyEmoji = marker.Difficulty switch
-                            {
-                                RouteDifficulty.Easy => "🟢",
-                                RouteDifficulty.Moderate => "🟡",
-                                RouteDifficulty.Difficult => "🔴",
-                                RouteDifficulty.Extreme => "⚫",
-                                _ => "⚪"
-                            };
-                            var difficultyLabel = !string.IsNullOrEmpty(marker.Difficulty) && RouteDifficulty.Labels.ContainsKey(marker.Difficulty)
-                                ? RouteDifficulty.Labels[marker.Difficulty]
-                                : "Sin dato";
-
-                            <div class="map-marker" style="top: @pos.Top; left: @pos.Left;" data-route-id="@marker.Id">
-                                <div class="marker-dot"></div>
-                                <div class="marker-tooltip">
-                                    <strong>@marker.Name</strong><br>
-                                    @marker.Location<br>
-                                    @difficultyEmoji @difficultyLabel@(marker.DurationHours.HasValue ? $" · {marker.DurationHours}h" : "")
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
             </div>
         </div>
     </section>

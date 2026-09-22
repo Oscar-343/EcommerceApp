@@ -6,7 +6,59 @@
 document.addEventListener('DOMContentLoaded', function () {
     initNavbarScroll();
     initMobileMenu();
+    initNavSearch();
+    initNavUserMenu();
 });
+
+// Buscador de la navbar: el ícono despliega el input; Escape o clic afuera lo cierra.
+function initNavSearch() {
+    const search = document.getElementById('navSearch');
+    const toggle = document.getElementById('navSearchToggle');
+    if (!search || !toggle) return;
+
+    toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const isActive = search.classList.toggle('active');
+        toggle.setAttribute('aria-expanded', isActive);
+        if (isActive) {
+            search.querySelector('.nav-search__input')?.focus();
+        }
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!search.contains(e.target)) {
+            search.classList.remove('active');
+            toggle.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            search.classList.remove('active');
+            toggle.setAttribute('aria-expanded', 'false');
+        }
+    });
+}
+
+// Menú desplegable de usuario en la navbar (Mis pedidos, Mis reservas, Cerrar sesión...).
+function initNavUserMenu() {
+    const menu = document.getElementById('navUserMenu');
+    const toggle = document.getElementById('navUserToggle');
+    if (!menu || !toggle) return;
+
+    toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const isActive = menu.classList.toggle('active');
+        toggle.setAttribute('aria-expanded', isActive);
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!menu.contains(e.target)) {
+            menu.classList.remove('active');
+            toggle.setAttribute('aria-expanded', 'false');
+        }
+    });
+}
 
 function initNavbarScroll() {
     const navbar = document.getElementById('mainNav');

@@ -70,18 +70,24 @@
             }
         </div>
 
-        <!-- Acciones -->
+        <!-- Cantidad + acciones -->
+        <div class="producto-card__qty" data-product-id="@Model.Id" data-max-stock="@Model.Stock">
+            <button type="button" class="producto-card__qty-btn" data-qty-action="dec" aria-label="Restar cantidad">−</button>
+            <span class="producto-card__qty-value" data-qty-value>1</span>
+            <button type="button" class="producto-card__qty-btn" data-qty-action="inc" aria-label="Sumar cantidad">+</button>
+        </div>
+
         <div class="producto-card__actions">
-            <a asp-controller="Products" 
-               asp-action="Details" 
-               asp-route-id="@Model.Id" 
+            <a asp-controller="Products"
+               asp-action="Details"
+               asp-route-id="@Model.Id"
                class="producto-card__btn producto-card__btn--secondary">
                 VER
             </a>
-            <button class="producto-card__btn producto-card__btn--primary" 
+            <button class="producto-card__btn producto-card__btn--primary"
                     data-product-id="@Model.Id"
-                    onclick="agregarAlCarrito(@Model.Id)">
-                🛒 AGREGAR
+                    onclick="agregarAlCarritoConCantidad(this, @Model.Id)">
+                <i class="fas fa-shopping-bag"></i> AGREGAR
             </button>
         </div>
     </div>

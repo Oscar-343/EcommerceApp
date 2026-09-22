@@ -1,0 +1,44 @@
+<footer class="site-footer">
+    <div class="site-footer__top">
+        <div class="footer-col footer-col--brand">
+            <a class="footer-logo" asp-area="" asp-controller="Home" asp-action="Index">
+                <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg" alt="Tren al Sur" />
+                <span>Tren al Sur</span>
+            </a>
+            <p class="footer-tagline">Equipamiento, rutas y experiencias para vivir la aventura al aire libre.</p>
+            <div class="footer-social">
+                <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://tiktok.com" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-col">
+            <h4 class="footer-col__title">Explorar</h4>
+            <a asp-controller="Home" asp-action="Index">Inicio</a>
+            <a asp-controller="Services" asp-action="Index">Rutas</a>
+            <a asp-controller="Products" asp-action="Index">Productos</a>
+            <a asp-controller="Favorites" asp-action="Index">Favoritos</a>
+        </div>
+
+        <div class="footer-col">
+            <h4 class="footer-col__title">Cuenta</h4>
+            <a asp-controller="Account" asp-action="Login">Iniciar sesión</a>
+            <a asp-controller="Account" asp-action="Register">Crear cuenta</a>
+            <a asp-controller="Orders" asp-action="Index">Mis pedidos</a>
+            <a asp-controller="Reservations" asp-action="Index">Mis reservas</a>
+        </div>
+
+        <div class="footer-col">
+            <h4 class="footer-col__title">Contacto</h4>
+            <a href="mailto:trenalsur@gmail.com"><i class="fas fa-envelope"></i> trenalsur@gmail.com</a>
+            <a href="https://wa.me/59177697909" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> +591 77697909</a>
+            <a href="https://maps.app.goo.gl/YJSTmHr98TLC1do3A" target="_blank" rel="noopener"><i class="fas fa-location-dot"></i> Edificio EOS, Cochabamba, Bolivia</a>
+        </div>
+    </div>
+
+    <div class="site-footer__bottom">
+        <p>&copy; 2026 Tren al Sur. Todos los derechos reservados.</p>
+        <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacidad</a>
+    </div>
+</footer>

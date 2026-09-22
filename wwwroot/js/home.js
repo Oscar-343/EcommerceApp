@@ -101,10 +101,9 @@ function initMapMarkers() {
  * Inicializar y forzar reproducción del video hero
  */
 function initHeroVideo() {
-    const video = document.querySelector('.hero-video');
+    const video = document.querySelector('.hero-brand__video');
 
     if (!video) {
-        console.error('No se encontró el elemento .hero-video');
         return;
     }
 

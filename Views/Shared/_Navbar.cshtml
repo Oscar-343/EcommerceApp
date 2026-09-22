@@ -4,45 +4,67 @@
 }
 <nav id="mainNav" class="navbar-cinematic">
     <div class="nav-container">
-        <a class="nav-logo" asp-area="" asp-controller="Home" asp-action="Index">
+        <a class="nav-logo" asp-area="" asp-controller="Home" asp-action="Index" aria-label="Tren al Sur - Inicio">
             <img src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/logo.jpg" alt="Tren al Sur" />
-            <span>Tren al Sur</span>
         </a>
 
-        <ul class="nav-menu">
+        <ul class="nav-menu" id="navMenu">
             <li><a class="nav-link @(currentController == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a></li>
             <li><a class="nav-link @(currentController == "Services" ? "active" : "")" asp-controller="Services" asp-action="Index">Rutas</a></li>
             <li><a class="nav-link @(currentController == "Products" ? "active" : "")" asp-controller="Products" asp-action="Index">Productos</a></li>
-            <li><a class="nav-link @(currentController == "Favorites" ? "active" : "")" asp-controller="Favorites" asp-action="Index">Favoritos</a></li>
-            <li><a class="nav-link @(currentController == "Cart" ? "active" : "")" asp-controller="Cart" asp-action="Index">Carrito @await Component.InvokeAsync("CartCount")</a></li>
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                <li><a class="nav-link @(currentController == "Orders" ? "active" : "")" asp-controller="Orders" asp-action="Index">Mis pedidos</a></li>
-                <li><a class="nav-link @(currentController == "Reservations" ? "active" : "")" asp-controller="Reservations" asp-action="Index">Mis reservas</a></li>
-            }
-            @if (User.IsInRole("Admin"))
-            {
-                <li><a class="nav-link @(currentController == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="Index">Panel admin</a></li>
-            }
+            <li><a class="nav-link" href="#">Nosotros</a></li>
+            <li><a class="nav-link" href="#">Contacto</a></li>
         </ul>
 
-        <div class="nav-user">
+        <div class="nav-actions">
+            <!-- Buscador: ícono que despliega un input, envía GET a Productos con ?search= -->
+            <div class="nav-search" id="navSearch">
+                <button type="button" class="nav-icon-btn" id="navSearchToggle" aria-label="Buscar" aria-expanded="false">
+                    <i class="fas fa-search"></i>
+                </button>
+                <form class="nav-search__form" asp-controller="Products" asp-action="Index" method="get">
+                    <input type="text" name="search" class="nav-search__input" placeholder="¿Qué estás buscando?" autocomplete="off" />
+                </form>
+            </div>
+
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <span class="nav-user__greeting">Hola, @User.Identity.Name</span>
-                <form asp-controller="Account" asp-action="Logout" method="post" class="nav-user__logout-form">
-                    <button type="submit" class="nav-user__logout">Cerrar sesión</button>
-                </form>
+                <a asp-controller="Favorites" asp-action="Index" class="nav-icon-btn @(currentController == "Favorites" ? "active" : "")" aria-label="Favoritos">
+                    <i class="fas fa-heart"></i>
+                    @await Component.InvokeAsync("FavoriteCount")
+                </a>
+                <a asp-controller="Cart" asp-action="Index" class="nav-icon-btn @(currentController == "Cart" ? "active" : "")" aria-label="Carrito">
+                    <i class="fas fa-shopping-bag"></i>
+                    @await Component.InvokeAsync("CartCount")
+                </a>
+
+                <div class="nav-user-menu" id="navUserMenu">
+                    <button type="button" class="nav-icon-btn" id="navUserToggle" aria-label="Mi cuenta" aria-expanded="false">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <div class="nav-user-dropdown" id="navUserDropdown">
+                        <p class="nav-user-dropdown__greeting">Hola, @User.Identity.Name</p>
+                        <a asp-controller="Orders" asp-action="Index" class="nav-user-dropdown__link"><i class="fas fa-box"></i> Mis pedidos</a>
+                        <a asp-controller="Reservations" asp-action="Index" class="nav-user-dropdown__link"><i class="fas fa-calendar-check"></i> Mis reservas</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Admin" asp-action="Index" class="nav-user-dropdown__link"><i class="fas fa-gauge"></i> Panel admin</a>
+                        }
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="nav-user-dropdown__logout-form">
+                            <button type="submit" class="nav-user-dropdown__link nav-user-dropdown__link--danger"><i class="fas fa-arrow-right-from-bracket"></i> Cerrar sesión</button>
+                        </form>
+                    </div>
+                </div>
             }
             else
             {
-                <a asp-controller="Account" asp-action="Login" class="nav-user__link">Iniciar sesión</a>
-                <a asp-controller="Account" asp-action="Register" class="nav-user__link nav-user__link--primary">Registrarse</a>
+                <a asp-controller="Account" asp-action="Login" class="nav-btn nav-btn--outline">Iniciar sesión</a>
+                <a asp-controller="Account" asp-action="Register" class="nav-btn nav-btn--primary">Registrarse</a>
             }
-        </div>
 
-        <button class="nav-toggle" id="navToggle" aria-label="Abrir menú">
-            ☰
-        </button>
+            <button class="nav-toggle" id="navToggle" aria-label="Abrir menú">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
     </div>
 </nav>
