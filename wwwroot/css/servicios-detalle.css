@@ -528,6 +528,39 @@
     color: var(--sv-text-primary);
 }
 
+/* --- Estilos generados por initRutasMap() (Leaflet) --- */
+.ruta-map .leaflet-control-attribution {
+    background: rgba(11, 16, 14, 0.75) !important;
+    color: var(--sv-text-secondary) !important;
+}
+
+.ruta-map .leaflet-control-attribution a {
+    color: var(--sv-text-secondary) !important;
+}
+
+.rutas-map-marker span {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--sv-green-hover);
+    border: 2px solid var(--sv-text-secondary);
+    box-shadow: 0 0 0 6px rgba(85, 127, 99, 0.3);
+}
+
+.rutas-map-popup {
+    font-family: var(--sv-font-body);
+    color: #111;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.rutas-map-popup a {
+    color: var(--sv-green-main);
+    font-weight: 600;
+    text-decoration: none;
+}
+
 /* =========================================================
    GUÍA
    ========================================================= */

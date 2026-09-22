@@ -80,7 +80,7 @@ namespace EcommerceApp.Controllers
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Products");
+            return RedirectToAction("Index", "Home");
         }
 
         // --- Restablecimiento de contraseña ---

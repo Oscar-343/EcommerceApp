@@ -6,6 +6,7 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/servicios-detalle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
@@ -131,28 +132,31 @@
         {
             <section class="ruta-section">
                 <h2 class="ruta-section__title">RECORRIDO</h2>
-                
+
+                @{
+                    var rutaMapPoints = new List<object>();
+                    if (Model.Service.StartLatitude.HasValue && Model.Service.StartLongitude.HasValue)
+                    {
+                        rutaMapPoints.Add(new
+                        {
+                            name = "Inicio" + (!string.IsNullOrEmpty(Model.Service.StartPoint) ? ": " + Model.Service.StartPoint : ""),
+                            lat = Model.Service.StartLatitude,
+                            lng = Model.Service.StartLongitude
+                        });
+                    }
+                    if (Model.Service.EndLatitude.HasValue && Model.Service.EndLongitude.HasValue)
+                    {
+                        rutaMapPoints.Add(new
+                        {
+                            name = "Fin" + (!string.IsNullOrEmpty(Model.Service.EndPoint) ? ": " + Model.Service.EndPoint : ""),
+                            lat = Model.Service.EndLatitude,
+                            lng = Model.Service.EndLongitude
+                        });
+                    }
+                }
+
                 <div class="ruta-map-section">
-                    <!-- Mapa placeholder para integración futura (Leaflet, Google Maps, etc.) -->
-                                        <div class="ruta-map" id="rutaMap" data-lat-inicio="@Model.Service.StartLatitude" data-lng-inicio="@Model.Service.StartLongitude" data-lat-fin="@Model.Service.EndLatitude" data-lng-fin="@Model.Service.EndLongitude">
-                        <!-- Representación visual del recorrido.
-                             Cuando se integre una API real (Leaflet / Google Maps), este SVG
-                             se reemplaza por el canvas del mapa; el contenedor #rutaMap y los
-                             data-attributes con las coordenadas ya quedan preparados para eso. -->
-                        <svg viewBox="0 0 600 400" class="ruta-map__visual" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Representación del recorrido de la ruta">
-                            <path d="M0,90 Q150,50 300,90 T600,90" class="ruta-map__contour"></path>
-                            <path d="M0,190 Q150,150 300,190 T600,190" class="ruta-map__contour"></path>
-                            <path d="M0,300 Q150,265 300,300 T600,300" class="ruta-map__contour"></path>
-
-                            <path d="M90,320 C 190,270 210,150 500,70" class="ruta-map__trail"></path>
-
-                            <circle cx="90" cy="320" r="9" class="ruta-map__point ruta-map__point--start"></circle>
-                            <text x="90" y="345" class="ruta-map__label">INICIO</text>
-
-                            <circle cx="500" cy="70" r="9" class="ruta-map__point ruta-map__point--end"></circle>
-                            <text x="500" y="52" class="ruta-map__label">FIN</text>
-                        </svg>
-                    </div>
+                    <div id="rutasMap" class="ruta-map" data-routes='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(rutaMapPoints))'></div>
 
                     <div class="ruta-map-info">
                         @if (!string.IsNullOrEmpty(Model.Service.StartPoint))
@@ -391,4 +395,6 @@
 
 @section Scripts {
     <script src="~/js/servicios-detalle.js" asp-append-version="true"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="~/js/rutas-map.js" asp-append-version="true"></script>
 }

@@ -22,6 +22,9 @@
   min-height: 100vh;
   color: var(--fav-text);
   font-family: "Outfit", "Segoe UI", system-ui, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 .fav-hero {

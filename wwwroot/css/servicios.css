@@ -383,6 +383,12 @@ body, html {
     display: flex;
     align-items: center;
     gap: 1rem;
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+}
+
+.rutas-hero:hover .rutas-hero__controls {
+    opacity: 1;
 }
 
 .rutas-hero__controls button {
@@ -521,12 +527,12 @@ body, html {
    ========================================================= */
 .servicios-filters-section {
     background: var(--sv-bg-section);
-    padding: 4rem 0;
+    padding: 2.5rem 0;
     border-bottom: 1px solid var(--sv-border);
 }
 
 .servicios-section-header {
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.8s var(--sv-ease), transform 0.8s var(--sv-ease);
@@ -544,7 +550,7 @@ body, html {
 .servicios-filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 2.5rem;
+    gap: 1.75rem;
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.8s var(--sv-ease), transform 0.8s var(--sv-ease);
@@ -559,7 +565,7 @@ body, html {
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--sv-text-secondary);
-    margin-bottom: 0.9rem;
+    margin-bottom: 0.6rem;
     font-weight: 600;
 }
 

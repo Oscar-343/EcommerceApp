@@ -1,0 +1,58 @@
+/* =========================================================
+   DICTADO POR VOZ — botón de micrófono inyectado por dictation.js
+   Global: usa solo variables de tokens.css para funcionar en los 3
+   layouts del sitio (público, admin, auth).
+   ========================================================= */
+.dictation-wrap {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.dictation-wrap input,
+.dictation-wrap textarea {
+    padding-right: 2.4rem;
+}
+
+.dictation-btn {
+    position: absolute;
+    right: 0.4rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    z-index: 2;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.dictation-btn:hover {
+    color: var(--color-green-accent);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.dictation-btn--active {
+    color: var(--color-green-accent);
+    animation: dictation-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes dictation-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(85, 127, 99, 0.45); }
+    50% { box-shadow: 0 0 0 7px rgba(85, 127, 99, 0); }
+}
+
+/* En textareas (más altos), el botón queda anclado arriba a la derecha
+   en vez de centrado en toda la altura del campo. */
+.dictation-wrap textarea ~ .dictation-btn {
+    top: 1.2rem;
+    transform: none;
+}

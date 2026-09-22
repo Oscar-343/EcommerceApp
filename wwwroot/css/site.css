@@ -17,6 +17,10 @@ html {
   min-height: 100%;
 }
 
+html, body {
+  background-color: var(--color-bg);
+}
+
 body {
   margin-bottom: 60px;
 }
@@ -169,30 +173,27 @@ body {
     border: 2px solid var(--color-bg);
 }
 
-/* Buscador: el ícono despliega un input a la izquierda */
+/* Buscador: input siempre visible en desktop (>992px). En mobile
+   (@media max-width: 992px, más abajo) vuelve a ser un ícono que
+   despliega el input, comportamiento que se preserva ahí sin tocar el JS. */
 .nav-search {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-.nav-search__form {
-    position: absolute;
-    right: 100%;
-    top: 50%;
-    transform: translateY(-50%) scaleX(0);
-    transform-origin: right center;
-    width: 260px;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.25s ease;
-    margin-right: 0.5rem;
+#navSearchToggle {
+    display: none;
 }
 
-.nav-search.active .nav-search__form {
-    transform: translateY(-50%) scaleX(1);
+.nav-search__form {
+    position: static;
+    transform: none;
+    width: 200px;
     opacity: 1;
     pointer-events: auto;
+    transition: all 0.25s ease;
+    margin-right: 0;
 }
 
 .nav-search__input {
@@ -357,6 +358,10 @@ body {
         display: block;
     }
 
+    #navSearchToggle {
+        display: inline-flex;
+    }
+
     .nav-search__form {
         position: fixed;
         top: 73px;
@@ -367,13 +372,29 @@ body {
         padding: 0.75rem 1.25rem;
         background: rgba(11, 16, 14, 0.98);
         transform-origin: top center;
+        transform: scaleY(0);
+        opacity: 0;
+        pointer-events: none;
     }
 
     .nav-search.active .nav-search__form {
-        transform: none;
+        transform: scaleY(1);
+        opacity: 1;
+        pointer-events: auto;
     }
 
     .nav-btn--outline { display: none; }
+}
+
+@media (min-width: 993px) and (max-width: 1200px) {
+    .nav-btn {
+        padding: 0.4rem 0.85rem;
+        font-size: 0.75rem;
+    }
+
+    .nav-search__form {
+        width: 160px;
+    }
 }
 
 /* El navbar es fixed (queda fuera del flujo normal), así que el

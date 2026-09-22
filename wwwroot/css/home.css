@@ -185,22 +185,29 @@ p, .section-subtitle, .hero-subtitle {
     position: relative;
     width: 100%;
     min-height: 100vh;
-    display: flex;
-    align-items: center;
+    display: grid;
     overflow: hidden;
     margin: 0;
     padding: 0;
     z-index: 0;
 }
 
-/* El video queda fijo al viewport (no al hero), así que al hacer
-   scroll el contenido de las siguientes secciones "lo tapa" -
-   mismo efecto que el background-attachment: fixed de Productos,
-   adaptado para <video> (esa propiedad no aplica a video). */
+/* El video y el texto comparten la misma celda de grid (se superponen)
+   en vez de repartirse el ancho como items de flex - así el video no le
+   "roba" espacio al texto.
+   El video queda "pegado" (sticky) dentro de los límites de .hero-brand
+   (que es position: relative), y al tener la misma altura que la sección
+   no hay "tramo extra" en el que se despegue y suba con el scroll: se
+   mantiene fijo en pantalla y en cuanto termina la sección la tapa la
+   siguiente, sin fugas al resto de la página como pasaba con position:
+   fixed. */
 .hero-brand__media {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
+    grid-area: 1 / 1;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 0;
 }
 
 .hero-brand__video {
@@ -299,6 +306,9 @@ p, .section-subtitle, .hero-subtitle {
 }
 
 .hero-brand__content {
+    grid-area: 1 / 1;
+    align-self: center;
+    justify-self: start;
     position: relative;
     z-index: 2;
     max-width: 640px;
@@ -1324,6 +1334,58 @@ p, .section-subtitle, .hero-subtitle {
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(49, 93, 69, 0.4);
         }
+
+/* === MAPA DE RUTAS (Leaflet, tonos oscuros) — mismo estilo que en Rutas === */
+.rutas-map-section {
+    background: var(--home-bg);
+    padding: 5rem 0;
+}
+
+.rutas-map {
+    height: 460px;
+    width: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--home-border);
+    filter: saturate(0.9);
+}
+
+.rutas-map .leaflet-control-attribution {
+    background: rgba(11, 16, 14, 0.75) !important;
+    color: var(--home-text-secondary) !important;
+}
+
+.rutas-map .leaflet-control-attribution a {
+    color: var(--home-text-secondary) !important;
+}
+
+.rutas-map-marker span {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--home-green-hover);
+    border: 2px solid var(--home-text-secondary);
+    box-shadow: 0 0 0 6px rgba(85, 127, 99, 0.3);
+}
+
+.rutas-map-popup {
+    font-family: var(--home-font-body, 'Open Sans', sans-serif);
+    color: #111;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.rutas-map-popup a {
+    color: var(--home-green);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+@media (max-width: 576px) {
+    .rutas-map { height: 320px; }
+}
+
     /* === FOOTER === */
     .footer-cinematic {
         background-color: #000;

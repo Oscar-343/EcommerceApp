@@ -6,6 +6,7 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -222,7 +223,10 @@
                         { "Trekking", "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=600&fit=crop" },
                         { "Trekking con camping", "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&h=600&fit=crop" },
                         { "Alta montaña", "https://images.unsplash.com/photo-1788532863064-4eba86e846ba?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fHNhamFtYXxlbnwwfHwwfHx8MA%3D%3D" },
-                        { "Caminatas de naturaleza", "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop" }
+                        { "Caminatas de naturaleza", "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop" },
+                        { "Aventura extrema", "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=800&h=600&fit=crop" },
+                        { "Volcanes y montañas", "https://images.unsplash.com/photo-1554260570-e9689a3418b8?w=800&h=600&fit=crop" },
+                        { "Escalada", "https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&h=600&fit=crop" }
                     };
                 }
 
@@ -244,6 +248,21 @@
             </div>
         </div>
     </section>
+
+    <!-- === RUTAS EN EL MAPA (reutiliza initRutasMap() de servicios.js) === -->
+    @{ var homeMapRoutes = Model.RouteMarkers.Where(r => r.Latitude.HasValue && r.Longitude.HasValue).ToList(); }
+    @if (homeMapRoutes.Any())
+    {
+        <section class="rutas-map-section">
+            <div class="container-fluid">
+                <div class="section-header">
+                    <h2 class="section-title">RUTAS CERCA DE TI</h2>
+                    <p class="section-subtitle">Descubre en el mapa las rutas disponibles.</p>
+                </div>
+                <div id="rutasMap" class="rutas-map" data-routes='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(homeMapRoutes.Select(r => new { id = r.Id, name = r.Name, location = r.Location, lat = r.Latitude, lng = r.Longitude })))'></div>
+            </div>
+        </section>
+    }
 
     <!-- === EQUÍPATE PARA TU PRÓXIMA AVENTURA === -->
     <section class="section-equip-now">
@@ -344,4 +363,6 @@
 
 @section Scripts {
     <script src="~/js/home.js" asp-append-version="true"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="~/js/rutas-map.js" asp-append-version="true"></script>
 }

@@ -5,7 +5,7 @@
 }
 <link rel="stylesheet" href="~/css/carrito.css" asp-append-version="true" />
 
-<div class="container cart-page" style="padding: 2rem 0;">
+<div class="container-fluid cart-page">
     <section class="cart-hero">
         <h1 class="cart-title">Pedido #@Model.Id</h1>
         <p class="cart-sub">Hecho el @Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") &middot; Estado: @Model.Status</p>

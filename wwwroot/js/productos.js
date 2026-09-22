@@ -75,6 +75,16 @@ function getAntiForgeryToken() {
 }
 
 /**
+ * Sin sesión, ASP.NET Identity responde 401 (en vez de redirigir) cuando la
+ * petición manda X-Requested-With: XMLHttpRequest, así que hay que revisar
+ * el status manualmente y mandar al login.
+ */
+function redirectToLogin() {
+    window.location.href = '/Account/Login?ReturnUrl=' +
+        encodeURIComponent(window.location.pathname);
+}
+
+/**
  * Inicializar funcionalidad de favoritos (sincronizado con el servidor vía Favorites/Toggle)
  */
 function initFavorites() {
@@ -99,6 +109,10 @@ function initFavorites() {
                 body: formData
             })
                 .then(response => {
+                    if (response.status === 401) {
+                        redirectToLogin();
+                        return null;
+                    }
                     if (response.redirected) {
                         window.location.href = response.url;
                         return null;
@@ -135,6 +149,10 @@ function agregarAlCarritoConCantidad(btn, productId) {
         body: formData
     })
         .then(response => {
+            if (response.status === 401) {
+                redirectToLogin();
+                return null;
+            }
             if (response.redirected) {
                 window.location.href = response.url;
                 return null;
