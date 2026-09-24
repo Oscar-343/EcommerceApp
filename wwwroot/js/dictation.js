@@ -27,6 +27,9 @@
     }
 
     function startDictation(field, btn) {
+        // Avisa a otros micrófonos del sitio (ej. el asistente) para que se detengan.
+        document.dispatchEvent(new CustomEvent('voz:detener'));
+
         if (activeButton && activeButton !== btn) {
             stopActive();
         }
@@ -123,5 +126,10 @@
             });
         });
         observer.observe(document.body, { childList: true, subtree: true });
+
+        // Si otro micrófono empieza a escuchar, se corta este dictado.
+        document.addEventListener('voz:detener', function () {
+            if (activeRecognition) activeRecognition.abort();
+        });
     });
 })();
