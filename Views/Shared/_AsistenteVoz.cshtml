@@ -1,0 +1,25 @@
+@* Asistente de voz: botón flotante abajo a la derecha.
+   Empieza oculto; asistente-voz.js lo muestra solo si el navegador reconoce voz. *@
+<div id="asistenteVoz" class="asistente-voz" hidden
+     data-url-inicio="@Url.Action("Index", "Home")"
+     data-url-rutas="@Url.Action("Index", "Services")"
+     data-url-productos="@Url.Action("Index", "Products")"
+     data-url-carrito="@Url.Action("Index", "Cart")"
+     data-url-favoritos="@Url.Action("Index", "Favorites")"
+     data-url-pedidos="@Url.Action("Index", "Orders")"
+     data-url-reservas="@Url.Action("Index", "Reservations")">
+
+    <div class="asistente-voz__panel" role="status" aria-live="polite" hidden>
+        <p class="asistente-voz__estado"></p>
+        <p class="asistente-voz__dicho"></p>
+    </div>
+
+    <button type="button" class="asistente-voz__btn" aria-label="Asistente de voz: toca y dime qué buscas">
+        <!-- Anillo tipo brújula: círculo punteado + 4 marcas cardinales -->
+        <svg class="asistente-voz__anillo" viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 4" />
+            <path d="M32 1v6 M32 57v6 M1 32h6 M57 32h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <i class="fas fa-microphone"></i>
+    </button>
+</div>
