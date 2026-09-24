@@ -9,7 +9,7 @@ namespace EcommerceApp.Models
         public int Id { get; set; }
 
         // === INFORMACIÓN BÁSICA ===
-        [Required, MaxLength(150), RegularExpression(@"^[\w\s\-]+$", ErrorMessage = "Solo texto, números, espacios y guiones.")]
+        [Required, MaxLength(150)]
         public string Name { get; set; } = string.Empty;
 
         [Required, MaxLength(100)]

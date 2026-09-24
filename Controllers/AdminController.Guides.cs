@@ -77,6 +77,8 @@ namespace EcommerceApp.Controllers
 
             guide.UpdatedAt = DateTime.UtcNow;
             context.Guides.Update(guide);
+            // Update() marca todo como modificado; CreatedAt no debe pisarse con el valor del formulario.
+            context.Entry(guide).Property(g => g.CreatedAt).IsModified = false;
             await context.SaveChangesAsync();
             TempData["Success"] = $"Guía \"{guide.Name}\" actualizado.";
             return RedirectToAction(nameof(Guides));

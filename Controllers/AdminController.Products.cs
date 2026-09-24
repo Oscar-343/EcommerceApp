@@ -48,6 +48,10 @@ namespace EcommerceApp.Controllers
 
             try
             {
+                // Validar primero: si el formulario tiene errores, no se sube nada a Supabase.
+                if (!ModelState.IsValid)
+                    return View(product);
+
                 if (imageFile != null && imageFile.Length > 0)
                     product.ImageUrl = await UploadAdminImageAsync(imageFile, "products");
 
@@ -57,9 +61,6 @@ namespace EcommerceApp.Controllers
                 var galleryUrls = await UploadGalleryAsync(galleryFiles, "products/gallery");
                 if (!string.IsNullOrWhiteSpace(galleryUrls))
                     product.GalleryImages = AppendPipeSeparated(product.GalleryImages, galleryUrls);
-
-                if (!ModelState.IsValid)
-                    return View(product);
 
                 context.Products.Add(product);
                 await context.SaveChangesAsync();
@@ -100,6 +101,10 @@ namespace EcommerceApp.Controllers
 
             try
             {
+                // Validar primero: si el formulario tiene errores, no se sube nada a Supabase.
+                if (!ModelState.IsValid)
+                    return View(product);
+
                 if (imageFile != null && imageFile.Length > 0)
                     product.ImageUrl = await UploadAdminImageAsync(imageFile, "products");
 
@@ -109,9 +114,6 @@ namespace EcommerceApp.Controllers
                 var galleryUrls = await UploadGalleryAsync(galleryFiles, "products/gallery");
                 if (!string.IsNullOrWhiteSpace(galleryUrls))
                     product.GalleryImages = AppendPipeSeparated(product.GalleryImages, galleryUrls);
-
-                if (!ModelState.IsValid)
-                    return View(product);
 
                 product.UpdatedAt = DateTime.UtcNow;
                 context.Products.Update(product);

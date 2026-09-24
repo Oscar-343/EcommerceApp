@@ -76,6 +76,8 @@ namespace EcommerceApp.Controllers
 
             transport.UpdatedAt = DateTime.UtcNow;
             context.Transports.Update(transport);
+            // Update() marca todo como modificado; CreatedAt no debe pisarse con el valor del formulario.
+            context.Entry(transport).Property(t => t.CreatedAt).IsModified = false;
             await context.SaveChangesAsync();
             TempData["Success"] = $"Transporte \"{transport.Name}\" actualizado.";
             return RedirectToAction(nameof(Transports));

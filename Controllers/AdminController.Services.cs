@@ -58,6 +58,14 @@ namespace EcommerceApp.Controllers
 
             try
             {
+                // Validar primero: si el formulario tiene errores, no se sube nada a Supabase.
+                if (!ModelState.IsValid)
+                {
+                    await LoadServiceLookupsAsync();
+                    ViewBag.SelectedProductIds = productIds ?? new List<int>();
+                    return View(service);
+                }
+
                 if (imageFile != null && imageFile.Length > 0)
                     service.ImageUrl = await UploadAdminImageAsync(imageFile, "services");
 
@@ -67,13 +75,6 @@ namespace EcommerceApp.Controllers
                 var galleryUrls = await UploadGalleryAsync(galleryFiles, "services/gallery");
                 if (!string.IsNullOrWhiteSpace(galleryUrls))
                     service.GalleryImages = AppendPipeSeparated(service.GalleryImages, galleryUrls);
-
-                if (!ModelState.IsValid)
-                {
-                    await LoadServiceLookupsAsync();
-                    ViewBag.SelectedProductIds = productIds ?? new List<int>();
-                    return View(service);
-                }
 
                 context.Services.Add(service);
                 await context.SaveChangesAsync();
@@ -129,6 +130,14 @@ namespace EcommerceApp.Controllers
 
             try
             {
+                // Validar primero: si el formulario tiene errores, no se sube nada a Supabase.
+                if (!ModelState.IsValid)
+                {
+                    await LoadServiceLookupsAsync();
+                    ViewBag.SelectedProductIds = productIds ?? new List<int>();
+                    return View(service);
+                }
+
                 if (imageFile != null && imageFile.Length > 0)
                     service.ImageUrl = await UploadAdminImageAsync(imageFile, "services");
 
@@ -138,13 +147,6 @@ namespace EcommerceApp.Controllers
                 var galleryUrls = await UploadGalleryAsync(galleryFiles, "services/gallery");
                 if (!string.IsNullOrWhiteSpace(galleryUrls))
                     service.GalleryImages = AppendPipeSeparated(service.GalleryImages, galleryUrls);
-
-                if (!ModelState.IsValid)
-                {
-                    await LoadServiceLookupsAsync();
-                    ViewBag.SelectedProductIds = productIds ?? new List<int>();
-                    return View(service);
-                }
 
                 service.UpdatedAt = DateTime.UtcNow;
                 context.Services.Update(service);

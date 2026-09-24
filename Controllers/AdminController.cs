@@ -21,7 +21,7 @@ namespace EcommerceApp.Controllers
         // ---------------------------------------------------------------
         // SUBIDA DE IMÁGENES / VIDEO (Supabase Storage)
         // ---------------------------------------------------------------
-        // Se llama por AJAX desde los formularios de Productos, Rutas y Branding.
+        // Se llama por AJAX desde los formularios de Productos y Rutas.
         // "folder" agrupa los archivos dentro del bucket: products, services, branding...
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -71,18 +71,6 @@ namespace EcommerceApp.Controllers
             }
 
             return Json(new { success = true, urls, url = urls[0] });
-        }
-
-        // ---------------------------------------------------------------
-        // BRANDING (logo, video de fondo, imagen de login...)
-        // ---------------------------------------------------------------
-        // No se guarda en base de datos: solo sube el archivo a Supabase y te
-        // muestra la URL pública para que la pegues donde corresponda en el código.
-        public IActionResult Branding()
-        {
-            ViewData["Title"] = "Branding";
-            ViewData["Subtitle"] = "Logo, video de fondo y otras imágenes de marca";
-            return View();
         }
 
         // Disponible en todas las vistas del panel (badge de reservas pendientes en el sidebar).
