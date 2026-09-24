@@ -45,6 +45,22 @@ namespace EcommerceApp.Controllers
 
             await using var transaction = await context.Database.BeginTransactionAsync();
 
+            foreach (var item in items)
+            {
+                // Descuenta solo si todavía hay stock suficiente. Es una sola operación en la BD,
+                // así dos compras simultáneas no pueden vender la misma unidad.
+                var filas = await context.Products
+                    .Where(p => p.Id == item.ProductId && p.Stock >= item.Quantity)
+                    .ExecuteUpdateAsync(s => s.SetProperty(p => p.Stock, p => p.Stock - item.Quantity));
+
+                if (filas == 0)
+                {
+                    await transaction.RollbackAsync();
+                    TempData["Success"] = $"\"{item.Product!.Name}\" ya no tiene stock suficiente. Ajusta la cantidad para continuar.";
+                    return RedirectToAction("Index", "Cart");
+                }
+            }
+
             var order = new Order
             {
                 UserId = userId,
@@ -65,8 +81,6 @@ namespace EcommerceApp.Controllers
                     UnitPrice = precioVigente,
                     Quantity = item.Quantity
                 });
-
-                product.Stock -= item.Quantity;
             }
 
             order.Total = order.Items.Sum(i => i.UnitPrice * i.Quantity);
@@ -127,16 +141,19 @@ namespace EcommerceApp.Controllers
                 return RedirectToAction(nameof(Details), new { id });
             }
 
-            var productIds = order.Items.Where(i => i.ProductId != null).Select(i => i.ProductId!.Value).ToList();
-            var products = await context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
-            foreach (var item in order.Items)
+            await using var transaction = await context.Database.BeginTransactionAsync();
+
+            foreach (var item in order.Items.Where(i => i.ProductId != null))
             {
-                var product = products.FirstOrDefault(p => p.Id == item.ProductId);
-                if (product != null) product.Stock += item.Quantity;
+                // Devuelve el stock directamente en la BD (suma sobre el valor actual, no sobre uno leído antes).
+                await context.Products
+                    .Where(p => p.Id == item.ProductId)
+                    .ExecuteUpdateAsync(s => s.SetProperty(p => p.Stock, p => p.Stock + item.Quantity));
             }
 
             order.Status = "Cancelado";
             await context.SaveChangesAsync();
+            await transaction.CommitAsync();
 
             TempData["Success"] = "Pedido cancelado y stock devuelto.";
             return RedirectToAction(nameof(Details), new { id });

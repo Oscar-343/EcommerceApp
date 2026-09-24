@@ -59,6 +59,8 @@ namespace EcommerceApp.Controllers
                 return RedirectToAction(nameof(OrderDetails), new { id });
             }
 
+            await using var transaction = await context.Database.BeginTransactionAsync();
+
             if (status == "Entregado")
             {
                 order.DeliveredAt = DateTime.UtcNow;
@@ -66,17 +68,18 @@ namespace EcommerceApp.Controllers
             else if (status == "Cancelado")
             {
                 // Devolver el stock de cada línea cuyo producto siga existiendo.
-                var productIds = order.Items.Where(i => i.ProductId != null).Select(i => i.ProductId!.Value).ToList();
-                var products = await context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
-                foreach (var item in order.Items)
+                foreach (var item in order.Items.Where(i => i.ProductId != null))
                 {
-                    var product = products.FirstOrDefault(p => p.Id == item.ProductId);
-                    if (product != null) product.Stock += item.Quantity;
+                    // Suma sobre el valor actual en la BD, no sobre uno leído antes.
+                    await context.Products
+                        .Where(p => p.Id == item.ProductId)
+                        .ExecuteUpdateAsync(s => s.SetProperty(p => p.Stock, p => p.Stock + item.Quantity));
                 }
             }
 
             order.Status = status;
             await context.SaveChangesAsync();
+            await transaction.CommitAsync();
             TempData["Success"] = "Estado del pedido actualizado.";
             return RedirectToAction(nameof(OrderDetails), new { id });
         }

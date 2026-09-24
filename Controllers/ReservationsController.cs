@@ -41,6 +41,10 @@ namespace EcommerceApp.Controllers
 
             await using var transaction = await context.Database.BeginTransactionAsync();
 
+            // Bloquea la ruta hasta el commit: otra reserva de la misma ruta espera su turno.
+            await context.Database.ExecuteSqlInterpolatedAsync(
+                $"SELECT 1 FROM \"Services\" WHERE \"Id\" = {serviceId} FOR UPDATE");
+
             var yaReservo = await context.Reservations.AnyAsync(r =>
                 r.UserId == userId && r.ServiceId == serviceId && r.TripDate == tripDate);
             if (yaReservo)
