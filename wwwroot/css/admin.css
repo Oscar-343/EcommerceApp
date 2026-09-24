@@ -1137,3 +1137,17 @@ input[type="file"].form-control::file-selector-button {
         color: #14201a !important;
     }
 }
+
+/* Estado del enlace de Google Maps (formulario de rutas) */
+.map-link-status {
+    display: block;
+    min-height: 1.2em;
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: #A8B0AA;
+}
+
+.map-link-status--ok { color: #557F63; }
+.map-link-status--error { color: #d9534f; }
+
+.map-link-status a { margin-left: 0.5rem; }

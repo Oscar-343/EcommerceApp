@@ -79,8 +79,36 @@
         </div>
 
         <div class="admin-form-section">
-            <h3>Coordenadas del mapa</h3>
-            <p class="hint">Opcional. Cópialas de Google Maps (clic derecho sobre el punto). Ejemplo: -17.3935, -66.1570</p>
+            <h3>Ubicación en el mapa</h3>
+            <p class="hint">
+                En Google Maps haz clic en el punto exacto (aparece un pin), luego <strong>Compartir → Copiar enlace</strong> y pégalo aquí.
+                También puedes pegar coordenadas copiadas con clic derecho.
+            </p>
+
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="StartMapLink">Enlace de Google Maps — punto de inicio</label>
+                    <input id="StartMapLink" type="text" inputmode="url" autocomplete="off" class="form-control"
+                           placeholder="https://maps.app.goo.gl/..."
+                           data-map-link
+                           data-resolve-url="@Url.Action("ResolveMapLink", "Admin")"
+                           data-lat-target="StartLatitude" data-lng-target="StartLongitude"
+                           data-status-id="StartMapLinkStatus" />
+                    <small id="StartMapLinkStatus" class="map-link-status" aria-live="polite"></small>
+                </div>
+                <div class="form-field">
+                    <label for="EndMapLink">Enlace de Google Maps — punto final</label>
+                    <input id="EndMapLink" type="text" inputmode="url" autocomplete="off" class="form-control"
+                           placeholder="Opcional si la ruta es un circuito"
+                           data-map-link
+                           data-resolve-url="@Url.Action("ResolveMapLink", "Admin")"
+                           data-lat-target="EndLatitude" data-lng-target="EndLongitude"
+                           data-status-id="EndMapLinkStatus" />
+                    <small id="EndMapLinkStatus" class="map-link-status" aria-live="polite"></small>
+                </div>
+            </div>
+
+            <p class="hint">Coordenadas (se llenan solas al pegar el enlace; puedes corregirlas a mano).</p>
             <div class="form-grid">
                 <div class="form-field">
                     <label asp-for="StartLatitude">Latitud de inicio</label>
@@ -278,6 +306,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/admin-map-link.js" asp-append-version="true"></script>
     <script>
         function wirePreview(inputId, previewId) {
             const input = document.getElementById(inputId);
