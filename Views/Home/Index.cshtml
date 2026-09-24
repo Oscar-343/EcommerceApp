@@ -205,8 +205,21 @@
             </div>
         </div>
     </section>
-    <!-- === RUTAS EN EL MAPA (reutiliza initRutasMap() de servicios.js) === -->
-    @{ var homeMapRoutes = Model.RouteMarkers.Where(r => r.Latitude.HasValue && r.Longitude.HasValue).ToList(); }
+    <!-- === RUTAS EN EL MAPA (reutiliza initRutasMap() de rutas-map.js) === -->
+    @{
+        // La consulta ya filtra rutas sin coordenadas; aquí solo se arma el JSON del mapa.
+        var homeMapRoutes = Model.RouteMarkers.Select(r => new
+        {
+            id = r.Id,
+            name = r.Name,
+            location = r.Location,
+            difficulty = r.Difficulty != null && RouteDifficulty.Labels.ContainsKey(r.Difficulty)
+                ? RouteDifficulty.Labels[r.Difficulty] : null,
+            duration = r.DurationHours,
+            lat = r.Latitude,
+            lng = r.Longitude
+        }).ToList();
+    }
     @if (homeMapRoutes.Any())
     {
         <section class="rutas-map-section">
@@ -215,7 +228,9 @@
                     <h2 class="section-title">RUTAS CERCA DE TI</h2>
                     <p class="section-subtitle">Descubre en el mapa las rutas disponibles.</p>
                 </div>
-                <div id="rutasMap" class="rutas-map" data-routes='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(homeMapRoutes.Select(r => new { id = r.Id, name = r.Name, location = r.Location, lat = r.Latitude, lng = r.Longitude })))'></div>
+                <div id="rutasMap" class="rutas-map"
+                     data-initial-view="bolivia"
+                     data-routes='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(homeMapRoutes))'></div>
             </div>
         </section>
     }

@@ -50,9 +50,9 @@ namespace EcommerceApp.Controllers
                 .Distinct()
                 .CountAsync();
 
-            // Marcadores para el mapa (solo coordenadas)
+            // Marcadores del mapa: solo rutas que tienen coordenadas de inicio.
             var routeMarkers = await _context.Services.AsNoTracking()
-                .Where(s => s.Status == "Active" && (s.StartLatitude.HasValue || s.Location != null))
+                .Where(s => s.Status == "Active" && s.StartLatitude.HasValue && s.StartLongitude.HasValue)
                 .Select(s => new MapMarker
                 {
                     Id = s.Id,
@@ -63,7 +63,6 @@ namespace EcommerceApp.Controllers
                     Latitude = s.StartLatitude,
                     Longitude = s.StartLongitude
                 })
-                .Take(10)
                 .ToListAsync();
 
             var model = new HomeViewModel

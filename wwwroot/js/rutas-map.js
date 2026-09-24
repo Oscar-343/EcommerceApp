@@ -36,19 +36,47 @@ function initRutasMap() {
     const bounds = [];
     routes.forEach(function (route) {
         const marker = L.marker([route.lat, route.lng], { icon: markerIcon }).addTo(map);
-        marker.bindPopup(
-            '<div class="rutas-map-popup">' +
-            '<strong>' + route.name + '</strong>' +
-            (route.location ? '<br>' + route.location : '') +
-            (route.id ? '<br><a href="/Services/Details/' + route.id + '">Ver ruta →</a>' : '') +
-            '</div>'
-        );
+        marker.bindPopup(crearPopup(route));
         bounds.push([route.lat, route.lng]);
     });
 
-    if (bounds.length === 1) {
+    // Límites aproximados de Bolivia (suroeste, noreste).
+    // Se usan límites y no un zoom fijo para que se adapte al tamaño de pantalla.
+    const BOLIVIA_BOUNDS = [[-22.9, -69.7], [-9.6, -57.4]];
+
+    if (el.dataset.initialView === 'bolivia') {
+        map.fitBounds(BOLIVIA_BOUNDS, { padding: [20, 20] });
+    } else if (bounds.length === 1) {
         map.setView(bounds[0], 8);
     } else {
         map.fitBounds(bounds, { padding: [40, 40] });
     }
+}
+
+// Arma el popup con textContent para que ningún texto se interprete como HTML.
+function crearPopup(route) {
+    const box = document.createElement('div');
+    box.className = 'rutas-map-popup';
+
+    const titulo = document.createElement('strong');
+    titulo.textContent = route.name;
+    box.appendChild(titulo);
+
+    // Línea de detalle: ubicación · dificultad · duración (solo las que existan)
+    const detalles = [route.location, route.difficulty, route.duration ? route.duration + ' h' : null]
+        .filter(Boolean);
+    if (detalles.length) {
+        const p = document.createElement('div');
+        p.textContent = detalles.join(' · ');
+        box.appendChild(p);
+    }
+
+    if (route.id) {
+        const link = document.createElement('a');
+        link.href = '/Services/Details/' + encodeURIComponent(route.id);
+        link.textContent = 'Ver ruta →';
+        box.appendChild(link);
+    }
+
+    return box;
 }
