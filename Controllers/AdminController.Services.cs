@@ -1,4 +1,5 @@
 using EcommerceApp.Models;
+using EcommerceApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -200,6 +201,20 @@ namespace EcommerceApp.Controllers
                 TempData["Success"] = $"Ruta \"{service.Name}\" eliminada.";
             }
             return RedirectToAction(nameof(Services));
+        }
+
+        // Recibe un enlace de Google Maps (o coordenadas) y devuelve latitud y longitud.
+        // La usa el formulario de rutas al pegar el enlace; no guarda nada.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResolveMapLink(string? url, [FromServices] MapLinkService mapLinks)
+        {
+            var coordenadas = await mapLinks.ObtenerCoordenadasAsync(url);
+
+            if (coordenadas == null)
+                return Json(new { ok = false, mensaje = "No encontré coordenadas en este enlace. Marca el punto exacto en Google Maps y vuelve a compartirlo." });
+
+            return Json(new { ok = true, lat = coordenadas.Value.Lat, lng = coordenadas.Value.Lng });
         }
     }
 }
