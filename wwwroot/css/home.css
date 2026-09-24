@@ -1264,11 +1264,23 @@ p, .section-subtitle, .hero-subtitle {
     border: 1px solid var(--home-border);
     filter: saturate(0.9);
 }
-
-.rutas-map .leaflet-control-attribution {
-    background: rgba(11, 16, 14, 0.75) !important;
-    color: var(--home-text-secondary) !important;
+.leaflet-control-attribution {
+    background: transparent !important;
+    color: #A8B0AA !important;
+    font-size: 9px;
+    opacity: .45;
+    transition: opacity .2s;
 }
+
+    .leaflet-control-attribution:hover {
+        opacity: 1;
+    }
+
+    .leaflet-control-attribution a {
+        color: #A8B0AA !important;
+    }
+.leaflet-control-attribution:hover { opacity: 1; }
+.leaflet-control-attribution a { color: #A8B0AA !important; }
 
 .rutas-map .leaflet-control-attribution a {
     color: var(--home-text-secondary) !important;

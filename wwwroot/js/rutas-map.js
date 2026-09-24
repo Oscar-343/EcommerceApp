@@ -21,10 +21,13 @@ function initRutasMap() {
 
     const map = L.map(el, { scrollWheelZoom: false });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 19
+    // Quita el enlace "Leaflet" (opcional). El crédito del mapa sí es obligatorio.
+    map.attributionControl.setPrefix(false);
+
+    // Mapa satelital de Esri (gratis, sin API key; exige mostrar el crédito).
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Powered by Esri | Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+        maxZoom: 18
     }).addTo(map);
 
     const markerIcon = L.divIcon({
