@@ -65,6 +65,15 @@ builder.Services.AddHttpClient<IImageStorageService, SupabaseImageStorageService
 // Cálculo de los reportes del panel admin (ingresos, reservas, ventas, inventario).
 builder.Services.AddScoped<ReportService>();
 
+// Lee enlaces de Google Maps en el admin. AllowAutoRedirect = false:
+// cada redirección se revisa a mano para no salir de los dominios de Google.
+builder.Services.AddHttpClient<MapLinkService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(8);
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (compatible; TrenAlSur/1.0)");
+})
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
