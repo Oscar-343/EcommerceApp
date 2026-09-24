@@ -97,9 +97,16 @@ namespace EcommerceApp.Models
         public string? Recommendations { get; set; } // Separado por pipe |
 
         // === GEOGRAFÍA (para mapa) ===
+        [Range(-90, 90, ErrorMessage = "La latitud debe estar entre -90 y 90.")]
         public double? StartLatitude { get; set; }
+
+        [Range(-180, 180, ErrorMessage = "La longitud debe estar entre -180 y 180.")]
         public double? StartLongitude { get; set; }
+
+        [Range(-90, 90, ErrorMessage = "La latitud debe estar entre -90 y 90.")]
         public double? EndLatitude { get; set; }
+
+        [Range(-180, 180, ErrorMessage = "La longitud debe estar entre -180 y 180.")]
         public double? EndLongitude { get; set; }
 
         // === RELACIONES ===

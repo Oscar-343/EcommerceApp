@@ -80,6 +80,33 @@
         </div>
 
         <div class="admin-form-section">
+            <h3>Coordenadas del mapa</h3>
+            <p class="hint">Opcional. Cópialas de Google Maps (clic derecho sobre el punto). Ejemplo: -17.3935, -66.1570</p>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label asp-for="StartLatitude">Latitud de inicio</label>
+                    <input asp-for="StartLatitude" type="number" step="any" class="form-control" />
+                    <span asp-validation-for="StartLatitude" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="StartLongitude">Longitud de inicio</label>
+                    <input asp-for="StartLongitude" type="number" step="any" class="form-control" />
+                    <span asp-validation-for="StartLongitude" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="EndLatitude">Latitud final</label>
+                    <input asp-for="EndLatitude" type="number" step="any" class="form-control" />
+                    <span asp-validation-for="EndLatitude" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="EndLongitude">Longitud final</label>
+                    <input asp-for="EndLongitude" type="number" step="any" class="form-control" />
+                    <span asp-validation-for="EndLongitude" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
             <h3>Dificultad y duración</h3>
             <div class="form-grid form-grid-3">
                 <div class="form-field">
