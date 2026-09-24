@@ -50,9 +50,6 @@ namespace EcommerceApp.Controllers
                 .Distinct()
                 .CountAsync();
 
-            // Categorías outdoor
-            var outdoorCategories = RouteCategories.All.ToList();
-
             // Marcadores para el mapa (solo coordenadas)
             var routeMarkers = await _context.Services.AsNoTracking()
                 .Where(s => s.Status == "Active" && (s.StartLatitude.HasValue || s.Location != null))
@@ -76,7 +73,6 @@ namespace EcommerceApp.Controllers
                 TotalRoutes = totalRoutes,
                 TotalProducts = totalProducts,
                 TotalCategories = totalCategories,
-                OutdoorCategories = outdoorCategories,
                 RouteMarkers = routeMarkers,
                 IsAuthenticated = User.Identity?.IsAuthenticated ?? false,
                 UserName = User.Identity?.Name

@@ -16,9 +16,6 @@ namespace EcommerceApp.Models
         public int TotalProducts { get; set; }
         public int TotalCategories { get; set; }
 
-        // Categorías outdoor para "Explora a tu manera"
-        public List<string> OutdoorCategories { get; set; } = new();
-
         // Marcadores para el mapa (coordenadas de rutas)
         public List<MapMarker> RouteMarkers { get; set; } = new();
 
