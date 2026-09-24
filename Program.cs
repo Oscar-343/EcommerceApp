@@ -99,25 +99,18 @@ app.MapControllerRoute(
 // Crear roles por defecto solo si no existen (evita errores al reiniciar la app)
 using (var scope = app.Services.CreateScope())
 {
+    // Roles base: el registro de clientes necesita que exista "User".
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     string[] roles = { "Admin", "User" };
     foreach (var role in roles)
     {
-            if (!await roleManager.RoleExistsAsync(role))
+        if (!await roleManager.RoleExistsAsync(role))
             await roleManager.CreateAsync(new IdentityRole(role));
     }
 
-    // Seed de productos de ejemplo (solo si no hay productos)
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    // Cuenta de administración: solo se crea si no existe.
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    await ProductSeeder.SeedProductsAsync(context);
-    await ServiceSeeder.SeedServicesAsync(context);
-
-    // Cuenta de administración
     await AdminSeeder.SeedAdminAsync(userManager, roleManager, builder.Configuration);
-
-    // Seed de pedidos y reservas de prueba, para probar los reportes
-    await OrderReservationSeeder.SeedOrdersAndReservationsAsync(context, userManager);
 }
 
 app.Run();
