@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-> Actualizado al terminar la Fase 7 de `Agente/PLAN_REPORTES.md` (carrito, pedidos, reservas reales y reportes). Sin correos ni credenciales.
+> Actualizado al terminar la Fase 7 de `Agente/PLAN_REPORTES.md` (carrito, pedidos, reservas reales y reportes) y las Fases 2 a 7 de `Agente/PLAN_HOME_MAPA_Y_CORRECCIONES.md` (rama `home-mapa`; la Fase 1, hero con video fijo, sigue pendiente). Sin correos ni credenciales.
 
 ## Stack
 
@@ -15,7 +15,9 @@ Entidades: `Product`, `Service` (con `Guide`/`Transport` opcionales), `ServicePr
 ## Frontend
 
 - Un solo `_Layout.cshtml` para toda la parte pública (navbar + footer compartidos en `_Navbar.cshtml`), `_AdminLayout.cshtml` para el panel admin, `_AuthLayout.cshtml` para login/registro.
-- Sin AJAX en el catálogo: "Agregar al carrito" y "Favoritos" son POST normales con token antiforgery (antes usaban `localStorage`/`console.log` simulados).
+- "Agregar al carrito" y "Favoritos" son POST con token antiforgery (antes usaban `localStorage`/`console.log` simulados). `CartController.Add` y `FavoritesController.Toggle` responden JSON cuando la petición es AJAX (`X-Requested-With: XMLHttpRequest`) y redirigen en caso contrario.
+- Home sin la sección "EXPLORA A TU MANERA": la navegación por categorías solo está en Rutas (`Services/Index`).
+- Mapa de rutas en el Home: un marcador por ruta activa con coordenadas de inicio, sin límite de cantidad. Encuadre inicial en Bolivia (`data-initial-view="bolivia"`); las rutas de otros países aparecen al alejar el zoom. `wwwroot/js/rutas-map.js` es compartido por Home, `Services/Index` y `Services/Details`; el popup se arma con `textContent` (ningún texto se interpreta como HTML).
 - Paleta de colores centralizada en `wwwroot/css/tokens.css`.
 - Región del negocio: Cochabamba, **Bolivia** (no Argentina).
 
@@ -25,6 +27,11 @@ Entidades: `Product`, `Service` (con `Guide`/`Transport` opcionales), `ServicePr
 - `OrdersController` y `ReservationsController` (`[Authorize]`) son los controladores públicos para checkout y reservas del cliente.
 - `Services/ReportService.cs` (`AddScoped`) centraliza las consultas de los 7 reportes del panel admin; sus ViewModels viven en `Models/Reports/`.
 - Categorías de productos y rutas son las 10/5 reales que usan los seeders (no listas inventadas).
+- Coordenadas de las rutas (`StartLatitude`/`StartLongitude`/`EndLatitude`/`EndLongitude`) editables desde `ServiceCreate`/`ServiceEdit`, con `[Range]`. Los `input type="number"` se leen con punto decimal aunque el servidor esté en `es-BO` (ASP.NET agrega el campo oculto `__Invariant`), por eso no se cambió la cultura.
+- `Product.Name` y `Service.Name` sin `RegularExpression` (en JavaScript `\w` no acepta acentos). `Guide.Name` y `Transport.Name` todavía lo tienen.
+- Productos y rutas validan el formulario antes de subir imágenes a Supabase (no quedan archivos huérfanos si hay errores).
+- Operaciones simultáneas: el checkout descuenta stock con un update atómico (`ExecuteUpdate` con `Stock >= cantidad`) dentro de la transacción; cancelar un pedido (cliente o admin) devuelve el stock también de forma atómica; crear una reserva bloquea la ruta con `SELECT ... FOR UPDATE` antes de calcular el cupo.
+- `Edit` de productos, rutas, guías y transportes no pisa `CreatedAt` (`IsModified = false`).
 - Moneda única formateada con `Helpers/PriceFormatter.cs` (`"Bs. " + N2`). CSV de reportes formateado con `Helpers/CsvHelper.cs`.
 
 ## Pendientes conocidos
