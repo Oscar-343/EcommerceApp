@@ -1,32 +1,32 @@
 /* ============================================
    HOME - CINEMATOGRÁFICO OUTDOOR PREMIUM
-   VERSIÓN CORREGIDA SEGÚN PROMPT MAESTRO
+   Móvil primero: la base es el teléfono y lo más grande se agrega
+   en la sección RESPONSIVE del final (anchos 576/768/992/1200).
+   La navbar y el footer viven en site.css.
    ============================================ */
 
-/* === PALETA DE COLORES EXACTA DEL PROMPT === */
+/* === PALETA DE COLORES === */
 :root {
     /* Fondo principal y secciones */
     --home-bg: #0B100E;
     --home-section: #111713;
     --home-block: #171E1A;
     --home-border: #303832;
-    
+
     /* Texto */
     --home-text: #F1F3F1;
     --home-text-secondary: #A8B0AA;
-    
+
     /* Colores de identidad */
     --home-green: #315D45;
     --home-green-hover: #557F63;
     --home-tierra: #7C7058;
-    
+
     /* Overlays y efectos */
     --home-overlay-dark: rgba(11, 16, 14, 0.85);
-    --home-overlay-green: rgba(49, 93, 69, 0.7);
-    --home-glass: rgba(23, 30, 26, 0.8);
 }
 
-/* === RESET COMPLETO - FULLSCREEN BASE === */
+/* === RESET Y BASE === */
 * {
     margin: 0;
     padding: 0;
@@ -34,9 +34,6 @@
 }
 
 html, body {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
     background-color: var(--home-bg);
     color: var(--home-text);
     font-family: 'Open Sans', sans-serif;
@@ -47,8 +44,8 @@ body {
     position: relative;
 }
 
-/* === TIPOGRAFÍA EXACTA === */
-h1, h2, h3, h4, .section-title, .hero-title {
+/* === TIPOGRAFÍA === */
+h1, h2, h3, h4, .section-title {
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
     text-transform: uppercase;
@@ -56,12 +53,11 @@ h1, h2, h3, h4, .section-title, .hero-title {
     line-height: 1.1;
 }
 
-p, .section-subtitle, .hero-subtitle {
+p, .section-subtitle {
     font-family: 'Open Sans', sans-serif;
     font-weight: 300;
     line-height: 1.7;
 }
-
 
 /* ============================================================
    HERO DE MARCA — Home v2 (video "clavado" en pantalla)
@@ -70,6 +66,7 @@ p, .section-subtitle, .hero-subtitle {
     position: relative;
     width: 100%;
     min-height: 100vh;
+    min-height: 100svh; /* alto visible real en móviles (sin la barra del navegador) */
     display: grid;
     overflow: hidden;
     margin: 0;
@@ -122,12 +119,13 @@ p, .section-subtitle, .hero-subtitle {
     pointer-events: none;
 }
 
+/* Adorno lateral: solo desde 992px (ver RESPONSIVE) */
 .hero-brand__flourish {
     position: absolute;
     top: 7rem;
     right: 3rem;
     z-index: 2;
-    display: flex;
+    display: none;
     align-items: flex-start;
     gap: .5rem;
     transform: rotate(-4deg);
@@ -145,12 +143,13 @@ p, .section-subtitle, .hero-subtitle {
         line-height: 1.5;
     }
 
+/* Indicador de scroll: solo desde 768px (ver RESPONSIVE) */
 .hero-brand__scrollcue {
     position: absolute;
     left: 2rem;
     bottom: 3rem;
     z-index: 2;
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     gap: .75rem;
@@ -190,14 +189,18 @@ p, .section-subtitle, .hero-subtitle {
     100% { top: 100%; opacity: 0; }
 }
 
+/* El relleno de arriba y abajo es igual (así el bloque sigue centrado) y
+   deja libre el alto de la navbar: en un teléfono en horizontal el título
+   y los botones no quedan tapados. */
 .hero-brand__content {
     grid-area: 1 / 1;
     align-self: center;
     justify-self: start;
     position: relative;
     z-index: 2;
+    width: 100%;
     max-width: 640px;
-    padding: 0 3rem;
+    padding: calc(var(--nav-height) + 1rem) var(--page-gutter);
 }
 
 .hero-brand__kicker {
@@ -234,22 +237,24 @@ p, .section-subtitle, .hero-subtitle {
 
 .hero-brand__subtitle {
     font-family: 'Open Sans', sans-serif;
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
     line-height: 1.6;
     color: var(--home-text-secondary);
     max-width: 460px;
-    margin-bottom: 2.5rem;
+    margin-bottom: clamp(1.75rem, 5vw, 2.5rem);
 }
 
+/* Botones: apilados a lo ancho en móvil, en fila desde 576px */
 .hero-brand__actions {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 1rem;
 }
 
 .hero-brand__btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: .65rem;
     padding: 1rem 1.75rem;
     border-radius: 999px;
@@ -283,6 +288,7 @@ p, .section-subtitle, .hero-subtitle {
         transform: translateY(-3px);
     }
 
+/* === ESTADÍSTICAS: 1 columna → 2 desde 576px → 4 desde 992px === */
 .hero-brand__stats {
     position: relative;
     z-index: 1;
@@ -293,18 +299,17 @@ p, .section-subtitle, .hero-subtitle {
 
 .hero-brand__stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr;
+    row-gap: 1.5rem;
 }
 
 .hero-brand__stat {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    padding: 0 1.5rem;
-    border-left: 1px solid var(--home-border);
+    padding: 0;
 }
 
-    .hero-brand__stat:first-child { border-left: none; padding-left: 0; }
     .hero-brand__stat i { font-size: 1.4rem; color: var(--home-green-hover); margin-top: .2rem; }
 
     .hero-brand__stat h3 {
@@ -326,56 +331,21 @@ p, .section-subtitle, .hero-subtitle {
     }
 
 /* ============================================================
-   MANIFIESTO
-   ============================================================ */
-.section-manifesto {
-    position: relative;
-    z-index: 1;
-    background: var(--home-bg);
-    padding: 7rem 0;
-    text-align: center;
-}
-
-.manifesto-kicker {
-    font-family: 'Montserrat', sans-serif;
-    font-size: .8rem;
-    font-weight: 700;
-    letter-spacing: .25em;
-    color: var(--home-green-hover);
-    margin-bottom: 1.5rem;
-}
-
-.manifesto-text {
-    max-width: 900px;
-    margin: 0 auto;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 300;
-    font-size: clamp(1.4rem, 2.4vw, 2.1rem);
-    line-height: 1.55;
-    color: var(--home-text-secondary);
-}
-
-.manifesto-text span {
-    color: var(--home-text);
-    font-weight: 600;
-}
-
-/* ============================================================
-   CÓMO FUNCIONA
+   CÓMO FUNCIONA: 1 columna → 3 desde 992px
    ============================================================ */
 .section-how {
     position: relative;
     z-index: 1;
     background: var(--home-section);
-    padding: 5rem 0 6rem;
+    padding: clamp(3.5rem, 8vw, 5rem) 0 clamp(4rem, 9vw, 6rem);
     border-top: 1px solid var(--home-border);
     border-bottom: 1px solid var(--home-border);
 }
 
 .how-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
+    grid-template-columns: 1fr;
+    gap: clamp(1.25rem, 3vw, 2rem);
 }
 
 .how-step {
@@ -384,7 +354,7 @@ p, .section-subtitle, .hero-subtitle {
     background: var(--home-block);
     border: 1px solid var(--home-border);
     border-radius: 14px;
-    padding: 2.25rem 2rem;
+    padding: clamp(1.5rem, 4vw, 2.25rem) clamp(1.25rem, 4vw, 2rem);
     transition: all .3s ease;
 }
 
@@ -425,181 +395,57 @@ p, .section-subtitle, .hero-subtitle {
         margin: 0;
     }
 
-@media (max-width: 991px) {
-    .hero-brand__flourish { display: none; }
-    .hero-brand__stats-grid { grid-template-columns: repeat(2, 1fr); row-gap: 1.75rem; }
-    .hero-brand__stat:nth-child(3) { border-left: none; padding-left: 0; }
-    .how-grid { grid-template-columns: 1fr; }
+/* === CONTENEDOR Y ENCABEZADOS DE SECCIÓN === */
+.container-fluid {
+    max-width: var(--page-max);
+    margin: 0 auto;
+    padding: 0 var(--page-gutter);
+    width: 100%;
 }
 
-@media (max-width: 640px) {
-    .hero-brand { min-height: 92vh; }
-    .hero-brand__content { padding: 0 1.5rem; max-width: 100%; }
-    .hero-brand__scrollcue { display: none; }
-    .hero-brand__stats-grid { grid-template-columns: 1fr; row-gap: 1.5rem; }
-    .hero-brand__stat { border-left: none; padding-left: 0; }
-    .section-manifesto { padding: 4.5rem 0; }
+.section-header {
+    text-align: center;
+    margin-bottom: clamp(2.5rem, 6vw, 4rem);
 }
-    /* === SECCIÓN: DESCUBRE TU PRÓXIMO CAMINO === */
-    .section-discover {
-        background-color: var(--home-bg);
-        padding: 6rem 0;
-        width: 100%;
-        margin: 0;
-    }
 
-    .container-fluid {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 2rem;
-        width: 100%;
-    }
+.section-title {
+    font-size: clamp(1.6rem, 5vw, 3rem);
+    margin-bottom: 1.5rem;
+    overflow-wrap: break-word; /* palabras largas no desbordan a 320px */
+}
 
-    .section-header {
-        text-align: center;
-        margin-bottom: 4rem;
-    }
+.section-subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
+    color: var(--home-text-secondary);
+    max-width: 700px;
+    margin: 0 auto;
+}
 
-    .section-title {
-        font-size: 3rem;
-        margin-bottom: 1.5rem;
-    }
+/* ============================================================
+   DESCUBRE TU PRÓXIMO CAMINO
+   En móvil los paneles se apilan con el texto siempre visible.
+   Desde 768px quedan en fila; el efecto de expandir y mostrar el
+   texto al pasar el mouse solo existe con mouse (hover: hover).
+   ============================================================ */
+.section-discover {
+    background-color: var(--home-bg);
+    padding: clamp(3.5rem, 8vw, 6rem) 0;
+    width: 100%;
+    margin: 0;
+}
 
-    .section-subtitle {
-        font-size: 1.1rem;
-        color: var(--home-text-secondary);
-        max-width: 700px;
-        margin: 0 auto;
-    }
-    /* Estructura editorial - NO tarjetas ecommerce */
-    .routes-editorial {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 2.5rem;
-    }
-
-    .route-editorial-card {
-        position: relative;
-        border-radius: 8px;
-        overflow: hidden;
-        transition: transform 0.4s ease;
-        background-color: var(--home-block);
-        border: 1px solid var(--home-border);
-    }
-
-    .route-editorial-large {
-        grid-column: span 2;
-        height: 600px;
-    }
-
-    .route-editorial-card:not(.route-editorial-large) {
-        height: 450px;
-    }
-
-    .route-editorial-card:hover {
-        transform: translateY(-4px);
-        border-color: var(--home-green);
-    }
-
-    .route-image-container {
-        position: relative;
-        width: 100%;
-        height: 60%;
-        overflow: hidden;
-    }
-
-    .route-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.7s ease;
-    }
-
-    .route-editorial-card:hover .route-image {
-        transform: scale(1.05);
-    }
-
-    .route-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient( 180deg, rgba(11, 16, 14, 0.3) 0%, rgba(11, 16, 14, 0.8) 100% );
-        transition: background 0.3s ease;
-    }
-
-    .route-editorial-card:hover .route-overlay {
-        background: linear-gradient( 180deg, rgba(49, 93, 69, 0.2) 0%, rgba(11, 16, 14, 0.95) 100% );
-    }
-
-    .route-content {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 2rem;
-        background: linear-gradient(180deg, rgba(11,16,14,0) 0%, rgba(11,16,14,0.95) 100%);
-    }
-
-    .route-meta {
-        margin-bottom: 0.5rem;
-    }
-
-    .route-location {
-        font-size: 0.85rem;
-        color: var(--home-green-hover);
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        font-weight: 600;
-    }
-
-    .route-name {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-        color: var(--home-text);
-    }
-
-    .route-details {
-        display: flex;
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-        font-size: 0.95rem;
-        color: var(--home-text-secondary);
-    }
-
-    .route-cta {
-        display: inline-block;
-        padding: 0.75rem 1.5rem;
-        background-color: transparent;
-        border: 2px solid var(--home-text);
-        color: var(--home-text);
-        text-decoration: none;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.08em;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-    }
-
-        .route-cta:hover {
-            background-color: var(--home-green);
-            border-color: var(--home-green);
-        }
-
-/* === CARRUSEL "DESCUBRE TU PRÓXIMO CAMINO" (paneles que se expanden en hover) === */
 .discover-carousel {
     display: flex;
+    flex-direction: column;
     gap: 0.75rem;
-    height: 450px;
     width: 100%;
     margin-top: 3rem;
 }
 
 .discover-panel {
     position: relative;
-    flex: 1;
+    flex: none;
+    height: 220px;
     min-width: 0;
     display: block;
     overflow: hidden;
@@ -608,14 +454,6 @@ p, .section-subtitle, .hero-subtitle {
     cursor: pointer;
     transition: flex 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-.discover-carousel:hover .discover-panel {
-    flex: 0.6;
-}
-
-    .discover-carousel:hover .discover-panel:hover {
-        flex: 5;
-    }
 
 .discover-panel__image {
     position: absolute;
@@ -626,26 +464,19 @@ p, .section-subtitle, .hero-subtitle {
     transition: transform 0.6s ease;
 }
 
-.discover-panel:hover .discover-panel__image {
-    transform: scale(1.06);
-}
-
 .discover-panel__overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(180deg, rgba(11, 16, 14, 0) 35%, rgba(11, 16, 14, 0.9) 100%);
-    opacity: 0.5;
-    transition: opacity 0.4s ease;
-}
-
-.discover-panel:hover .discover-panel__overlay {
     opacity: 1;
+    transition: opacity 0.4s ease;
 }
 
 .discover-panel__vertical-label {
     position: absolute;
     left: 1.25rem;
     bottom: 1.5rem;
+    display: none;
     writing-mode: vertical-rl;
     transform: rotate(180deg);
     color: var(--home-text);
@@ -653,12 +484,7 @@ p, .section-subtitle, .hero-subtitle {
     letter-spacing: 0.1em;
     font-size: 0.85rem;
     white-space: nowrap;
-    opacity: 1;
     transition: opacity 0.3s ease;
-}
-
-.discover-panel:hover .discover-panel__vertical-label {
-    opacity: 0;
 }
 
 .discover-panel__caption {
@@ -666,15 +492,8 @@ p, .section-subtitle, .hero-subtitle {
     left: 0;
     right: 0;
     bottom: 0;
-    padding: 1.75rem;
-    opacity: 0;
-    transform: translateY(12px);
+    padding: clamp(1.25rem, 3vw, 1.75rem);
     transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-.discover-panel:hover .discover-panel__caption {
-    opacity: 1;
-    transform: translateY(0);
 }
 
 .discover-panel__location {
@@ -687,9 +506,10 @@ p, .section-subtitle, .hero-subtitle {
 }
 
 .discover-panel__name {
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
     color: var(--home-text);
     margin: 0 0 0.75rem;
+    overflow-wrap: break-word;
 }
 
 .discover-panel__cta {
@@ -701,454 +521,26 @@ p, .section-subtitle, .hero-subtitle {
     color: var(--home-green-hover);
 }
 
-@media (max-width: 768px) {
-    .discover-carousel {
-        flex-direction: column;
-        height: auto;
-    }
-
-        .discover-panel,
-        .discover-carousel:hover .discover-panel,
-        .discover-carousel:hover .discover-panel:hover {
-            flex: none;
-            height: 220px;
-        }
-
-    .discover-panel__vertical-label {
-        display: none;
-    }
-
-    .discover-panel__overlay,
-    .discover-panel__caption {
-        opacity: 1;
-        transform: none;
-    }
-}
-
-    /* === SECCIÓN MAPA === */
-    .section-map-discovery {
-        background-color: var(--home-bg);
-        padding: 6rem 0;
-        width: 100%;
-    }
-
-    .map-discovery-container {
-        width: 100%;
-        height: 500px;
-        background-color: var(--home-block);
-        border: 1px solid var(--home-border);
-        border-radius: 8px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .map-visual {
-        width: 100%;
-        height: 100%;
-        position: relative;
-    }
-
-    .map-placeholder-visual {
-        width: 100%;
-        height: 100%;
-        background-color: #1E2722;
-        position: relative;
-    }
-
-    .map-marker {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        transform: translate(-50%, -50%);
-    }
-
-    .marker-dot {
-        width: 12px;
-        height: 12px;
-        background-color: var(--home-green);
-        border-radius: 50%;
-        border: 3px solid var(--home-text);
-        position: relative;
-        transition: all 0.3s ease;
-    }
-
-    .map-marker:hover .marker-dot {
-        background-color: var(--home-green-hover);
-        transform: scale(1.3);
-    }
-
-    .marker-tooltip {
-        position: absolute;
-        bottom: 25px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: var(--home-overlay-dark);
-        color: var(--home-text);
-        padding: 0.75rem 1rem;
-        border-radius: 4px;
-        font-size: 0.85rem;
-        white-space: nowrap;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease;
-        border: 1px solid var(--home-border);
-        z-index: 10;
-    }
-
-    .map-marker:hover .marker-tooltip {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .marker-tooltip strong {
-        display: block;
-        margin-bottom: 0.25rem;
-    }
-    /* === EQUÍPATE === */
-    .section-equip-now {
-        background-color: var(--home-section);
-        padding: 6rem 0;
-        width: 100%;
-    }
-
-    .products-curated {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 2rem;
-    }
-
-    .product-curated-card {
-        background-color: var(--home-block);
-        border: 1px solid var(--home-border);
-        border-radius: 8px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: block;
-    }
-
-        .product-curated-card:hover {
-            border-color: var(--home-green);
-            transform: translateY(-4px);
-        }
-
-    .product-image-wrapper {
-        position: relative;
-        width: 100%;
-        height: 250px;
-        overflow: hidden;
-    }
-
-    .product-curated-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-
-    .product-curated-card:hover .product-curated-image {
-        transform: scale(1.05);
-    }
-
-    .product-badge {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        padding: 0.4rem 0.75rem;
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        border-radius: 3px;
-        z-index: 2;
-    }
-
-        .product-badge.new {
-            background-color: var(--home-green);
-            color: var(--home-text);
-        }
-
-        .product-badge.discount {
-            background-color: #DC3545;
-            color: var(--home-text);
-        }
-
-    .product-curated-info {
-        padding: 1.5rem;
-    }
-
-    .product-curated-category {
-        font-size: 0.75rem;
-        color: var(--home-text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        margin-bottom: 0.5rem;
-    }
-
-    .product-curated-name {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: var(--home-text);
-        line-height: 1.3;
-    }
-
-    .product-curated-brand {
-        font-size: 0.9rem;
-        color: var(--home-text-secondary);
-        margin-bottom: 1rem;
-    }
-
-    .product-curated-price {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .price-original {
-        font-size: 0.9rem;
-        color: var(--home-text-secondary);
-        text-decoration: line-through;
-    }
-
-    .price-current {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--home-green-hover);
-    }
-
-    .section-cta {
-        text-align: center;
-        margin-top: 3rem;
-    }
-
-    .btn-view-all {
-        display: inline-block;
-        padding: 1rem 2.5rem;
-        background-color: transparent;
-        border: 2px solid var(--home-text);
-        color: var(--home-text);
-        text-decoration: none;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.9rem;
-        letter-spacing: 0.08em;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-    }
-
-        .btn-view-all:hover {
-            background-color: var(--home-green);
-            border-color: var(--home-green);
-        }
-    /* === COMPARTE EL CAMINO (COMUNIDAD) === */
-    .section-community-share {
-        background-color: var(--home-bg);
-        padding: 6rem 0;
-        width: 100%;
-    }
-
-    .community-mosaic {
-        width: 100%;
-    }
-
-    .mosaic-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        grid-template-rows: repeat(2, 300px);
-        gap: 1rem;
-    }
-
-    .mosaic-item {
-        position: relative;
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: pointer;
-    }
-
-        .mosaic-item.large {
-            grid-column: span 2;
-            grid-row: span 1;
-        }
-
-        .mosaic-item.tall {
-            grid-row: span 2;
-        }
-
-        .mosaic-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .mosaic-item:hover img {
-            transform: scale(1.05);
-        }
-
-    .mosaic-caption {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(180deg, rgba(11,16,14,0) 0%, rgba(11,16,14,0.95) 100%);
-        padding: 1.5rem;
-        color: var(--home-text);
-    }
-
-    .mosaic-user {
-        display: block;
-        font-size: 0.85rem;
-        color: var(--home-green-hover);
-        font-weight: 600;
-        margin-bottom: 0.25rem;
-    }
-
-    .mosaic-route {
-        display: block;
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 0.25rem;
-    }
-
-    .mosaic-location {
-        display: block;
-        font-size: 0.8rem;
-        color: var(--home-text-secondary);
-    }
-    /* === SECCIÓN EMOCIONAL === */
-    .section-emotional-impact {
-        width: 100%;
-        height: 70vh;
-        min-height: 500px;
-        position: relative;
-    }
-
-    .emotional-bg {
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-        position: relative;
-    }
-
-    .emotional-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient( 180deg, rgba(11, 16, 14, 0.4) 0%, rgba(11, 16, 14, 0.8) 100% );
-    }
-
-    .emotional-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        max-width: 800px;
-        width: 100%;
-        padding: 2rem;
-        z-index: 2;
-    }
-
-    .emotional-title {
-        font-size: 3.5rem;
-        margin-bottom: 1rem;
-        color: var(--home-text);
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .emotional-subtitle {
-        font-size: 1.5rem;
-        color: var(--home-text-secondary);
-        margin-bottom: 2rem;
-        font-weight: 300;
-    }
-
-    .emotional-cta {
-        display: inline-block;
-        padding: 1rem 2.5rem;
-        background-color: var(--home-green);
-        color: var(--home-text);
-        text-decoration: none;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.95rem;
-        letter-spacing: 0.08em;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-    }
-
-        .emotional-cta:hover {
-            background-color: var(--home-green-hover);
-            transform: translateY(-2px);
-        }
-    /* === CTA FINAL === */
-    .section-final-cta {
-        background-color: var(--home-section);
-        padding: 6rem 2rem;
-        text-align: center;
-        width: 100%;
-    }
-
-    .final-cta-container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .final-cta-title {
-        font-size: 2.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .final-cta-text {
-        font-size: 1.1rem;
-        color: var(--home-text-secondary);
-        margin-bottom: 2rem;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .final-cta-btn {
-        display: inline-block;
-        padding: 1.25rem 3.5rem;
-        background-color: var(--home-green);
-        color: var(--home-text);
-        border: none;
-        border-radius: 4px;
-        font-weight: 700;
-        font-size: 1rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-    }
-
-        .final-cta-btn:hover {
-            background-color: var(--home-green-hover);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(49, 93, 69, 0.4);
-        }
-
-/* === MAPA DE RUTAS (Leaflet, tonos oscuros) — mismo estilo que en Rutas === */
+/* ============================================================
+   MAPA DE RUTAS (Leaflet, tonos oscuros) — mismo estilo que en Rutas
+   ============================================================ */
 .rutas-map-section {
     background: var(--home-bg);
-    padding: 5rem 0;
+    padding: clamp(3.5rem, 8vw, 5rem) 0;
 }
 
+/* isolation: los controles de Leaflet usan z-index 1000; así quedan
+   encerrados en el mapa y no pasan por encima de la navbar. */
 .rutas-map {
-    height: 460px;
+    height: 320px;
     width: 100%;
     border-radius: 14px;
     overflow: hidden;
     border: 1px solid var(--home-border);
     filter: saturate(0.9);
+    isolation: isolate;
 }
+
 .leaflet-control-attribution {
     background: transparent !important;
     color: #A8B0AA !important;
@@ -1164,8 +556,6 @@ p, .section-subtitle, .hero-subtitle {
     .leaflet-control-attribution a {
         color: #A8B0AA !important;
     }
-.leaflet-control-attribution:hover { opacity: 1; }
-.leaflet-control-attribution a { color: #A8B0AA !important; }
 
 .rutas-map .leaflet-control-attribution a {
     color: var(--home-text-secondary) !important;
@@ -1194,229 +584,326 @@ p, .section-subtitle, .hero-subtitle {
     text-decoration: none;
 }
 
-@media (max-width: 576px) {
-    .rutas-map { height: 320px; }
+/* ============================================================
+   EQUÍPATE: 2 productos por fila en móvil → 4 desde 1200px
+   ============================================================ */
+.section-equip-now {
+    background-color: var(--home-section);
+    padding: clamp(3.5rem, 8vw, 6rem) 0;
+    width: 100%;
 }
 
-    /* === FOOTER === */
+.products-curated {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
 
-    .social-icon {
-        width: 40px;
-        height: 40px;
+.product-curated-card {
+    min-width: 0;
+    background-color: var(--home-block);
+    border: 1px solid var(--home-border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: block;
+}
+
+    .product-curated-card:hover {
+        border-color: var(--home-green);
+        transform: translateY(-4px);
+    }
+
+.product-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 6 / 5;
+    overflow: hidden;
+}
+
+.product-curated-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-curated-card:hover .product-curated-image {
+    transform: scale(1.05);
+}
+
+.product-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 3px;
+    z-index: 2;
+}
+
+    .product-badge.new {
+        background-color: var(--home-green);
+        color: var(--home-text);
+    }
+
+    .product-badge.discount {
+        background-color: #DC3545;
+        color: var(--home-text);
+    }
+
+.product-curated-info {
+    padding: clamp(0.85rem, 3vw, 1.5rem);
+}
+
+.product-curated-category {
+    font-size: 0.75rem;
+    color: var(--home-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+    overflow-wrap: break-word;
+}
+
+.product-curated-name {
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--home-text);
+    line-height: 1.3;
+    overflow-wrap: break-word;
+}
+
+.product-curated-brand {
+    font-size: 0.9rem;
+    color: var(--home-text-secondary);
+    margin-bottom: 1rem;
+}
+
+.product-curated-price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.75rem;
+}
+
+.price-original {
+    font-size: 0.9rem;
+    color: var(--home-text-secondary);
+    text-decoration: line-through;
+}
+
+.price-current {
+    font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+    font-weight: 700;
+    color: var(--home-green-hover);
+}
+
+.section-cta {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.btn-view-all {
+    display: inline-block;
+    padding: 1rem clamp(1.5rem, 5vw, 2.5rem);
+    background-color: transparent;
+    border: 2px solid var(--home-text);
+    color: var(--home-text);
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+    .btn-view-all:hover {
+        background-color: var(--home-green);
+        border-color: var(--home-green);
+    }
+
+/* ============================================================
+   SECCIÓN EMOCIONAL — alto mínimo (no fijo) y texto centrado
+   ============================================================ */
+.section-emotional-impact {
+    width: 100%;
+    position: relative;
+    display: grid;
+    min-height: max(500px, 70vh);
+}
+
+.emotional-bg {
+    width: 100%;
+    position: relative;
+    display: grid;
+    place-items: center;
+    background-size: cover;
+    background-position: center;
+}
+
+.emotional-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient( 180deg, rgba(11, 16, 14, 0.4) 0%, rgba(11, 16, 14, 0.8) 100% );
+}
+
+.emotional-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+    width: 100%;
+    padding: 2rem var(--page-gutter);
+}
+
+.emotional-title {
+    font-size: clamp(1.9rem, 6vw, 3.5rem);
+    margin-bottom: 1rem;
+    color: var(--home-text);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    overflow-wrap: break-word;
+}
+
+.emotional-subtitle {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    color: var(--home-text-secondary);
+    margin-bottom: 2rem;
+    font-weight: 300;
+}
+
+/* === RESPONSIVE === */
+
+@media (min-width: 576px) {
+    /* Hero: botones en fila */
+    .hero-brand__actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    /* Estadísticas: 2 columnas, con línea divisoria en la segunda */
+    .hero-brand__stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        row-gap: 1.75rem;
+    }
+
+    .hero-brand__stat {
+        padding: 0 1.5rem;
+        border-left: 1px solid var(--home-border);
+    }
+
+    .hero-brand__stat:nth-child(odd) {
+        border-left: none;
+        padding-left: 0;
+    }
+}
+
+@media (min-width: 768px) {
+    /* Hero: más aire a los lados e indicador de scroll */
+    .hero-brand__content {
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+
+    .hero-brand__scrollcue {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--home-block);
-        border-radius: 50%;
-        color: var(--home-text-secondary);
-        text-decoration: none;
-        transition: all 0.3s ease;
     }
 
-        .social-icon:hover {
-            background-color: var(--home-green);
-            color: var(--home-text);
-            transform: translateY(-2px);
-        }
-    /* === ANIMACIONES === */
-    @@keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    /* Descubre: paneles en fila */
+    .discover-carousel {
+        flex-direction: row;
+        height: 450px;
     }
 
-    @@keyframes bounce {
-        0%, 20%, 50%, 80%, 100% {
-            transform: translateX(-50%) translateY(0);
-        }
-
-        40% {
-            transform: translateX(-50%) translateY(-10px);
-        }
-
-        60% {
-            transform: translateX(-50%) translateY(-5px);
-        }
-    }
-    /* === RESPONSIVE COMPLETO === */
-    @@media (max-width: 1200px) {
-        .hero-title {
-            font-size: 3rem;
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-        }
-
-        .routes-editorial {
-            grid-template-columns: 1fr;
-        }
-
-        .route-editorial-large {
-            grid-column: span 1;
-            height: 500px;
-        }
+    .discover-panel {
+        flex: 1;
+        height: auto;
     }
 
-    @@media (max-width: 992px) {
-
-        .mosaic-grid {
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(4, 250px);
-        }
-
-        .mosaic-item.tall {
-            grid-row: span 1;
-        }
-
-        .hero-title {
-            font-size: 2.5rem;
-        }
-
-        .hero-subtitle {
-            font-size: 1.1rem;
-        }
-
-        .hero-actions {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .hero-btn {
-            width: 100%;
-            text-align: center;
-        }
+    /* Mapa: más alto */
+    .rutas-map {
+        height: 460px;
     }
 
-    @@media (max-width: 768px) {
-        .container-fluid {
-            padding: 0 1rem;
-        }
+    /* Equípate: más separación entre tarjetas */
+    .products-curated {
+        gap: 2rem;
+    }
+}
 
-        .hero-content {
-            padding: 1rem;
-        }
-
-        .hero-title {
-            font-size: 2rem;
-        }
-
-        .section-title {
-            font-size: 1.8rem;
-        }
-
-        .emotional-title {
-            font-size: 2.5rem;
-        }
-
-        .emotional-subtitle {
-            font-size: 1.2rem;
-        }
-
-        .products-curated {
-            grid-template-columns: 1fr;
-        }
-
-        .mosaic-grid {
-            grid-template-columns: 1fr;
-            grid-template-rows: repeat(6, 250px);
-        }
-
-        .mosaic-item.large,
-        .mosaic-item.tall {
-            grid-column: span 1;
-            grid-row: span 1;
-        }
+@media (min-width: 992px) {
+    /* Hero: adorno lateral */
+    .hero-brand__flourish {
+        display: flex;
     }
 
-    @@media (max-width: 480px) {
-
-        .hero-title {
-            font-size: 1.75rem;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-        }
-
-        .emotional-title {
-            font-size: 2rem;
-        }
+    /* Estadísticas: 4 columnas */
+    .hero-brand__stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        row-gap: 0;
     }
-    /* === ESTADOS DE ANIMACIÓN === */
-    .home-animate {
+
+    .hero-brand__stat:nth-child(3) {
+        border-left: 1px solid var(--home-border);
+        padding-left: 1.5rem;
+    }
+
+    /* Cómo funciona: 3 columnas */
+    .how-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    /* Equípate: 4 productos por fila */
+    .products-curated {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* Descubre: con mouse, el panel se expande y muestra su texto al pasar
+   por encima (en táctil el texto se ve siempre). */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+    .discover-carousel:hover .discover-panel {
+        flex: 0.6;
+    }
+
+    .discover-carousel:hover .discover-panel:hover {
+        flex: 5;
+    }
+
+    .discover-panel:hover .discover-panel__image {
+        transform: scale(1.06);
+    }
+
+    .discover-panel__overlay {
+        opacity: 0.5;
+    }
+
+    .discover-panel:hover .discover-panel__overlay {
+        opacity: 1;
+    }
+
+    .discover-panel__vertical-label {
+        display: block;
+    }
+
+    .discover-panel:hover .discover-panel__vertical-label {
         opacity: 0;
-        animation: fadeInUp 0.8s ease-out forwards;
     }
 
-        .home-animate:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .home-animate:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .home-animate:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        .home-animate:nth-child(4) {
-            animation-delay: 0.4s;
-        }
-
-        .home-animate:nth-child(5) {
-            animation-delay: 0.5s;
-        }
-/* === BARRA INFERIOR MÓVIL (solo visible < 768px) === */
-.mobile-bottom-nav {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    .mobile-bottom-nav {
-        display: flex;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 64px;
-        background-color: var(--home-overlay-dark);
-        backdrop-filter: blur(12px);
-        border-top: 1px solid var(--home-border);
-        z-index: 1000;
-        justify-content: space-around;
-        align-items: center;
+    .discover-panel__caption {
+        opacity: 0;
+        transform: translateY(12px);
     }
 
-    .mobile-nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.25rem;
-        color: var(--home-text-secondary);
-        text-decoration: none;
-        font-size: 0.65rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-    }
-
-        .mobile-nav-item i {
-            font-size: 1.1rem;
-        }
-
-        .mobile-nav-item.active {
-            color: var(--home-green-hover);
-        }
-
-    /* Espacio para que el contenido no quede tapado por la barra */
-    body {
-        padding-bottom: 64px;
+    .discover-panel:hover .discover-panel__caption {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

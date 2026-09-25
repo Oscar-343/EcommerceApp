@@ -11,18 +11,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background-color: #0B100E;
-            color: #F1F3F1;
-            font-family: 'Open Sans', sans-serif;
-        }
-    </style>
 }
 
 @* ============================================================
    HERO DE MARCA — Home v2
-   El video queda "clavado" en pantalla (position: fixed en el CSS)
+   El video queda "clavado" en pantalla (position: sticky en el CSS)
    mientras el resto del contenido pasa por encima, igual que el
    efecto de fondo fijo que ya usamos en Productos.
    ============================================================ *@
@@ -294,30 +287,6 @@
             </div>
         </div>
     </section>
-
-    <!-- === BARRA INFERIOR MÓVIL === -->
-    <nav class="mobile-bottom-nav">
-        <a asp-controller="Home" asp-action="Index" class="mobile-nav-item active">
-            <i class="fas fa-home"></i><span>Inicio</span>
-        </a>
-        <a asp-controller="Services" asp-action="Index" class="mobile-nav-item">
-            <i class="fas fa-map-marked-alt"></i><span>Explorar</span>
-        </a>
-        <a asp-controller="Products" asp-action="Index" class="mobile-nav-item">
-            <i class="fas fa-campground"></i><span>Productos</span>
-        </a>
-        <a asp-controller="Cart" asp-action="Index" class="mobile-nav-item">
-            <i class="fas fa-shopping-cart"></i><span>Carrito</span>
-        </a>
-        @if (User.Identity?.IsAuthenticated == true)
-        {
-            <a href="#profile" class="mobile-nav-item"><i class="fas fa-user"></i><span>Perfil</span></a>
-        }
-        else
-        {
-            <a asp-controller="Account" asp-action="Login" class="mobile-nav-item"><i class="fas fa-user"></i><span>Perfil</span></a>
-        }
-    </nav>
 
 @section Scripts {
     <script src="~/js/home.js" asp-append-version="true"></script>
