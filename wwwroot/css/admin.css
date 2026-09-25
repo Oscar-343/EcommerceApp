@@ -1,6 +1,9 @@
 /* =========================================================
    PANEL DE ADMINISTRACIÓN — Tren al Sur
    Usa los tokens definidos en tren-al-sur.css (--forest-*, --sand, etc.)
+   Móvil primero: la base es el teléfono y lo más grande se agrega en la
+   sección RESPONSIVE del final (anchos 576/768/992). Desde 992px la barra
+   lateral queda fija; por debajo es un panel que abre el botón de menú.
    ========================================================= */
 
 .admin-body {
@@ -16,18 +19,49 @@
     min-height: 100vh;
 }
 
+/* En móvil y tablet: panel que entra desde la izquierda (admin.js le pone
+   la clase is-open). Se oculta con transform + visibility, nunca con
+   estilos en línea. */
 .admin-sidebar {
-    width: 260px;
+    width: min(260px, 85vw);
     flex-shrink: 0;
     background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--forest-deep) 140%);
     border-right: 1px solid rgba(242, 241, 234, 0.08);
     display: flex;
     flex-direction: column;
-    position: sticky;
+    position: fixed;
+    left: 0;
     top: 0;
     height: 100vh;
-    z-index: 30;
-    transition: transform 0.25s ease;
+    height: 100dvh;
+    z-index: var(--z-drawer);
+    transform: translateX(-102%);
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0.25s ease;
+}
+
+.admin-sidebar.is-open {
+    transform: translateX(0);
+    visibility: visible;
+}
+
+/* Fondo oscuro detrás del panel. Va antes de la barra en el HTML:
+   con el mismo z-index, la barra queda por encima. */
+.admin-sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-drawer);
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.admin-sidebar-overlay.is-open {
+    display: block;
+}
+
+/* Con el panel abierto no se desplaza la página de atrás */
+body.admin-nav-open {
+    overflow: hidden;
 }
 
 .admin-brand {
@@ -86,6 +120,7 @@
     display: flex;
     align-items: center;
     gap: 0.7rem;
+    min-height: 44px; /* cómodo para tocar */
     padding: 0.62rem 0.7rem;
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
@@ -132,7 +167,9 @@
 }
 
 .admin-sidebar-footer a {
-    display: block;
+    display: flex;
+    align-items: center;
+    min-height: 44px;
     font-size: 0.82rem;
     color: var(--text-secondary);
     text-decoration: none;
@@ -156,7 +193,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1.1rem 1.8rem;
+    padding: 0.85rem 1rem;
     border-bottom: 1px solid rgba(242, 241, 234, 0.08);
     position: sticky;
     top: 0;
@@ -165,12 +202,27 @@
     z-index: 20;
 }
 
+/* Botón de menú + título: el título se achica (y se corta) antes de
+   empujar el usuario fuera de la pantalla */
+.admin-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-topbar-left > div {
+    min-width: 0;
+}
+
 .admin-topbar-title {
     font-family: var(--font-display);
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--warm-white);
     margin: 0;
+    overflow-wrap: break-word;
 }
 
 .admin-topbar-subtitle {
@@ -180,21 +232,28 @@
 }
 
 .admin-toggle {
-    display: none;
+    display: inline-flex;
+    flex-shrink: 0;
     background: none;
     border: 1px solid rgba(242, 241, 234, 0.2);
     color: var(--warm-white);
     border-radius: var(--radius-sm);
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     align-items: center;
     justify-content: center;
 }
 
 .admin-user {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     gap: 0.7rem;
+}
+
+/* Nombre y rol: solo desde 768px (en móvil queda el avatar) */
+.admin-user > div:last-child {
+    display: none;
 }
 
 .admin-user-avatar {
@@ -235,12 +294,12 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 1rem;
-    margin-bottom: 1.6rem;
+    margin-bottom: 1rem;
 }
 
 .admin-page-header h1 {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--warm-white);
     margin: 0 0 0.2rem;
@@ -333,7 +392,7 @@
 /* ---------- Stat cards (dashboard) ---------- */
 .stat-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
     gap: 1rem;
     margin-bottom: 1.8rem;
 }
@@ -429,8 +488,9 @@
     border-radius: var(--radius-sm);
     color: var(--warm-white);
     padding: 0.5rem 0.9rem;
-    font-size: 0.85rem;
-    min-width: 220px;
+    font-size: 1rem; /* 16px: evita el zoom de iPhone */
+    min-width: 0;
+    max-width: 100%;
 }
 
 .admin-search::placeholder {
@@ -564,21 +624,14 @@
     margin-bottom: 0.9rem;
 }
 
+/* Formularios: 1 columna en móvil, 2 desde 768px (3 desde 992px en form-grid-3) */
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
 }
 
-.form-grid-3 {
-    grid-template-columns: repeat(3, 1fr);
-}
-
 .form-span-2 {
-    grid-column: span 2;
-}
-
-.form-span-full {
     grid-column: 1 / -1;
 }
 
@@ -605,7 +658,7 @@
     color: var(--warm-white);
     border-radius: var(--radius-sm);
     padding: 0.55rem 0.8rem;
-    font-size: 0.88rem;
+    font-size: 1rem; /* 16px en móvil: evita el zoom de iPhone */
     width: 100%;
 }
 
@@ -711,44 +764,6 @@
     font-size: 0.87rem;
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 991px) {
-    .admin-sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        transform: translateX(-100%);
-        box-shadow: 20px 0 60px rgba(0,0,0,0.5);
-    }
-
-    .admin-sidebar.is-open {
-        transform: translateX(0);
-    }
-
-    .admin-toggle {
-        display: inline-flex;
-    }
-
-    .form-grid, .form-grid-3 {
-        grid-template-columns: 1fr;
-    }
-
-    .form-span-2, .form-span-full {
-        grid-column: 1 / -1;
-    }
-}
-
-@media (max-width: 576px) {
-    .admin-content {
-        padding: 1.1rem;
-    }
-
-    .admin-topbar {
-        padding: 1rem;
-    }
-}
-
-
 /* =========================================================
    PRESENTACIÓN FINAL — refinamientos visuales
    ========================================================= */
@@ -761,7 +776,6 @@
 }
 
 .admin-card,
-.admin-stat-card,
 .admin-table-wrap,
 .admin-form-section {
     border: 1px solid rgba(242, 241, 234, 0.09);
@@ -791,8 +805,8 @@
     position: relative;
     overflow: hidden;
     background: linear-gradient(145deg, rgba(17, 26, 22, 0.94), rgba(11, 19, 15, 0.96));
-    border-radius: var(--radius-lg);
-    padding: clamp(1rem, 2vw, 1.45rem);
+    border-radius: 14px;
+    padding: 1rem;
 }
 
 .admin-form-section::before {
@@ -874,7 +888,7 @@ input[type="file"].form-control::file-selector-button {
 }
 
 .img-preview-box {
-    min-height: 170px;
+    min-height: 145px;
     margin-top: .8rem;
     border: 1px dashed rgba(216, 201, 168, .22);
     border-radius: 14px;
@@ -890,15 +904,18 @@ input[type="file"].form-control::file-selector-button {
 
 .img-preview-box img {
     width: 100%;
-    height: 210px;
+    height: 180px;
     object-fit: cover;
     display: block;
 }
 
+/* Botones del formulario: apilados a lo ancho en móvil, en fila desde 768px */
 .admin-form-footer {
     position: sticky;
     bottom: 0;
     z-index: 10;
+    flex-direction: column-reverse;
+    align-items: stretch;
     margin: .25rem -0.25rem 0;
     padding: 1rem;
     border: 1px solid rgba(242, 241, 234, .08);
@@ -966,83 +983,25 @@ input[type="file"].form-control::file-selector-button {
 }
 
 .admin-sidebar {
-    box-shadow: 12px 0 40px rgba(0,0,0,.14);
+    box-shadow: 20px 0 50px rgba(0,0,0,.35);
 }
 
 .admin-topbar {
     border-bottom-color: rgba(242, 241, 234, .1);
 }
 
-@media (max-width: 900px) {
-    .admin-sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        transform: translateX(-102%);
-        box-shadow: 20px 0 50px rgba(0,0,0,.35);
-    }
-
-    .admin-sidebar.is-open {
-        transform: translateX(0);
-    }
-
-    .admin-toggle {
-        display: inline-flex;
-    }
-
-    .admin-content {
-        padding: 1rem;
-    }
-
-    .admin-topbar {
-        padding: .85rem 1rem;
-    }
+.admin-form-footer .btn-admin,
+.admin-form-footer a {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
 }
-
-@media (max-width: 640px) {
-    .admin-user > div:last-child {
-        display: none;
-    }
-
-    .admin-page-header {
-        margin-bottom: 1rem;
-    }
-
-    .admin-page-header h1 {
-        font-size: 1.3rem;
-    }
-
-    .admin-form-section {
-        border-radius: 14px;
-        padding: 1rem;
-    }
-
-    .admin-form-footer {
-        flex-direction: column-reverse;
-        align-items: stretch;
-    }
-
-    .admin-form-footer .btn-admin,
-    .admin-form-footer a {
-        width: 100%;
-        text-align: center;
-        justify-content: center;
-    }
-
-    .img-preview-box {
-        min-height: 145px;
-    }
-
-    .img-preview-box img {
-        height: 180px;
-    }
-}
-
 
 .admin-form-section h3 .section-note {
-    display: inline-flex;
+    display: block;
+    width: fit-content;
     align-items: center;
-    margin-left: .55rem;
+    margin: .45rem 0 0;
     padding: .22rem .55rem;
     border: 1px solid rgba(216, 201, 168, .18);
     border-radius: 999px;
@@ -1054,12 +1013,12 @@ input[type="file"].form-control::file-selector-button {
     vertical-align: middle;
 }
 
-@media (max-width: 640px) {
-    .admin-form-section h3 .section-note {
-        display: block;
-        width: fit-content;
-        margin: .45rem 0 0;
-    }
+/* Botones de exportar / imprimir de los reportes: se envuelven */
+.admin-export-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    align-items: flex-start;
 }
 
 /* ---------- Impresión (reportes) ----------
@@ -1151,3 +1110,117 @@ input[type="file"].form-control::file-selector-button {
 .map-link-status--error { color: #d9534f; }
 
 .map-link-status a { margin-left: 0.5rem; }
+
+/* === RESPONSIVE === */
+
+@media (min-width: 576px) {
+    /* Buscador: ancho mínimo cómodo */
+    .admin-search {
+        min-width: 220px;
+    }
+}
+
+@media (min-width: 768px) {
+    /* Barra superior: se ve el nombre y el rol del usuario */
+    .admin-user > div:last-child {
+        display: block;
+    }
+
+    /* Encabezado de página */
+    .admin-page-header {
+        margin-bottom: 1.6rem;
+    }
+
+    .admin-page-header h1 {
+        font-size: 1.5rem;
+    }
+
+    /* Formularios: 2 columnas */
+    .form-grid,
+    .form-grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .form-span-2 {
+        grid-column: span 2;
+    }
+
+    .admin-form-section {
+        border-radius: var(--radius-lg);
+        padding: clamp(1rem, 2vw, 1.45rem);
+    }
+
+    .admin-form-section h3 .section-note {
+        display: inline-flex;
+        width: auto;
+        margin: 0 0 0 .55rem;
+    }
+
+    .admin-form .form-control,
+    .admin-form .form-select,
+    .admin-form textarea {
+        font-size: 0.88rem;
+    }
+
+    .admin-search {
+        font-size: 0.85rem;
+    }
+
+    /* Botones del formulario en fila, a la derecha */
+    .admin-form-footer {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .admin-form-footer .btn-admin,
+    .admin-form-footer a {
+        width: auto;
+    }
+
+    /* Vista previa de imágenes más alta */
+    .img-preview-box {
+        min-height: 170px;
+    }
+
+    .img-preview-box img {
+        height: 210px;
+    }
+}
+
+@media (min-width: 992px) {
+    /* Barra lateral fija a la izquierda, sin botón ni fondo oscuro */
+    .admin-sidebar {
+        width: 260px;
+        position: sticky;
+        height: 100vh;
+        z-index: 30;
+        transform: none;
+        visibility: visible;
+        transition: none;
+        box-shadow: 12px 0 40px rgba(0,0,0,.14);
+    }
+
+    .admin-sidebar-overlay,
+    .admin-toggle {
+        display: none;
+    }
+
+    .admin-nav-link,
+    .admin-sidebar-footer a {
+        min-height: 0;
+    }
+
+    .admin-sidebar-footer a {
+        display: block;
+    }
+
+    /* Barra superior con más aire */
+    .admin-topbar {
+        padding: 1.1rem 1.8rem;
+    }
+
+    /* Formularios de 3 columnas */
+    .form-grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}

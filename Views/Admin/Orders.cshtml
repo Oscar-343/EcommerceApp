@@ -14,7 +14,7 @@
 <div class="admin-card">
     <div class="admin-card-header">
         <h2>Listado de pedidos</h2>
-        <form method="get" asp-action="Orders" style="display:flex; gap:0.5rem;">
+        <form method="get" asp-action="Orders" style="display:flex; flex-wrap:wrap; gap:0.5rem;">
             <select name="status" class="admin-search" onchange="this.form.submit()">
                 <option value="">Todos los estados</option>
                 @foreach (var s in statuses)

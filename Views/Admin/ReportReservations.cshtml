@@ -19,7 +19,7 @@
         <h1>Reservas</h1>
         <p>Filtrado por fecha de salida (TripDate), estado y ruta.</p>
     </div>
-    <div class="no-print" style="display:flex; gap:.6rem; align-items:flex-start;">
+    <div class="no-print admin-export-actions">
         <a class="btn-admin btn-admin-outline btn-admin-sm" asp-action="ReportReservationsCsv"
            asp-route-desde="@Model.Desde.ToString("yyyy-MM-dd")" asp-route-hasta="@Model.Hasta.ToString("yyyy-MM-dd")"
            asp-route-estado="@Model.Estado" asp-route-serviceId="@Model.ServiceId">Exportar CSV</a>

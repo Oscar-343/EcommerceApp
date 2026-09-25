@@ -11,7 +11,7 @@
         <h1>Ingresos</h1>
         <p>Solo cuentan reservas <strong>Acabado</strong> y pedidos <strong>Entregado</strong>, por su fecha de finalización.</p>
     </div>
-    <div class="no-print" style="display:flex; gap:.6rem; align-items:flex-start;">
+    <div class="no-print admin-export-actions">
         <a class="btn-admin btn-admin-outline btn-admin-sm" asp-action="ReportIncomeCsv"
            asp-route-desde="@Model.Desde.ToString("yyyy-MM-dd")" asp-route-hasta="@Model.Hasta.ToString("yyyy-MM-dd")">Exportar CSV</a>
         <button type="button" class="btn-admin btn-admin-outline btn-admin-sm" onclick="window.print()">Imprimir / Guardar como PDF</button>
