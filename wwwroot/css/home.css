@@ -62,121 +62,6 @@ p, .section-subtitle, .hero-subtitle {
     line-height: 1.7;
 }
 
-/* === NAVBAR CINEMATOGRÁFICA - EXACTA === */
-.navbar-cinematic {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: rgba(11, 16, 14, 0.7);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--home-border);
-    z-index: 1000;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 1rem 0;
-}
-
-.navbar-cinematic.scrolled {
-    background-color: var(--home-overlay-dark);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-.nav-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    text-decoration: none;
-}
-
-    .nav-logo img {
-        height: 48px;
-        width: auto;
-        max-width: 180px;
-        object-fit: contain;
-        display: block;
-        filter: brightness(1.1);
-    }
-
-.nav-logo span {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--home-text);
-    letter-spacing: 0.05em;
-}
-
-.nav-menu {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
-}
-
-.nav-link {
-    text-decoration: none;
-    color: var(--home-text-secondary);
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 500;
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    transition: color 0.3s ease;
-    position: relative;
-    padding: 0.5rem 0;
-}
-
-.nav-link:hover, .nav-link.active {
-    color: var(--home-text);
-}
-
-.nav-link.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: var(--home-green);
-}
-
-.nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.nav-action-icon {
-    color: var(--home-text-secondary);
-    font-size: 1.1rem;
-    transition: color 0.3s ease;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-}
-
-.nav-action-icon:hover {
-    color: var(--home-green-hover);
-}
-
-.nav-toggle {
-    display: none;
-    background: none;
-    border: none;
-    color: var(--home-text);
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
 
 /* ============================================================
    HERO DE MARCA — Home v2 (video "clavado" en pantalla)
@@ -1314,66 +1199,6 @@ p, .section-subtitle, .hero-subtitle {
 }
 
     /* === FOOTER === */
-    .footer-cinematic {
-        background-color: #000;
-        border-top: 1px solid var(--home-border);
-        padding: 4rem 0 2rem;
-        color: var(--home-text-secondary);
-        width: 100%;
-    }
-
-    .footer-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 2rem;
-    }
-
-    .footer-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 3rem;
-        margin-bottom: 3rem;
-    }
-
-    .footer-column {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .footer-title {
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 700;
-        font-size: 1rem;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--home-text);
-        margin-bottom: 1.5rem;
-    }
-
-    .footer-link {
-        margin-bottom: 0.75rem;
-        color: var(--home-text-secondary);
-        text-decoration: none;
-        transition: color 0.3s ease;
-        font-size: 0.9rem;
-    }
-
-        .footer-link:hover {
-            color: var(--home-green-hover);
-        }
-
-    .footer-contact {
-        margin-bottom: 0.75rem;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .footer-socials {
-        display: flex;
-        gap: 1rem;
-    }
 
     .social-icon {
         width: 40px;
@@ -1392,23 +1217,6 @@ p, .section-subtitle, .hero-subtitle {
             background-color: var(--home-green);
             color: var(--home-text);
             transform: translateY(-2px);
-        }
-
-    .footer-bottom {
-        padding-top: 2rem;
-        border-top: 1px solid var(--home-border);
-        text-align: center;
-        font-size: 0.85rem;
-    }
-
-    .footer-legal {
-        color: var(--home-text-secondary);
-        text-decoration: none;
-        margin: 0 0.5rem;
-    }
-
-        .footer-legal:hover {
-            color: var(--home-green-hover);
         }
     /* === ANIMACIONES === */
     @@keyframes fadeInUp {
@@ -1457,13 +1265,6 @@ p, .section-subtitle, .hero-subtitle {
     }
 
     @@media (max-width: 992px) {
-        .nav-menu {
-            display: none;
-        }
-
-        .nav-toggle {
-            display: block;
-        }
 
         .mosaic-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -1535,13 +1336,6 @@ p, .section-subtitle, .hero-subtitle {
     }
 
     @@media (max-width: 480px) {
-        .nav-container {
-            padding: 0 1rem;
-        }
-
-        .nav-logo span {
-            font-size: 1rem;
-        }
 
         .hero-title {
             font-size: 1.75rem;
@@ -1553,11 +1347,6 @@ p, .section-subtitle, .hero-subtitle {
 
         .emotional-title {
             font-size: 2rem;
-        }
-
-        .footer-grid {
-            grid-template-columns: 1fr;
-            gap: 2rem;
         }
     }
     /* === ESTADOS DE ANIMACIÓN === */

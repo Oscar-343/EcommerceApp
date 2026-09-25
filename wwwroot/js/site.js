@@ -69,18 +69,47 @@ function initNavbarScroll() {
     }, { passive: true });
 }
 
+// Menú móvil (hamburguesa). Usa una clase (is-open), nunca estilos en línea:
+// así, al pasar a escritorio el CSS vuelve a mandar y el menú no queda atascado.
 function initMobileMenu() {
     const toggle = document.getElementById('navToggle');
-    const menu = document.querySelector('.nav-menu');
+    const menu = document.getElementById('navMenu');
     if (!toggle || !menu) return;
 
-    toggle.addEventListener('click', function () {
-        menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    const icono = toggle.querySelector('i');
+    const escritorio = window.matchMedia('(min-width: 992px)');
+
+    function mostrar(abierto) {
+        menu.classList.toggle('is-open', abierto);
+        document.body.classList.toggle('nav-open', abierto); // bloquea el scroll de la página detrás
+        toggle.setAttribute('aria-expanded', String(abierto));
+        toggle.setAttribute('aria-label', abierto ? 'Cerrar menú' : 'Abrir menú');
+        if (icono) {
+            icono.classList.toggle('fa-bars', !abierto);
+            icono.classList.toggle('fa-xmark', abierto);
+        }
+    }
+
+    toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        mostrar(!menu.classList.contains('is-open'));
     });
 
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function () {
-            menu.style.display = 'none';
-        });
+    // Se cierra al elegir una opción, con Escape o con un clic fuera del menú.
+    menu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => mostrar(false)));
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') mostrar(false);
+    });
+
+    document.addEventListener('click', function (e) {
+        if (menu.classList.contains('is-open') && !menu.contains(e.target) && !toggle.contains(e.target)) {
+            mostrar(false);
+        }
+    });
+
+    // Al pasar a escritorio se limpia el estado móvil.
+    escritorio.addEventListener('change', function (e) {
+        if (e.matches) mostrar(false);
     });
 }

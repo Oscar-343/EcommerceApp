@@ -3,9 +3,9 @@
    ========================================================= */
 .asistente-voz {
     position: fixed;
-    right: 1.5rem;
-    bottom: 1.5rem;
-    z-index: 998; /* debajo de overlays (filtros móviles usan 999) */
+    right: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom)); /* respeta la barra del iPhone */
+    z-index: var(--z-floating);
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -20,8 +20,8 @@
 /* --- Botón --- */
 .asistente-voz__btn {
     position: relative;
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -87,7 +87,7 @@
 
 /* --- Panel de mensajes --- */
 .asistente-voz__panel {
-    max-width: 280px;
+    max-width: min(280px, calc(100vw - 2rem));
     padding: 0.8rem 1rem;
     border: 1px solid var(--color-border);
     border-radius: 12px;
@@ -121,20 +121,17 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- Móvil --- */
-@media (max-width: 768px) {
+/* === RESPONSIVE === */
+
+@media (min-width: 768px) {
+    /* Botón flotante: más separado del borde y algo más grande */
     .asistente-voz {
-        right: 1rem;
-        bottom: 1rem;
+        right: 1.5rem;
+        bottom: max(1.5rem, env(safe-area-inset-bottom));
     }
 
     .asistente-voz__btn {
-        width: 56px;
-        height: 56px;
-    }
-
-    /* El Home tiene una barra inferior fija de 64px: el botón se ubica encima */
-    body:has(.mobile-bottom-nav) .asistente-voz {
-        bottom: calc(64px + 1rem);
+        width: 60px;
+        height: 60px;
     }
 }

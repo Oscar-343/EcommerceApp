@@ -38,6 +38,7 @@ body {
    NAVBAR COMPARTIDA — usada por _Navbar.cshtml en todas las
    páginas públicas. Solo logo (sin texto), buscador desplegable,
    carrito/favoritos como íconos solo con sesión iniciada.
+   Es la ÚNICA definición de la navbar: ningún otro .css la repite.
    ========================================================= */
 .navbar-cinematic {
     position: fixed;
@@ -47,7 +48,7 @@ body {
     background-color: rgba(11, 16, 14, 0.7);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--color-border);
-    z-index: 1000;
+    z-index: var(--z-nav);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 0.85rem 0;
 }
@@ -58,13 +59,13 @@ body {
 }
 
 .nav-container {
-    max-width: 1400px;
+    max-width: var(--page-max);
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 var(--page-gutter);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.5rem;
+    gap: 0.5rem;
 }
 
 .nav-logo {
@@ -75,19 +76,62 @@ body {
 }
 
 .nav-logo img {
-    height: 44px;
+    height: clamp(36px, 11vw, 44px); /* un poco más chico en teléfonos de 320px */
     width: auto;
     object-fit: contain;
     display: block;
     border-radius: 6px;
 }
 
+/* --- Menú: en móvil es un panel que se despliega bajo la navbar --- */
+.nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+/* La navbar es fixed, así que es la referencia de posición de sus hijos:
+   absolute + top: 100% deja el panel justo debajo, mida lo que mida la navbar
+   (antes era top: 73px fijo y no coincidía en todas las páginas). */
 .nav-menu {
-    display: flex;
-    list-style: none;
-    gap: 1.75rem;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
     margin: 0;
-    padding: 0;
+    padding: 0.5rem var(--page-gutter) 1.5rem;
+    list-style: none;
+    max-height: calc(100vh - var(--nav-height));
+    max-height: calc(100svh - var(--nav-height));
+    overflow-y: auto;
+    background: rgba(11, 16, 14, 0.98);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.nav-menu.is-open {
+    display: flex;
+}
+
+.nav-menu li + li {
+    border-top: 1px solid var(--color-border);
+}
+
+.nav-menu .nav-link {
+    display: block;
+    padding: 1rem 0; /* alto cómodo para tocar (44px o más) */
+}
+
+body.nav-open {
+    overflow: hidden;
 }
 
 .nav-link {
@@ -100,7 +144,6 @@ body {
     text-transform: uppercase;
     transition: color 0.3s ease;
     position: relative;
-    padding: 0.5rem 0;
 }
 
 .nav-link:hover, .nav-link.active {
@@ -121,7 +164,7 @@ body {
 .nav-actions {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.125rem;
 }
 
 .nav-icon-btn {
@@ -129,8 +172,8 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: transparent;
     border: 1px solid transparent;
@@ -164,27 +207,33 @@ body {
     border: 2px solid var(--color-bg);
 }
 
-/* Buscador: input siempre visible en desktop (>992px). En mobile
-   (@media max-width: 992px, más abajo) vuelve a ser un ícono que
-   despliega el input, comportamiento que se preserva ahí sin tocar el JS. */
+/* Buscador: en móvil es un ícono que despliega el campo en un panel a lo
+   ancho bajo la navbar (igual que el menú). Desde 992px el campo se ve
+   siempre en línea y el ícono se oculta. */
 .nav-search {
-    position: relative;
     display: flex;
     align-items: center;
 }
 
-#navSearchToggle {
-    display: none;
+.nav-search__form {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0.75rem var(--page-gutter);
+    background: rgba(11, 16, 14, 0.98);
+    transform-origin: top center;
+    transform: scaleY(0);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s ease;
 }
 
-.nav-search__form {
-    position: static;
-    transform: none;
-    width: 200px;
+.nav-search.active .nav-search__form {
+    transform: scaleY(1);
     opacity: 1;
     pointer-events: auto;
-    transition: all 0.25s ease;
-    margin-right: 0;
 }
 
 .nav-search__input {
@@ -194,7 +243,7 @@ body {
     border: 1px solid var(--color-border);
     background: var(--color-card);
     color: var(--color-text);
-    font-size: 0.85rem;
+    font-size: 1rem; /* 16px: evita el zoom de iPhone */
 }
 
 .nav-search__input:focus {
@@ -202,9 +251,13 @@ body {
     border-color: var(--color-green-accent);
 }
 
-/* Botones de sesión (visitante) */
+/* Botones de sesión (visitante). En móvil solo queda "Registrarse";
+   "Iniciar sesión" pasa al menú desplegable (.nav-menu__login). */
 .nav-btn {
-    padding: 0.5rem 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
     border-radius: 999px;
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
@@ -216,6 +269,7 @@ body {
 }
 
 .nav-btn--outline {
+    display: none;
     color: var(--color-text);
     border: 1px solid var(--color-border);
     background: transparent;
@@ -246,6 +300,7 @@ body {
     top: calc(100% + 0.75rem);
     right: 0;
     min-width: 220px;
+    max-width: calc(100vw - 2 * var(--page-gutter)); /* no se sale del borde a 320px */
     background: var(--color-card);
     border: 1px solid var(--color-border);
     border-radius: 10px;
@@ -255,7 +310,6 @@ body {
     visibility: hidden;
     transform: translateY(-8px);
     transition: all 0.2s ease;
-    z-index: 1001;
 }
 
 .nav-user-menu.active .nav-user-dropdown {
@@ -280,6 +334,7 @@ body {
     align-items: center;
     gap: 0.6rem;
     width: 100%;
+    min-height: 44px;
     padding: 0.55rem 0.6rem;
     border-radius: 6px;
     color: var(--color-text);
@@ -309,92 +364,13 @@ body {
     margin: 0;
 }
 
-.nav-toggle {
-    display: none;
-    background: none;
-    border: none;
-    color: var(--color-text);
-    font-size: 1.4rem;
-    cursor: pointer;
-}
-
-@media (max-width: 992px) {
-    .nav-menu {
-        position: fixed;
-        top: 73px;
-        left: 0;
-        width: 100%;
-        background: rgba(11, 16, 14, 0.98);
-        display: none;
-        flex-direction: column;
-        gap: 0;
-        padding: 0.5rem 2rem 1.5rem;
-        border-bottom: 1px solid var(--color-border);
-    }
-
-    .nav-menu.active {
-        display: flex;
-    }
-
-    .nav-menu li {
-        border-top: 1px solid var(--color-border);
-    }
-
-    .nav-menu .nav-link {
-        display: block;
-        padding: 1rem 0;
-    }
-
-    .nav-toggle {
-        display: block;
-    }
-
-    #navSearchToggle {
-        display: inline-flex;
-    }
-
-    .nav-search__form {
-        position: fixed;
-        top: 73px;
-        left: 0;
-        right: 0;
-        width: auto;
-        margin: 0;
-        padding: 0.75rem 1.25rem;
-        background: rgba(11, 16, 14, 0.98);
-        transform-origin: top center;
-        transform: scaleY(0);
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .nav-search.active .nav-search__form {
-        transform: scaleY(1);
-        opacity: 1;
-        pointer-events: auto;
-    }
-
-    .nav-btn--outline { display: none; }
-}
-
-@media (min-width: 993px) and (max-width: 1200px) {
-    .nav-btn {
-        padding: 0.4rem 0.85rem;
-        font-size: 0.75rem;
-    }
-
-    .nav-search__form {
-        width: 160px;
-    }
-}
-
 /* El navbar es fixed (queda fuera del flujo normal), así que el
    contenido necesita este espacio arriba para no quedar tapado.
    Las páginas con hero a pantalla completa (Home, Productos,
    Servicios) marcan ViewData["FullBleed"] = true para que el
    navbar transparente quede flotando sobre su propio hero. */
 main[role="main"] {
-    padding-top: 84px;
+    padding-top: calc(var(--nav-height) + 0.75rem);
 }
 
 main[role="main"].main-fullbleed {
@@ -402,7 +378,8 @@ main[role="main"].main-fullbleed {
 }
 
 /* =========================================================
-   FOOTER COMPARTIDO — tradicional, 4 columnas + barra inferior
+   FOOTER COMPARTIDO — columnas apiladas en móvil, 2 desde 576px
+   y 4 desde 992px, más una barra inferior
    ========================================================= */
 .site-footer {
     background-color: var(--color-section);
@@ -412,11 +389,11 @@ main[role="main"].main-fullbleed {
 }
 
 .site-footer__top {
-    max-width: 1400px;
+    max-width: var(--page-max);
     margin: 0 auto;
-    padding: 4rem 2rem 3rem;
+    padding: 3rem var(--page-gutter) 2rem;
     display: grid;
-    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+    grid-template-columns: 1fr;
     gap: 2.5rem;
 }
 
@@ -434,6 +411,7 @@ main[role="main"].main-fullbleed {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    min-height: 44px; /* cómodo para tocar */
     color: var(--color-text-secondary);
     text-decoration: none;
     padding: 0.35rem 0;
@@ -488,8 +466,8 @@ main[role="main"].main-fullbleed {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 1px solid var(--color-border);
     color: var(--color-text);
@@ -504,9 +482,9 @@ main[role="main"].main-fullbleed {
 
 .site-footer__bottom {
     border-top: 1px solid var(--color-border);
-    max-width: 1400px;
+    max-width: var(--page-max);
     margin: 0 auto;
-    padding: 1.25rem 2rem;
+    padding: 1.25rem var(--page-gutter);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -528,15 +506,116 @@ main[role="main"].main-fullbleed {
     color: var(--color-text);
 }
 
-@media (max-width: 900px) {
+/* === RESPONSIVE === */
+
+@media (min-width: 576px) {
+    /* Footer: 2 columnas */
     .site-footer__top {
         grid-template-columns: 1fr 1fr;
     }
 }
 
-@media (max-width: 560px) {
+@media (min-width: 992px) {
+    /* Navbar: menú horizontal, sin botón */
+    .nav-container {
+        gap: 1.5rem;
+    }
+
+    .nav-toggle {
+        display: none;
+    }
+
+    .nav-menu {
+        position: static;
+        display: flex;
+        flex-direction: row;
+        gap: 1.75rem;
+        padding: 0;
+        max-height: none;
+        overflow: visible;
+        background: none;
+        border: 0;
+    }
+
+    .nav-menu li + li {
+        border-top: 0;
+    }
+
+    .nav-menu .nav-link {
+        padding: 0.5rem 0;
+    }
+
+    .nav-menu__login {
+        display: none;
+    }
+
+    /* Navbar: acciones compactas (entre 992 y 1199px hay poco espacio) */
+    .nav-actions {
+        gap: 0.65rem;
+    }
+
+    .nav-icon-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .nav-btn {
+        min-height: 0;
+        padding: 0.4rem 0.85rem;
+        font-size: 0.75rem;
+    }
+
+    .nav-btn--outline {
+        display: inline-flex;
+    }
+
+    /* Buscador: campo siempre visible en línea */
+    #navSearchToggle {
+        display: none;
+    }
+
+    .nav-search__form {
+        position: static;
+        width: 160px;
+        padding: 0;
+        background: none;
+        transform: none;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .nav-search__input {
+        font-size: 0.85rem;
+    }
+
+    .nav-user-dropdown__link {
+        min-height: 0;
+    }
+
+    /* Footer: 4 columnas */
     .site-footer__top {
-        grid-template-columns: 1fr;
-        padding: 3rem 1.5rem 2rem;
+        grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+        padding: 4rem 2rem 3rem;
+    }
+
+    .footer-col a {
+        min-height: 0;
+    }
+
+    .footer-social a {
+        width: 38px;
+        height: 38px;
+    }
+}
+
+@media (min-width: 1200px) {
+    /* Navbar: tamaños completos de escritorio */
+    .nav-btn {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.8rem;
+    }
+
+    .nav-search__form {
+        width: 200px;
     }
 }

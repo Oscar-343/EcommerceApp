@@ -1,12 +1,12 @@
 /* =========================================================
    PWA — botón discreto "Instalar app" (abajo a la izquierda)
-   La esquina derecha la ocupa el asistente de voz (z-index 998).
+   La esquina derecha la ocupa el asistente de voz.
    ========================================================= */
 .tas-install {
     position: fixed;
     left: 16px;
-    bottom: 16px;
-    z-index: 997; /* debajo del asistente, de overlays (999) y de modales/offcanvas de Bootstrap (1040+) */
+    bottom: max(16px, env(safe-area-inset-bottom)); /* respeta la barra del iPhone */
+    z-index: var(--z-floating); /* misma capa que el asistente de voz: no se tocan */
     display: flex;
     align-items: center;
     gap: 4px;
@@ -132,28 +132,6 @@
     height: 18px;
     vertical-align: -3px;
     color: #557F63;
-}
-
-/* --- Móvil --- */
-@media (max-width: 768px) {
-    /* El Home tiene una barra inferior fija de 64px: el botón se ubica encima,
-       igual que hace el asistente de voz. */
-    body:has(.mobile-bottom-nav) .tas-install {
-        bottom: calc(64px + 16px);
-    }
-}
-
-/* Pantallas muy estrechas: solo el ícono (el aria-label se mantiene) */
-@media (max-width: 359px) {
-    .tas-install__label {
-        display: none;
-    }
-
-    .tas-install__btn {
-        width: 44px;
-        padding: 0;
-        justify-content: center;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
