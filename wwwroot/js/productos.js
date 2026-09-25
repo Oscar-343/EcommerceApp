@@ -35,34 +35,39 @@ function initQtyStepper() {
 }
 
 /**
- * Inicializar toggle de filtros en móvil
+ * Panel de filtros en móvil y tablet (menos de 1200px). Usa clases
+ * (is-open), nunca estilos en línea: desde 1200px el CSS lo muestra
+ * como barra lateral fija y el estado móvil se limpia solo.
  */
 function initFiltersToggle() {
-    const filtrosToggle = document.getElementById('filtros-toggle');
+    const toggle = document.getElementById('filtros-toggle');
     const filtros = document.getElementById('filtros');
     const overlay = document.getElementById('filtros-overlay');
+    const cerrar = document.getElementById('filtros-close');
+    if (!toggle || !filtros || !overlay) return;
 
-    if (!filtrosToggle) return;
+    const escritorio = window.matchMedia('(min-width: 1200px)');
 
-    filtrosToggle.addEventListener('click', function () {
-        filtros.classList.toggle('active');
-        overlay.classList.toggle('active');
+    function mostrar(abierto) {
+        filtros.classList.toggle('is-open', abierto);
+        overlay.classList.toggle('is-open', abierto);
+        document.body.classList.toggle('filtros-open', abierto); // bloquea el scroll de atrás
+        toggle.setAttribute('aria-expanded', String(abierto));
+    }
+
+    toggle.addEventListener('click', () => mostrar(true));
+    overlay.addEventListener('click', () => mostrar(false));
+    if (cerrar) cerrar.addEventListener('click', () => mostrar(false));
+
+    // "Limpiar filtros" navega a otra página: se cierra antes de irse.
+    filtros.querySelectorAll('a').forEach(link => link.addEventListener('click', () => mostrar(false)));
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && filtros.classList.contains('is-open')) mostrar(false);
     });
 
-    overlay.addEventListener('click', function () {
-        filtros.classList.remove('active');
-        overlay.classList.remove('active');
-    });
-
-    // Cerrar filtros al hacer clic en un enlace
-    const links = filtros.querySelectorAll('a');
-    links.forEach(link => {
-        link.addEventListener('click', function () {
-            setTimeout(() => {
-                filtros.classList.remove('active');
-                overlay.classList.remove('active');
-            }, 100);
-        });
+    escritorio.addEventListener('change', function (e) {
+        if (e.matches) mostrar(false);
     });
 }
 

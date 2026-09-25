@@ -74,9 +74,18 @@
                 </div>
 
                 <div class="productos-catalog__container">
+                    <!-- Fondo oscuro del panel de filtros (móvil y tablet). Va antes del
+                         panel: con el mismo z-index, el panel queda por encima. -->
+                    <div class="productos-filters-overlay" id="filtros-overlay"></div>
+
                     <!-- === FILTROS === -->
-                    <aside class="productos-filters" id="filtros">
-                        <h3 class="productos-filters__title">FILTRAR</h3>
+                    <aside class="productos-filters" id="filtros" aria-label="Filtros">
+                        <div class="productos-filters__header">
+                            <h3 class="productos-filters__title">FILTRAR</h3>
+                            <button type="button" class="productos-filters__close" id="filtros-close" aria-label="Cerrar filtros">
+                                <i class="fas fa-xmark" aria-hidden="true"></i>
+                            </button>
+                        </div>
 
                         <form method="get" asp-action="Index" id="filtros-form">
                             <div class="productos-filters__group">
@@ -114,7 +123,7 @@
                                 <div class="productos-filters__range">
                                     <input type="number" name="minPrice" class="productos-filters__range-input"
                                            placeholder="Min" value="@Model.MinPrice" min="0" />
-                                    <span style="color: var(--productos-text-secondary);">-</span>
+                                    <span class="productos-filters__range-separator">-</span>
                                     <input type="number" name="maxPrice" class="productos-filters__range-input"
                                            placeholder="Max" value="@Model.MaxPrice" min="0" />
                                 </div>
@@ -149,8 +158,8 @@
 
                     <!-- === CATÁLOGO === -->
                     <main>
-                        <button class="productos-filters-toggle" id="filtros-toggle">☰ FILTRAR EQUIPAMIENTO</button>
-                        <div class="productos-filters-overlay" id="filtros-overlay"></div>
+                        <button type="button" class="productos-filters-toggle" id="filtros-toggle"
+                                aria-expanded="false" aria-controls="filtros">☰ FILTRAR EQUIPAMIENTO</button>
 
                         <div class="productos-grid" id="productos-grid">
                             @if (Model.Products?.Any() == true)
@@ -170,10 +179,10 @@
                             }
                             else
                             {
-                                <div class="productos-empty" style="grid-column: 1 / -1;">
+                                <div class="productos-empty">
                                     <div class="productos-empty__icon">🔍</div>
                                     <p class="productos-empty__text">No encontramos productos que coincidan con tu búsqueda.</p>
-                                    <p class="productos-empty__text" style="font-size: 0.95rem;">Intenta cambiar los filtros o la búsqueda.</p>
+                                    <p class="productos-empty__text productos-empty__text--small">Intenta cambiar los filtros o la búsqueda.</p>
                                 </div>
                             }
                         </div>
@@ -184,32 +193,5 @@
     </div>
 
 @section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const filtrosToggle = document.getElementById('filtros-toggle');
-            const filtros = document.getElementById('filtros');
-            const overlay = document.getElementById('filtros-overlay');
-
-            if (filtrosToggle) {
-                filtrosToggle.addEventListener('click', function () {
-                    filtros.classList.toggle('active');
-                    overlay.classList.toggle('active');
-                });
-
-                overlay.addEventListener('click', function () {
-                    filtros.classList.remove('active');
-                    overlay.classList.remove('active');
-                });
-            }
-
-            const links = filtros.querySelectorAll('a');
-            links.forEach(link => {
-                link.addEventListener('click', function () {
-                    filtros.classList.remove('active');
-                    overlay.classList.remove('active');
-                });
-            });
-        });
-    </script>
     <script src="~/js/productos.js" asp-append-version="true"></script>
 }
