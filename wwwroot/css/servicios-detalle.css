@@ -1,6 +1,8 @@
 /* =========================================================
    SERVICIOS / RUTAS — Detalle de Ruta
-   Diseño cinematográfico, editorial, experiencia premium
+   Móvil primero: la base es el teléfono y lo más grande se agrega
+   en la sección RESPONSIVE del final (anchos 768/992).
+   La navbar y el footer viven en site.css.
    ========================================================= */
 
 :root {
@@ -28,6 +30,12 @@
    BASE Y RESET
    ========================================================= */
 
+body {
+    background-color: var(--sv-bg-primary);
+    color: var(--sv-text-primary);
+    font-family: 'Inter', sans-serif;
+}
+
 .ruta-detalle {
     background: var(--sv-bg-primary);
     color: var(--sv-text-primary);
@@ -37,7 +45,7 @@
 .ruta-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0 var(--page-gutter);
 }
 
 /* =========================================================
@@ -46,8 +54,8 @@
 
 .ruta-hero {
     position: relative;
-    height: 80vh;
-    min-height: 560px;
+    min-height: max(400px, 50vh);
+    min-height: max(400px, 50svh);
     display: flex;
     align-items: flex-end;
     overflow: hidden;
@@ -78,13 +86,14 @@
     z-index: 2;
 }
 
+/* El relleno de arriba deja libre la navbar si el título es largo */
 .ruta-hero__content {
     position: relative;
     z-index: 3;
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 3rem 2.5rem 3rem;
+    padding: calc(var(--nav-height) + 1.5rem) var(--page-gutter) 2rem;
     animation: heroContentFade 0.8s var(--sv-ease) forwards;
     opacity: 0;
 }
@@ -104,12 +113,13 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    min-height: 44px;
     color: var(--sv-text-secondary);
     text-decoration: none;
     font-size: 0.85rem;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
     transition: all 0.2s var(--sv-ease-smooth);
     cursor: pointer;
 }
@@ -121,19 +131,21 @@
 
 .ruta-hero__title {
     font-family: var(--sv-font-display);
-    font-size: clamp(2.5rem, 5vw, 4.25rem);
+    font-size: clamp(1.4rem, 5vw, 4.25rem);
     font-weight: 800;
     letter-spacing: 0.01em;
     line-height: 1.05;
     margin: 0 0 1.5rem;
     text-transform: uppercase;
     max-width: 900px;
+    overflow-wrap: break-word;
 }
 
+/* Datos del hero: uno debajo del otro en móvil, en fila desde 768px */
 .ruta-hero__meta {
     display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 0.5rem;
     font-size: 0.85rem;
     color: var(--sv-text-secondary);
 }
@@ -153,26 +165,27 @@
 
 /* =========================================================
    GALERÍA DE IMÁGENES
+   Móvil: foto principal y debajo las demás en una fila deslizable.
+   Desde 768px: foto principal a la izquierda y cuadrícula de 2 x 2.
    ========================================================= */
 
 .ruta-gallery {
     background: var(--sv-bg-section);
-    padding: 3rem 1.5rem;
+    padding: clamp(2rem, 5vw, 3rem) var(--page-gutter);
 }
 
 .ruta-gallery__container {
     max-width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
 }
 
 .ruta-gallery__main {
-    grid-row: span 2;
     overflow: hidden;
     border-radius: 0;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 16 / 9;
 }
 
 .ruta-gallery__main img {
@@ -182,17 +195,17 @@
     transition: transform 0.6s var(--sv-ease);
 }
 
-.ruta-gallery:hover .ruta-gallery__main img {
-    transform: scale(1.05);
-}
-
 .ruta-gallery__grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.25rem;
 }
 
 .ruta-gallery__item {
+    flex: 0 0 40%;
+    scroll-snap-align: start;
     overflow: hidden;
     aspect-ratio: 1;
     border-radius: 0;
@@ -205,28 +218,21 @@
     transition: transform 0.4s var(--sv-ease);
 }
 
-.ruta-gallery__item:hover img {
-    transform: scale(1.08);
-}
-
 /* =========================================================
    INFORMACIÓN GENERAL (GRID)
    ========================================================= */
 
 .ruta-info-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
-    margin: 4rem 0;
-    padding: 0 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+    gap: clamp(1rem, 3vw, 2rem);
+    margin: clamp(1.5rem, 5vw, 4rem) auto;
     max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .ruta-info-card {
     background: var(--sv-bg-section);
-    padding: 2rem;
+    padding: clamp(1.25rem, 4vw, 2rem);
     border: 1px solid var(--sv-border);
     border-radius: 0;
     transition: all 0.3s var(--sv-ease-smooth);
@@ -249,10 +255,11 @@
 
 .ruta-info-card__value {
     font-family: var(--sv-font-display);
-    font-size: 1.8rem;
+    font-size: clamp(1.4rem, 3.5vw, 1.8rem);
     font-weight: 700;
     color: var(--sv-green-hover);
     margin-bottom: 0.8rem;
+    overflow-wrap: break-word;
 }
 
 .ruta-info-card__description {
@@ -267,7 +274,7 @@
    ========================================================= */
 
 .ruta-section {
-    padding: 4rem 1.5rem;
+    padding: clamp(1.5rem, 6vw, 4rem) 0;
     max-width: 1200px;
     margin: 0 auto;
     border-bottom: 1px solid var(--sv-border);
@@ -284,12 +291,13 @@
 
 .ruta-section__title {
     font-family: var(--sv-font-display);
-    font-size: 1.8rem;
+    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
     font-weight: 700;
     margin: 0 0 1.5rem;
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--sv-text-primary);
+    overflow-wrap: break-word;
 }
 
 .ruta-section__subtitle {
@@ -306,72 +314,24 @@
 }
 
 /* =========================================================
-   MAPA DEL RECORRIDO
+   MAPA DEL RECORRIDO: mapa arriba y datos debajo; lado a lado desde 992px
    ========================================================= */
 
 .ruta-map-section {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
 }
 
+/* isolation: los controles de Leaflet (z-index 1000) no pasan por
+   encima de la navbar al hacer scroll. */
 .ruta-map {
     background: var(--sv-bg-section);
     border: 1px solid var(--sv-border);
     border-radius: 0;
     overflow: hidden;
-    min-height: 400px;
-}
-
-.ruta-map__visual {
-    width: 100%;
-    height: 100%;
-    min-height: 400px;
-    display: block;
-}
-
-.ruta-map__contour {
-    fill: none;
-    stroke: var(--sv-border);
-    stroke-width: 1.5;
-    opacity: 0.6;
-}
-
-.ruta-map__trail {
-    fill: none;
-    stroke: var(--sv-green-hover);
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-dasharray: 8 8;
-    animation: ruta-trail-dash 25s linear infinite;
-}
-
-@keyframes ruta-trail-dash {
-    to {
-        stroke-dashoffset: -400;
-    }
-}
-
-.ruta-map__point {
-    stroke: var(--sv-bg-section);
-    stroke-width: 3;
-}
-
-.ruta-map__point--start {
-    fill: #4CAF50;
-}
-
-.ruta-map__point--end {
-    fill: #F44336;
-}
-
-.ruta-map__label {
-    fill: var(--sv-text-primary);
-    font-family: var(--sv-font-display);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-anchor: middle;
+    min-height: 320px;
+    isolation: isolate;
 }
 
 .ruta-map-info {
@@ -441,7 +401,7 @@
 
 .ruta-guide {
     background: var(--sv-bg-section);
-    padding: 2rem;
+    padding: clamp(1.25rem, 4vw, 2rem);
     border: 1px solid var(--sv-border);
 }
 
@@ -478,7 +438,7 @@
 
 .ruta-transport {
     background: var(--sv-bg-section);
-    padding: 2rem;
+    padding: clamp(1.25rem, 4vw, 2rem);
     border: 1px solid var(--sv-border);
 }
 
@@ -516,13 +476,13 @@
 
 .ruta-includes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+    gap: clamp(1rem, 3vw, 2rem);
 }
 
 .ruta-includes-block {
     background: var(--sv-bg-section);
-    padding: 2rem;
+    padding: clamp(1.25rem, 4vw, 2rem);
     border: 1px solid var(--sv-border);
 }
 
@@ -555,7 +515,7 @@
 
 .ruta-recommendations {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
     gap: 1.5rem;
 }
 
@@ -575,15 +535,20 @@
 
 /* =========================================================
    EQUIPAMIENTO RECOMENDADO
+   Móvil: fila deslizable. Desde 768px: cuadrícula.
    ========================================================= */
 
 .ruta-products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.5rem;
 }
 
 .ruta-product-card {
+    flex: 0 0 min(220px, 70%);
+    scroll-snap-align: start;
     background: var(--sv-bg-section);
     border: 1px solid var(--sv-border);
     overflow: hidden;
@@ -592,7 +557,6 @@
 
 .ruta-product-card:hover {
     border-color: var(--sv-green-main);
-    transform: translateY(-5px);
 }
 
 .ruta-product-card__image {
@@ -607,10 +571,6 @@
     transition: transform 0.4s var(--sv-ease);
 }
 
-.ruta-product-card:hover .ruta-product-card__image img {
-    transform: scale(1.1);
-}
-
 .ruta-product-card__content {
     padding: 1.2rem;
 }
@@ -621,6 +581,7 @@
     font-weight: 700;
     margin: 0 0 0.3rem;
     color: var(--sv-text-primary);
+    overflow-wrap: break-word;
 }
 
 .ruta-product-card__category {
@@ -638,7 +599,9 @@
 }
 
 .ruta-product-card__link {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     color: var(--sv-green-main);
     text-decoration: none;
     font-size: 0.85rem;
@@ -653,21 +616,22 @@
 
 /* =========================================================
    CTA (RESERVA)
+   Móvil: texto arriba y botón a lo ancho. Desde 992px: lado a lado.
    ========================================================= */
 
 .ruta-cta-block {
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 2rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
     align-items: center;
-    padding: 2rem;
+    padding: clamp(1.25rem, 4vw, 2rem);
     background: var(--sv-bg-block);
     border: 2px solid var(--sv-green-main);
 }
 
 .ruta-cta-title {
     font-family: var(--sv-font-display);
-    font-size: 1.8rem;
+    font-size: clamp(1.3rem, 3.5vw, 1.8rem);
     font-weight: 700;
     margin: 0 0 0.5rem;
     color: var(--sv-text-primary);
@@ -680,7 +644,9 @@
 }
 
 .ruta-cta-button {
-    padding: 1rem 2.5rem;
+    display: inline-block;
+    width: 100%;
+    padding: 1rem 1.5rem;
     background: linear-gradient(135deg, var(--sv-green-main), var(--sv-green-hover));
     color: var(--sv-text-primary);
     border: none;
@@ -688,9 +654,10 @@
     font-weight: 600;
     font-size: 0.95rem;
     letter-spacing: 0.05em;
+    text-align: center;
+    text-decoration: none;
     cursor: pointer;
     transition: all 0.3s var(--sv-ease-smooth);
-    white-space: nowrap;
 }
 
 .ruta-cta-button:hover {
@@ -699,118 +666,140 @@
     filter: brightness(1.1);
 }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+/* Formulario de reserva (solo con sesión): los campos se acomodan en
+   varias líneas. Los campos usan 16px (evita el zoom de iPhone). */
+.ruta-reserva-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-end;
+}
 
-@media (max-width: 1024px) {
-    .ruta-hero__title {
-        font-size: 2.5rem;
+.ruta-reserva-form__label {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+}
+
+.ruta-reserva-form__input {
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+.ruta-reserva-form__input--people {
+    width: 80px;
+}
+
+.ruta-reserva-form__total {
+    font-size: 0.9rem;
+}
+
+/* === RESPONSIVE === */
+
+@media (min-width: 768px) {
+    /* Contenedor y secciones con su margen de escritorio */
+    .ruta-container {
+        padding: 0 1.5rem;
     }
 
-    .ruta-map-section {
-        grid-template-columns: 1fr;
+    .ruta-section,
+    .ruta-info-grid {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
     }
 
-    .ruta-cta-block {
-        grid-template-columns: 1fr;
+    .ruta-gallery {
+        padding: 3rem 1.5rem;
+    }
+
+    /* Hero: más alto, con los datos en fila */
+    .ruta-hero {
+        min-height: max(560px, 80vh);
+        min-height: max(560px, 80svh);
+    }
+
+    .ruta-hero__content {
+        padding: calc(var(--nav-height) + 1.5rem) 2.5rem 3rem;
+    }
+
+    .ruta-hero__back {
+        margin-bottom: 2rem;
+    }
+
+    .ruta-hero__meta {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    /* Galería: foto principal a la izquierda y cuadrícula a la derecha */
+    .ruta-gallery__container {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
         gap: 1.5rem;
     }
 
-    .ruta-cta-button {
-        width: 100%;
-        text-align: center;
+    .ruta-gallery__main {
+        grid-row: span 2;
+        aspect-ratio: 4 / 5;
     }
-}
 
-@media (max-width: 768px) {
-    .ruta-hero {
-        height: 50vh;
+    .ruta-gallery__grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        overflow: visible;
+        padding-bottom: 0;
+    }
+
+    /* Mapa del recorrido: más alto */
+    .ruta-map {
         min-height: 400px;
     }
 
-    .ruta-hero__title {
-        font-size: 1.8rem;
-    }
-
-    .ruta-hero__meta {
-        flex-direction: column;
-        gap: 0.8rem;
-        font-size: 0.9rem;
-    }
-
-    .ruta-gallery__container {
-        grid-template-columns: 1fr;
-    }
-
-    .ruta-gallery__main {
-        grid-row: unset;
-        aspect-ratio: 16 / 9;
-    }
-
-    .ruta-gallery__grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .ruta-info-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-        margin: 2rem 0;
-    }
-
-    .ruta-info-card {
-        padding: 1.5rem;
-    }
-
-    .ruta-section {
-        padding: 2.5rem 1rem;
-    }
-
-    .ruta-section__title {
-        font-size: 1.4rem;
-    }
-
+    /* Equipamiento: cuadrícula */
     .ruta-products-grid {
-        grid-template-columns: repeat(2, 1fr);
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        overflow: visible;
+        padding-bottom: 0;
     }
 }
 
-@media (max-width: 480px) {
-    .ruta-hero__title {
-        font-size: 1.4rem;
+@media (min-width: 992px) {
+    /* Mapa y datos del recorrido lado a lado */
+    .ruta-map-section {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     }
 
-    .ruta-hero__meta {
-        gap: 0.5rem;
-        font-size: 0.85rem;
-    }
-
-    .ruta-gallery__grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .ruta-info-grid {
-        grid-template-columns: 1fr;
-        margin: 1.5rem 0;
-    }
-
-    .ruta-section {
-        padding: 1.5rem 1rem;
-    }
-
-    .ruta-section__title {
-        font-size: 1.2rem;
-    }
-
+    /* Reserva: texto y botón lado a lado */
     .ruta-cta-block {
-        padding: 1.5rem;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 2rem;
     }
 
-    .ruta-cta-title {
-        font-size: 1.3rem;
+    .ruta-cta-button {
+        width: auto;
+        padding: 1rem 2.5rem;
+        white-space: nowrap;
+    }
+}
+
+/* Zoom de fotos y elevación de tarjetas: solo con mouse */
+@media (hover: hover) and (pointer: fine) {
+    .ruta-gallery:hover .ruta-gallery__main img {
+        transform: scale(1.05);
     }
 
-    .ruta-products-grid {
-        grid-template-columns: 1fr;
+    .ruta-gallery__item:hover img {
+        transform: scale(1.08);
+    }
+
+    .ruta-product-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .ruta-product-card:hover .ruta-product-card__image img {
+        transform: scale(1.1);
     }
 }

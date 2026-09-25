@@ -9,13 +9,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background-color: #0B100E;
-            color: #F1F3F1;
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
 }
 
 <div class="ruta-detalle">
@@ -350,18 +343,18 @@
                 }
                 else if (User.Identity?.IsAuthenticated == true)
                 {
-                    <form asp-controller="Reservations" asp-action="Create" method="post" style="display:flex; flex-wrap:wrap; gap:0.75rem; align-items:flex-end;">
+                    <form asp-controller="Reservations" asp-action="Create" method="post" class="ruta-reserva-form">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="serviceId" value="@Model.Service.Id" />
                         <div>
-                            <label style="display:block; font-size:0.8rem; margin-bottom:0.2rem;">Fecha de salida</label>
-                            <input type="date" name="tripDate" id="tripDate" min="@DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd")" required style="padding:0.5rem;" />
+                            <label class="ruta-reserva-form__label" for="tripDate">Fecha de salida</label>
+                            <input type="date" name="tripDate" id="tripDate" min="@DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd")" required class="ruta-reserva-form__input" />
                         </div>
                         <div>
-                            <label style="display:block; font-size:0.8rem; margin-bottom:0.2rem;">Personas</label>
-                            <input type="number" name="peopleCount" id="peopleCount" min="1" max="@Model.Service.MaxGroupSize" value="1" required style="padding:0.5rem; width:80px;" />
+                            <label class="ruta-reserva-form__label" for="peopleCount">Personas</label>
+                            <input type="number" name="peopleCount" id="peopleCount" min="1" max="@Model.Service.MaxGroupSize" value="1" required class="ruta-reserva-form__input ruta-reserva-form__input--people" />
                         </div>
-                        <div style="font-size:0.9rem;">
+                        <div class="ruta-reserva-form__total">
                             Total estimado: <strong id="totalEstimado">@PriceFormatter.Format(Model.Service.Price)</strong>
                         </div>
                         <button type="submit" class="ruta-cta-button">Reservar</button>
