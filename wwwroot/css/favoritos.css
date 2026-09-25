@@ -1,20 +1,15 @@
 /* ============================================
    FAVORITOS — Premium Outdoor
    Paleta: bosque, arena, vidrio oscuro
+   Móvil primero: 2 tarjetas por fila en el teléfono; desde 768px,
+   tarjetas de 300px (las que entren por fila).
    ============================================ */
 
 :root {
   /* Apuntan a wwwroot/css/tokens.css: paleta única del sitio */
-  --fav-bg: var(--color-bg);
-  --fav-card: rgba(23, 61, 45, 0.55);
-  --fav-card-border: rgba(79, 138, 104, 0.35);
-  --fav-glass: rgba(11, 16, 14, 0.65);
   --fav-text: var(--color-text);
   --fav-sub: var(--color-text-secondary);
   --fav-sand: #d8c9a8;
-  --fav-forest: var(--color-green);
-  --fav-forest-deep: #173d2d;
-  --fav-tierra: var(--color-tierra);
 }
 
 .fav-page {
@@ -24,7 +19,7 @@
   font-family: "Outfit", "Segoe UI", system-ui, sans-serif;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.5rem var(--page-gutter);
 }
 
 .fav-hero {
@@ -43,12 +38,13 @@
 
 .fav-title {
   font-weight: 800;
-  font-size: clamp(2.5rem, 5vw, 3.8rem);
+  font-size: clamp(2rem, 5vw, 3.8rem);
   color: var(--fav-sand);
   letter-spacing: -0.03em;
   text-shadow: 0 4px 30px rgba(79,138,104,0.25);
   position: relative;
   z-index: 1;
+  overflow-wrap: break-word;
 }
 
 .fav-sub {
@@ -59,18 +55,20 @@
   z-index: 1;
 }
 
+/* Productos y rutas: 2 por fila en móvil */
 .fav-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 2rem;
 }
 
 .fav-card {
-  flex: 0 0 300px;
+  min-width: 0;
   background: linear-gradient(135deg, rgba(23,61,45,0.55), rgba(23,61,45,0.35));
   border: 1px solid rgba(79,138,104,0.35);
   border-radius: 1.2rem;
-  padding: 1.25rem;
+  padding: 0.75rem;
   backdrop-filter: blur(14px) saturate(120%);
   -webkit-backdrop-filter: blur(14px) saturate(120%);
   box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
@@ -90,41 +88,32 @@
   transition: opacity 0.4s ease;
   pointer-events: none;
 }
-.fav-card:hover {
-  transform: translateY(-8px) scale(1.01);
-  box-shadow: 0 24px 56px rgba(0,0,0,0.45), 0 0 0 1px rgba(79,138,104,0.55), inset 0 1px 0 rgba(255,255,255,0.1);
-  border-color: rgba(79,138,104,0.65);
-}
-.fav-card:hover::before {
-  opacity: 1;
-}
 
 .fav-card img {
   width: 100%;
-  height: 160px;
+  height: 110px;
   object-fit: cover;
   border-radius: 0.6rem;
   box-shadow: 0 6px 20px rgba(0,0,0,0.35);
   transition: transform 0.35s ease, filter 0.35s ease;
   filter: brightness(0.92);
 }
-.fav-card:hover img {
-  transform: scale(1.03);
-  filter: brightness(1.05);
-}
 
 .fav-card h4 {
   color: var(--fav-sand);
   font-family: "Outfit", sans-serif;
+  font-size: clamp(1rem, 3vw, 1.5rem);
   font-weight: 700;
   margin-top: 0.8rem;
   letter-spacing: -0.02em;
+  overflow-wrap: break-word;
 }
 
 .fav-card .meta {
   color: var(--fav-sub);
   font-size: 0.85rem;
   margin-top: 0.15rem;
+  overflow-wrap: break-word;
 }
 
 .fav-card .price {
@@ -137,6 +126,7 @@
 .fav-btn-remove {
   display: block;
   width: 100%;
+  min-height: 44px; /* cómodo para tocar */
   margin-top: 0.75rem;
   padding: 0.55rem 0.8rem;
   border-radius: 0.6rem;
@@ -144,7 +134,7 @@
   color: var(--fav-sand);
   border: 1px solid rgba(124,112,88,0.35);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
   box-shadow: 0 2px 10px rgba(124,112,88,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
   cursor: pointer;
@@ -157,11 +147,73 @@
 }
 
 .fav-empty-state {
+  grid-column: 1 / -1;
   background: linear-gradient(135deg, rgba(23,61,45,0.3), rgba(23,61,45,0.15));
   border: 1px dashed rgba(79,138,104,0.35);
   border-radius: 1.2rem;
-  padding: 3.5rem 2rem;
+  padding: 2rem 1.25rem;
   text-align: center;
   backdrop-filter: blur(8px);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.fav-empty-state__title {
+  color: var(--fav-sand);
+  font-family: 'Outfit';
+  font-weight: 700;
+}
+
+.fav-empty-state__btn {
+  margin-top: 1rem;
+  display: inline-block;
+  width: auto;
+}
+
+/* === RESPONSIVE === */
+
+@media (min-width: 768px) {
+  /* Página: más margen */
+  .fav-page {
+    padding: 2rem;
+  }
+
+  /* Tarjetas de 300px, las que entren por fila */
+  .fav-grid {
+    grid-template-columns: repeat(auto-fill, 300px);
+    gap: 1rem;
+  }
+
+  .fav-card {
+    padding: 1.25rem;
+  }
+
+  .fav-card img {
+    height: 160px;
+  }
+
+  .fav-btn-remove {
+    font-size: 0.9rem;
+  }
+
+  .fav-empty-state {
+    padding: 3.5rem 2rem;
+  }
+}
+
+/* Elevación y brillo de la tarjeta: solo con mouse */
+@media (hover: hover) and (pointer: fine) {
+  .fav-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 24px 56px rgba(0,0,0,0.45), 0 0 0 1px rgba(79,138,104,0.55), inset 0 1px 0 rgba(255,255,255,0.1);
+    border-color: rgba(79,138,104,0.65);
+  }
+
+  .fav-card:hover::before {
+    opacity: 1;
+  }
+
+  .fav-card:hover img {
+    transform: scale(1.03);
+    filter: brightness(1.05);
+  }
 }

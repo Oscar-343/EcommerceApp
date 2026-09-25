@@ -11,28 +11,28 @@
         <p class="cart-sub">Historial de tus pedidos confirmados.</p>
     </section>
 
-    <div style="margin-top: 2rem;">
+    <div class="cart-section">
         @if (!Model.Any())
         {
             <div class="cart-empty-state">
-                <h3 style="color: var(--cart-sand); font-family: 'Outfit'; font-weight: 700;">Todavía no tienes pedidos</h3>
+                <h3 class="cart-empty-state__title">Todavía no tienes pedidos</h3>
                 <p>Cuando confirmes tu carrito, aparecerán aquí.</p>
-                <a asp-controller="Products" asp-action="Index" class="cart-btn-primary" style="margin-top: 1rem; display: inline-block; width: auto;">Ver tienda</a>
+                <a asp-controller="Products" asp-action="Index" class="cart-btn-primary cart-empty-state__btn">Ver tienda</a>
             </div>
         }
         else
         {
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="cart-list">
                 @foreach (var order in Model)
                 {
-                    <a asp-action="Details" asp-route-id="@order.Id" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.8rem; padding: 1rem; text-decoration: none; color: inherit;">
-                        <div>
-                            <h4 style="color: var(--sand); font-family: 'Outfit'; margin: 0;">Pedido #@order.Id</h4>
-                            <div style="color: var(--text-secondary); font-size: 0.85rem;">@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+                    <a asp-action="Details" asp-route-id="@order.Id" class="cart-item cart-item--row cart-item--link">
+                        <div class="cart-item__info">
+                            <h4 class="cart-item__name">Pedido #@order.Id</h4>
+                            <div class="cart-item__meta">@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: 600; color: #fff;">@PriceFormatter.Format(order.Total)</div>
-                            <div style="font-size: 0.85rem; color: var(--text-secondary);">@order.Status</div>
+                        <div class="cart-item__side">
+                            <div class="cart-item__price">@PriceFormatter.Format(order.Total)</div>
+                            <div class="cart-item__meta">@order.Status</div>
                         </div>
                     </a>
                 }

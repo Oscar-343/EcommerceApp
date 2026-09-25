@@ -13,58 +13,56 @@
         <p class="cart-sub">Productos seleccionados para tu aventura.</p>
     </section>
 
-    <div class="row" style="margin-top: 2rem;">
-        <div class="col-md-8">
+    <div class="cart-layout">
+        <div class="cart-layout__main">
             @if (!Model.Any())
             {
                 <div class="cart-empty-state">
-                    <h3 style="color: var(--cart-sand); font-family: 'Outfit'; font-weight: 700;">Tu carrito está vacío</h3>
+                    <h3 class="cart-empty-state__title">Tu carrito está vacío</h3>
                     <p>Explora nuestra tienda y agrega productos de senderismo.</p>
-                    <a asp-controller="Products" asp-action="Index" class="cart-btn-primary" style="margin-top: 1rem; display: inline-block; width: auto;">Ver tienda</a>
+                    <a asp-controller="Products" asp-action="Index" class="cart-btn-primary cart-empty-state__btn">Ver tienda</a>
                 </div>
             }
             else
             {
-                <div style="margin-bottom: 1rem;">
-                    <a asp-controller="Products" asp-action="Index" style="color: var(--cart-sand);">&larr; Seguir comprando</a>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <a asp-controller="Products" asp-action="Index" class="cart-back">&larr; Seguir comprando</a>
+                <div class="cart-list">
                     @foreach (var item in Model)
                     {
                         var p = item.Product;
                         var precioVigente = p?.PromotionalPrice ?? p?.Price ?? item.UnitPrice;
                         var sinStock = p == null || p.Stock <= 0;
                         var superaStock = p != null && !sinStock && item.Quantity > p.Stock;
-                        <div style="display: flex; gap: 1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.8rem; padding: 1rem; transition: transform 0.2s ease; align-items: center;">
-                            <img src="@(p?.ImageUrl ?? "/images/default-product.svg")" style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;" alt="" />
-                            <div style="flex: 1;">
-                                <h4 style="color: var(--sand); font-family: 'Outfit'; margin: 0;">@(p?.Name ?? "Producto no disponible")</h4>
-                                <div style="color: var(--text-secondary); font-size: 0.85rem;">@p?.Category</div>
-                                <div style="margin-top: 0.3rem; font-weight: 600; color: #fff;">@PriceFormatter.Format(precioVigente) c/u &middot; Subtotal: @PriceFormatter.Format(precioVigente * item.Quantity)</div>
+                        <div class="cart-item">
+                            <img src="@(p?.ImageUrl ?? "/images/default-product.svg")" class="cart-item__img" alt="" />
+                            <div class="cart-item__info">
+                                <h4 class="cart-item__name">@(p?.Name ?? "Producto no disponible")</h4>
+                                <div class="cart-item__meta">@p?.Category</div>
+                                <div class="cart-item__price">@PriceFormatter.Format(precioVigente) c/u &middot; Subtotal: @PriceFormatter.Format(precioVigente * item.Quantity)</div>
                                 @if (sinStock)
                                 {
-                                    <div style="margin-top: 0.3rem; color: #e07a7a; font-size: 0.85rem;">Sin stock disponible. Quítalo del carrito para continuar.</div>
+                                    <div class="cart-item__warning cart-item__warning--error">Sin stock disponible. Quítalo del carrito para continuar.</div>
                                 }
                                 else if (superaStock)
                                 {
-                                    <div style="margin-top: 0.3rem; color: #e0b97a; font-size: 0.85rem;">Solo quedan @p!.Stock unidades. Ajusta la cantidad para continuar.</div>
+                                    <div class="cart-item__warning">Solo quedan @p!.Stock unidades. Ajusta la cantidad para continuar.</div>
                                 }
                             </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <form asp-action="Update" method="post" style="display: inline;">
+                            <div class="cart-item__actions">
+                                <form asp-action="Update" method="post" class="cart-inline-form">
                                     <input type="hidden" name="productId" value="@item.ProductId" />
                                     <input type="hidden" name="direction" value="dec" />
                                     <button type="submit" class="cart-qty-btn" disabled="@(item.Quantity <= 1)">−</button>
                                 </form>
-                                <span style="min-width: 1.5rem; text-align: center;">@item.Quantity</span>
-                                <form asp-action="Update" method="post" style="display: inline;">
+                                <span class="cart-item__qty">@item.Quantity</span>
+                                <form asp-action="Update" method="post" class="cart-inline-form">
                                     <input type="hidden" name="productId" value="@item.ProductId" />
                                     <input type="hidden" name="direction" value="inc" />
                                     <button type="submit" class="cart-qty-btn" disabled="@(sinStock || (p != null && item.Quantity >= p.Stock))">+</button>
                                 </form>
-                                <form asp-action="Remove" method="post" style="display: inline;">
+                                <form asp-action="Remove" method="post" class="cart-inline-form cart-item__remove-form">
                                     <input type="hidden" name="productId" value="@item.ProductId" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">✕</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger cart-item__remove" aria-label="Quitar del carrito">✕</button>
                                 </form>
                             </div>
                         </div>
@@ -72,24 +70,24 @@
                 </div>
             }
         </div>
-        <div class="col-md-4">
-            <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08); position: sticky; top: 1rem;">
-                <h3 style="font-family: 'Outfit'; color: var(--sand);">Resumen</h3>
-                <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+        <div class="cart-layout__aside">
+            <div class="cart-summary">
+                <h3 class="cart-summary__title">Resumen</h3>
+                <div class="cart-summary__line">
                     <span>Subtotal</span>
                     <strong>@PriceFormatter.Format((decimal)ViewBag.Total)</strong>
                 </div>
-                <hr style="border-color: rgba(255,255,255,0.1);" />
-                <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; color: #fff;">
+                <hr class="cart-summary__divider" />
+                <div class="cart-summary__total">
                     <span>Total estimado</span>
                     <span>@PriceFormatter.Format((decimal)ViewBag.Total)</span>
                 </div>
                 <form asp-controller="Orders" asp-action="Checkout" method="post">
-                    <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; margin-top: 1rem; display: block; text-align: center;" disabled="@(!puedeConfirmar)">Confirmar pedido</button>
+                    <button type="submit" class="btn-admin btn-admin-primary cart-summary__btn" disabled="@(!puedeConfirmar)">Confirmar pedido</button>
                 </form>
                 @if (hayProblemaDeStock)
                 {
-                    <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #e07a7a; text-align: center;">Corrige los productos sin stock suficiente para continuar.</div>
+                    <div class="cart-summary__note">Corrige los productos sin stock suficiente para continuar.</div>
                 }
             </div>
         </div>

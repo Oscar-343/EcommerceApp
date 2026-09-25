@@ -34,6 +34,14 @@ body {
 }
 
 
+/* Páginas de solo texto (Privacy, Error): legibles y con margen lateral */
+.page-text {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem var(--page-gutter);
+    overflow-wrap: break-word;
+}
+
 /* =========================================================
    NAVBAR COMPARTIDA — usada por _Navbar.cshtml en todas las
    páginas públicas. Solo logo (sin texto), buscador desplegable,

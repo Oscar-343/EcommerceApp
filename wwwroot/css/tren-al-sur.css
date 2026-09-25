@@ -22,14 +22,19 @@
 
 /* =========================================================
    FONDO A PANTALLA COMPLETA (imagen o video)
+   Móvil primero: logo, tarjeta y acceso demo uno debajo del otro.
+   Desde 768px el logo y el acceso demo flotan en las esquinas.
    ========================================================= */
 .auth-page {
     position: relative;
     min-height: 100vh;
+    min-height: 100svh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 1.5rem;
+    gap: 1rem;
+    padding: 1.5rem var(--page-gutter);
     font-family: var(--font-body);
     color: var(--warm-white);
     overflow: hidden;
@@ -63,9 +68,7 @@
 }
 
 .auth-brand {
-    position: fixed;
-    top: 2rem;
-    left: 2.25rem;
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.6rem;
@@ -82,14 +85,8 @@
         color: var(--sand);
     }
 
-    .auth-brand svg {
-        width: 22px;
-        height: 22px;
-        color: var(--forest-light);
-    }
-
     .auth-brand img {
-        height: 100px;
+        height: 64px;
         width: auto;
         object-fit: contain;
     }
@@ -105,7 +102,7 @@
     background: rgba(17, 26, 22, 0.35);
     border: 1px solid rgba(242, 241, 234, 0.15);
     border-radius: var(--radius-lg);
-    padding: 1.8rem 1.6rem;
+    padding: 1.5rem 1.2rem;
     backdrop-filter: blur(14px) saturate(120%);
     -webkit-backdrop-filter: blur(14px) saturate(120%);
     box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45);
@@ -123,11 +120,10 @@
 
 /* -------- Ventana flotante con credenciales demo -------- */
 .auth-demo-hint {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
+    position: relative;
     z-index: 20;
-    max-width: 230px;
+    width: 100%;
+    max-width: 360px;
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
@@ -214,7 +210,7 @@
     color: var(--warm-white);
     border-radius: var(--radius-sm);
     padding: 0.55rem 0.8rem;
-    font-size: 0.9rem;
+    font-size: 1rem; /* 16px: evita el zoom de iPhone */
     font-family: var(--font-body);
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
@@ -230,17 +226,22 @@
         box-shadow: 0 0 0 3px rgba(79, 138, 104, 0.2);
     }
 
+/* Mostrar contraseña: 44 x 44 para tocar cómodo, dentro del campo */
 .auth-toggle-visibility {
     position: absolute;
-    right: 10px;
+    right: 0;
     top: 50%;
     transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
     background: none;
     border: none;
-    padding: 4px;
+    padding: 0;
     color: var(--text-secondary);
     cursor: pointer;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
     .auth-toggle-visibility:hover {
@@ -253,7 +254,7 @@
     }
 
 .auth-input[type="password"], .auth-input.has-toggle {
-    padding-right: 2.2rem;
+    padding-right: 2.75rem;
 }
 
 .auth-error-text {
@@ -287,6 +288,8 @@
 
 .auth-row-between {
     display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     align-items: center;
     justify-content: space-between;
     margin: 0.1rem 0 1rem;
@@ -317,6 +320,7 @@
 .auth-submit {
     position: relative;
     width: 100%;
+    min-height: 44px;
     padding: 0.65rem 0.9rem;
     border: none;
     border-radius: var(--radius-sm);
@@ -395,7 +399,8 @@
             text-decoration: underline;
         }
 
-/* -------- Divisor + botones sociales -------- */
+/* -------- Divisor + botones sociales (Google y GitHub): uno debajo
+   del otro y a lo ancho en móvil, lado a lado desde 576px -------- */
 .auth-divider {
     display: flex;
     align-items: center;
@@ -414,6 +419,7 @@
 
 .auth-social-row {
     display: flex;
+    flex-direction: column;
     gap: 0.5rem;
 }
 
@@ -424,6 +430,7 @@
 
 .auth-social-btn {
     width: 100%;
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -449,19 +456,41 @@
         flex-shrink: 0;
     }
 
-@media (max-width: 420px) {
-    .auth-page {
-        flex-direction: column;
+/* === RESPONSIVE === */
+
+@media (min-width: 576px) {
+    /* Tarjeta: relleno completo */
+    .auth-card {
+        padding: 1.8rem 1.6rem;
     }
 
-    .auth-card {
-        padding: 1.5rem 1.2rem;
+    /* Botones sociales lado a lado */
+    .auth-social-row {
+        flex-direction: row;
     }
+}
+
+@media (min-width: 768px) {
+    /* Logo arriba a la izquierda y acceso demo abajo a la derecha */
+    .auth-brand {
+        position: fixed;
+        top: 2rem;
+        left: 2.25rem;
+    }
+
+        .auth-brand img {
+            height: 100px;
+        }
 
     .auth-demo-hint {
-        position: static;
-        margin-top: 1rem;
-        max-width: 100%;
-        width: 100%;
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        width: auto;
+        max-width: 230px;
+    }
+
+    .auth-input {
+        font-size: 0.9rem;
     }
 }

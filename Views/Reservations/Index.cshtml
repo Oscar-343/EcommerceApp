@@ -11,34 +11,34 @@
         <p class="cart-sub">Historial de tus reservas de rutas.</p>
     </section>
 
-    <div style="margin-top: 2rem;">
+    <div class="cart-section">
         @if (!Model.Any())
         {
             <div class="cart-empty-state">
-                <h3 style="color: var(--cart-sand); font-family: 'Outfit'; font-weight: 700;">Todavía no tienes reservas</h3>
+                <h3 class="cart-empty-state__title">Todavía no tienes reservas</h3>
                 <p>Elige una ruta y reserva tu fecha de salida.</p>
-                <a asp-controller="Services" asp-action="Index" class="cart-btn-primary" style="margin-top: 1rem; display: inline-block; width: auto;">Ver rutas</a>
+                <a asp-controller="Services" asp-action="Index" class="cart-btn-primary cart-empty-state__btn">Ver rutas</a>
             </div>
         }
         else
         {
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="cart-list">
                 @foreach (var r in Model)
                 {
-                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.8rem; padding: 1rem;">
-                        <div>
-                            <h4 style="color: var(--sand); font-family: 'Outfit'; margin: 0;">@(r.Service?.Name ?? "Ruta eliminada")</h4>
-                            <div style="color: var(--text-secondary); font-size: 0.85rem;">
+                    <div class="cart-item cart-item--row">
+                        <div class="cart-item__info">
+                            <h4 class="cart-item__name">@(r.Service?.Name ?? "Ruta eliminada")</h4>
+                            <div class="cart-item__meta">
                                 Salida: @r.TripDate.ToString("dd/MM/yyyy") &middot; @r.PeopleCount persona(s)
                             </div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: 600; color: #fff;">@PriceFormatter.Format(r.TotalPrice)</div>
-                            <div style="font-size: 0.85rem; color: var(--text-secondary);">@r.Status</div>
+                        <div class="cart-item__side">
+                            <div class="cart-item__price">@PriceFormatter.Format(r.TotalPrice)</div>
+                            <div class="cart-item__meta">@r.Status</div>
                             @if (r.Status == "Pendiente")
                             {
-                                <form asp-action="Cancel" asp-route-id="@r.Id" method="post" style="margin-top: 0.5rem;">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Cancelar esta reserva?')">Cancelar</button>
+                                <form asp-action="Cancel" asp-route-id="@r.Id" method="post" class="cart-item__cancel-form">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger cart-item__remove" onclick="return confirm('¿Cancelar esta reserva?')">Cancelar</button>
                                 </form>
                             }
                         </div>

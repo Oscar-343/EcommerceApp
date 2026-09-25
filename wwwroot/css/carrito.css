@@ -1,14 +1,14 @@
 /* ============================================
    CARRITO — Premium Outdoor
    Paleta: bosque, arena, vidrio oscuro
+   Lo usan: Cart/Index, Orders/Index, Orders/Details y Reservations/Index.
+   Móvil primero: la base es el teléfono y lo más grande se agrega
+   en la sección RESPONSIVE del final (anchos 768/992).
    ============================================ */
 
 :root {
   /* Apuntan a wwwroot/css/tokens.css: paleta única del sitio */
   --cart-bg: var(--color-bg);
-  --cart-card: rgba(23, 61, 45, 0.55);
-  --cart-card-border: rgba(79, 138, 104, 0.35);
-  --cart-glass: rgba(11, 16, 14, 0.7);
   --cart-text: var(--color-text);
   --cart-sub: var(--color-text-secondary);
   --cart-sand: #d8c9a8;
@@ -23,7 +23,7 @@
   font-family: "Outfit", "Segoe UI", system-ui, sans-serif;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.5rem var(--page-gutter);
 }
 
 .cart-hero {
@@ -41,12 +41,13 @@
 
 .cart-title {
   font-weight: 800;
-  font-size: clamp(2.5rem, 5vw, 3.8rem);
+  font-size: clamp(2rem, 5vw, 3.8rem);
   color: var(--cart-sand);
   letter-spacing: -0.03em;
   text-shadow: 0 4px 30px rgba(79,138,104,0.25);
   position: relative;
   z-index: 1;
+  overflow-wrap: break-word;
 }
 
 .cart-sub {
@@ -57,32 +58,142 @@
   z-index: 1;
 }
 
-.cart-card {
-  background: linear-gradient(135deg, rgba(23,61,45,0.55), rgba(23,61,45,0.35));
-  border: 1px solid rgba(79,138,104,0.35);
-  border-radius: 1.2rem;
-  padding: 1.2rem 1.4rem;
-  backdrop-filter: blur(14px) saturate(120%);
-  -webkit-backdrop-filter: blur(14px) saturate(120%);
-  transition: transform 0.35s cubic-bezier(0.65,0,0.35,1), box-shadow 0.35s ease, border-color 0.35s ease;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
-}
-.cart-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(79,138,104,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
-  border-color: rgba(79,138,104,0.65);
+/* Enlace "Seguir comprando" / "Volver a mis pedidos" */
+.cart-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: 1rem;
+  color: var(--cart-sand);
 }
 
-.cart-card img {
-  border-radius: 0.75rem;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  transition: transform 0.3s ease;
+.cart-section {
+  margin-top: 2rem;
 }
-.cart-card:hover img {
-  transform: scale(1.02);
+
+/* === DISTRIBUCIÓN: lista y resumen ===
+   Móvil y tablet: el resumen va debajo. Desde 992px: al costado. */
+.cart-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.cart-layout--compact {
+  margin-top: 1.5rem;
+}
+
+.cart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* === LÍNEA DEL CARRITO / PEDIDO / RESERVA ===
+   En móvil es una tarjeta: foto y datos arriba, controles en una fila
+   debajo. Desde 768px todo va en una sola fila. */
+.cart-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem 1rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 0.8rem;
+  padding: 1rem;
+  transition: transform 0.2s ease;
+}
+
+/* Líneas sin foto (pedidos y reservas): datos a la izquierda y
+   precio/estado a la derecha; se envuelven si no entran. */
+.cart-item--row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.cart-item--link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.cart-item__img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.cart-item__info {
+  min-width: 0;
+  flex: 1;
+}
+
+.cart-item__name {
+  font-family: 'Outfit';
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+.cart-item__meta {
+  font-size: 0.85rem;
+}
+
+.cart-item__price {
+  margin-top: 0.3rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.cart-item__warning {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: #e0b97a;
+}
+
+.cart-item__warning--error {
+  color: #e07a7a;
+}
+
+.cart-item__side {
+  text-align: right;
+}
+
+.cart-item__cancel-form {
+  margin-top: 0.5rem;
+}
+
+/* Cantidad y quitar: fila completa debajo de la foto en móvil */
+.cart-item__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cart-item__qty {
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+/* "Quitar" queda al extremo derecho de la fila */
+.cart-item__remove-form {
+  margin-left: auto;
+}
+
+.cart-item__remove {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.cart-inline-form {
+  display: inline;
 }
 
 .cart-qty-btn {
+  min-width: 44px; /* cómodo para tocar */
+  min-height: 44px;
   background: rgba(79,138,104,0.25);
   border: 1px solid rgba(79,138,104,0.4);
   color: var(--cart-sand);
@@ -96,16 +207,68 @@
   border-color: rgba(79,138,104,0.7);
 }
 
-.cart-summary-glass {
-  background: linear-gradient(180deg, rgba(23,61,45,0.6), rgba(11,16,14,0.85));
-  border: 1px solid rgba(79,138,104,0.35);
-  border-radius: 1.2rem;
+/* === RESUMEN === */
+.cart-summary {
+  background: rgba(255,255,255,0.05);
+  border-radius: 1rem;
   padding: 1.5rem;
-  backdrop-filter: blur(16px) saturate(120%);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
-  position: sticky;
-  top: 1.5rem;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.cart-summary__title {
+  font-family: 'Outfit';
+}
+
+.cart-summary__line {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.5rem 0;
+}
+
+.cart-summary__total {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cart-summary__divider {
+  border-color: rgba(255,255,255,0.1);
+}
+
+.cart-summary__status {
+  margin: 0.5rem 0;
+}
+
+.cart-summary__date {
+  font-size: 0.85rem;
+}
+
+/* Botón de confirmar / cancelar: siempre a lo ancho del resumen */
+.cart-summary__btn {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.cart-summary__form {
+  margin-top: 1rem;
+}
+
+.cart-summary__form .cart-summary__btn {
+  margin-top: 0;
+}
+
+.cart-summary__note {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #e07a7a;
+  text-align: center;
 }
 
 .cart-btn-primary {
@@ -129,11 +292,74 @@
   border-color: rgba(79,138,104,0.8);
 }
 
+/* === ESTADO VACÍO === */
 .cart-empty-state {
   background: linear-gradient(135deg, rgba(23,61,45,0.3), rgba(23,61,45,0.15));
   border: 1px dashed rgba(79,138,104,0.35);
   border-radius: 1.2rem;
-  padding: 3rem 2rem;
+  padding: 2rem 1.25rem;
   text-align: center;
   backdrop-filter: blur(8px);
+}
+
+.cart-empty-state__title {
+  color: var(--cart-sand);
+  font-family: 'Outfit';
+  font-weight: 700;
+}
+
+.cart-empty-state__btn {
+  margin-top: 1rem;
+  display: inline-block;
+  width: auto;
+}
+
+/* === RESPONSIVE === */
+
+@media (min-width: 768px) {
+  /* Página: más margen */
+  .cart-page {
+    padding: 2rem;
+  }
+
+  .cart-empty-state {
+    padding: 3rem 2rem;
+  }
+
+  /* Línea del carrito: todo en una fila */
+  .cart-item {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .cart-item__img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .cart-item__actions {
+    grid-column: auto;
+  }
+
+  .cart-item__remove-form {
+    margin-left: 0;
+  }
+
+  .cart-qty-btn,
+  .cart-item__remove {
+    min-width: 0;
+    min-height: 0;
+  }
+}
+
+@media (min-width: 992px) {
+  /* Lista y resumen lado a lado; el resumen acompaña el scroll */
+  .cart-layout {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+
+  .cart-summary {
+    position: sticky;
+    top: calc(var(--nav-height) + 1rem);
+  }
 }

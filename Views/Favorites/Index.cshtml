@@ -12,13 +12,13 @@
         <h1 class="fav-title">Mis favoritos</h1>
         <p class="fav-sub">Productos y rutas que guardaste para después.</p>
     </section>
-    <div class="fav-grid" style="margin-top: 2rem; gap: 1rem;">
+    <div class="fav-grid">
         @if (!Model.Any())
         {
-            <div class="fav-empty-state" style="width: 100%;">
-                <h3 style="color: var(--fav-sand); font-family: 'Outfit'; font-weight: 700;">Aún no tienes favoritos</h3>
+            <div class="fav-empty-state">
+                <h3 class="fav-empty-state__title">Aún no tienes favoritos</h3>
                 <p>Explora productos o rutas y haz clic en el corazón para guardarlos.</p>
-                <a asp-controller="Products" asp-action="Index" class="cart-btn-primary" style="margin-top: 1rem; display: inline-block; width: auto;">Ver tienda</a>
+                <a asp-controller="Products" asp-action="Index" class="cart-btn-primary fav-empty-state__btn">Ver tienda</a>
             </div>
         }
         else
