@@ -15,6 +15,24 @@
     --color-green: #315D45;
     --color-green-accent: #557F63;
     --color-tierra: #7C7058;
+
+    /* Anchos de corte (solo referencia: CSS no permite variables dentro de @media).
+       Siempre min-width, de menor a mayor:
+         576px  teléfono grande
+         768px  tablet vertical
+         992px  tablet horizontal / laptop (aparece el menú horizontal)
+         1200px escritorio
+         1400px escritorio grande                                          */
+
+    --page-gutter: clamp(1rem, 4vw, 2rem); /* margen lateral de todas las páginas */
+    --page-max: 1400px;                     /* ancho máximo del contenido */
+    --nav-height: 72px;                     /* alto aproximado de la navbar */
+
+    /* Capas: usar solo estos valores de z-index */
+    --z-floating: 900;  /* asistente de voz y botones flotantes */
+    --z-nav: 1000;      /* navbar fija */
+    --z-drawer: 1100;   /* filtros móviles, barra lateral del admin y su fondo oscuro */
+    --z-toast: 1200;    /* mensajes emergentes */
 }
 
 /* Respeta la preferencia del sistema de reducir animaciones */

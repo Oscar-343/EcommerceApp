@@ -1,11 +1,19 @@
+/* Base responsive global */
 html {
-  font-size: 14px;
+    font-size: 100%; /* 16px: los tamaños se ajustan con clamp(), no achicando la raíz */
+    -webkit-text-size-adjust: 100%;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+img,
+video {
+    max-width: 100%;
+}
+
+/* Evita el zoom automático de iPhone al tocar un campo */
+input,
+select,
+textarea {
+    font-size: max(16px, 1rem);
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -23,23 +31,6 @@ html, body {
 
 body {
   margin-bottom: 60px;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
-}
-
-.navbar-brand img {
-  height: 30px;
-  width: auto;
-  object-fit: contain;
-  margin-right: 0.4rem;
-  vertical-align: middle;
 }
 
 
