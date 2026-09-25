@@ -14,6 +14,14 @@
     <link rel="stylesheet" href="~/css/dictation.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/asistente-voz.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/EcommerceApp.styles.css" asp-append-version="true" />
+    <link rel="manifest" href="~/manifest.webmanifest" />
+    <meta name="theme-color" content="#0B100E" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Tren al Sur" />
+    <link rel="apple-touch-icon" href="~/icons/apple-touch-icon.png" />
+    <link rel="stylesheet" href="~/css/pwa-install.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -34,5 +42,8 @@
     <script src="~/js/dictation.js" asp-append-version="true"></script>
     <script src="~/js/asistente-voz.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <partial name="_PwaInstallButton" />
+    <script src="~/js/pwa.js" asp-append-version="true"></script>
 </body>
 </html>

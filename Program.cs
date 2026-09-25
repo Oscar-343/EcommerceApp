@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using EcommerceApp.Data;
 using EcommerceApp.Models;
@@ -96,10 +97,34 @@ forwardedHeadersOptions.KnownProxies.Clear();
 app.UseForwardedHeaders(forwardedHeadersOptions);
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+
+// PWA: ASP.NET no conoce la extensión .webmanifest; se agrega al mapeo por defecto.
+var staticContentTypes = new FileExtensionContentTypeProvider();
+staticContentTypes.Mappings[".webmanifest"] = "application/manifest+json";
+app.UseStaticFiles(new StaticFileOptions { ContentTypeProvider = staticContentTypes });
+
 app.UseRouting();
 
 app.UseAuthentication();
+
+// PWA: el navbar muestra el nombre del usuario y los contadores de carrito/favoritos,
+// así que el Service Worker solo puede guardar páginas de visitantes anónimos.
+// La cookie de Identity es HttpOnly (el SW no la ve), por eso el servidor marca
+// el HTML anónimo con este header. Sin el header, el SW no guarda la página.
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        if (context.User.Identity?.IsAuthenticated != true &&
+            context.Response.ContentType?.StartsWith("text/html") == true)
+        {
+            context.Response.Headers["X-TAS-Page-Cache"] = "anon";
+        }
+        return Task.CompletedTask;
+    });
+    await next();
+});
+
 app.UseAuthorization();
 
 app.MapControllerRoute(

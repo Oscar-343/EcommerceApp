@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0B100E" />
+    <title>Sin conexión - Tren al Sur</title>
+    <!-- Página autocontenida: el Service Worker la sirve sin red, así que
+         no puede depender de CSS, fuentes ni imágenes externas. -->
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html, body { height: 100%; margin: 0; }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            background: #0B100E;
+            color: #F1F3F1;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            text-align: center;
+        }
+
+        .offline { max-width: 420px; }
+
+        .offline__icon {
+            width: 160px;
+            max-width: 60vw;
+            height: auto;
+            margin-bottom: 24px;
+        }
+
+        .offline__title {
+            margin: 0 0 12px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .offline__text {
+            margin: 0 0 28px;
+            color: #A8B0AA;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .offline__retry {
+            min-height: 44px;
+            padding: 0 28px;
+            border: 1px solid #557F63;
+            border-radius: 999px;
+            background: transparent;
+            color: #F1F3F1;
+            font: inherit;
+            font-size: 0.9rem;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .offline__retry:hover { background: #315D45; }
+
+        .offline__retry:focus-visible {
+            outline: 2px solid #557F63;
+            outline-offset: 3px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .offline__retry { transition: none; }
+        }
+    </style>
+</head>
+<body>
+    <main class="offline">
+        <!-- Montañas con un sendero punteado que se pierde en el horizonte -->
+        <svg class="offline__icon" viewBox="0 0 160 110" aria-hidden="true">
+            <path d="M8 96 L58 30 L82 60 L102 38 L152 96 Z" fill="none" stroke="#557F63" stroke-width="3" stroke-linejoin="round" />
+            <path d="M48 44 L58 30 L68 43" fill="none" stroke="#557F63" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+            <path d="M80 108 C 82 94, 70 88, 78 78 S 96 66, 90 58" fill="none" stroke="#557F63" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 6" />
+        </svg>
+
+        <h1 class="offline__title">Sin señal en el camino</h1>
+        <p class="offline__text">Parece que estás fuera de cobertura. Las rutas que ya visitaste siguen disponibles.</p>
+        <button type="button" class="offline__retry" onclick="location.reload()">Reintentar</button>
+    </main>
+</body>
+</html>

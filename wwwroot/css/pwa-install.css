@@ -1,0 +1,165 @@
+/* =========================================================
+   PWA — botón discreto "Instalar app" (abajo a la izquierda)
+   La esquina derecha la ocupa el asistente de voz (z-index 998).
+   ========================================================= */
+.tas-install {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 997; /* debajo del asistente, de overlays (999) y de modales/offcanvas de Bootstrap (1040+) */
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 400ms ease-out, transform 400ms ease-out;
+}
+
+.tas-install.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tas-install[hidden],
+.tas-install__ios[hidden] {
+    display: none;
+}
+
+/* --- Botón principal (píldora) --- */
+.tas-install__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 18px 0 14px;
+    border: 1px solid #303832;
+    border-radius: 999px;
+    background: rgba(23, 30, 26, 0.85);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: #F1F3F1;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tas-install__btn:hover,
+.tas-install__btn:focus-visible {
+    border-color: #557F63;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+}
+
+.tas-install__btn:focus-visible,
+.tas-install__close:focus-visible {
+    outline: 2px solid #557F63;
+    outline-offset: 3px;
+}
+
+.tas-install__icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: #557F63;
+}
+
+/* La flecha baja 2px: gesto de "descarga" */
+.tas-install__arrow {
+    transition: transform 0.25s ease;
+}
+
+.tas-install__btn:hover .tas-install__arrow,
+.tas-install__btn:focus-visible .tas-install__arrow {
+    transform: translateY(2px);
+}
+
+/* --- Cerrar (secundario) --- */
+.tas-install__close {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #A8B0AA;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.tas-install__close:hover {
+    color: #F1F3F1;
+}
+
+/* --- Panel de instrucciones iOS (sale por encima del botón) --- */
+.tas-install__ios {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 10px);
+    width: max-content;
+    max-width: min(280px, calc(100vw - 32px));
+    padding: 14px 16px;
+    border: 1px solid #303832;
+    border-radius: 12px;
+    background: #171E1A;
+    color: #F1F3F1;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+}
+
+.tas-install__ios-title {
+    margin: 0 0 6px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.tas-install__ios-text {
+    margin: 0;
+    color: #A8B0AA;
+}
+
+.tas-install__ios-text strong {
+    color: #F1F3F1;
+}
+
+.tas-install__share {
+    width: 18px;
+    height: 18px;
+    vertical-align: -3px;
+    color: #557F63;
+}
+
+/* --- Móvil --- */
+@media (max-width: 768px) {
+    /* El Home tiene una barra inferior fija de 64px: el botón se ubica encima,
+       igual que hace el asistente de voz. */
+    body:has(.mobile-bottom-nav) .tas-install {
+        bottom: calc(64px + 16px);
+    }
+}
+
+/* Pantallas muy estrechas: solo el ícono (el aria-label se mantiene) */
+@media (max-width: 359px) {
+    .tas-install__label {
+        display: none;
+    }
+
+    .tas-install__btn {
+        width: 44px;
+        padding: 0;
+        justify-content: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tas-install,
+    .tas-install__btn,
+    .tas-install__arrow {
+        transition: none;
+    }
+}

@@ -1,0 +1,32 @@
+@* Botón discreto "Instalar app" (PWA), abajo a la izquierda.
+   Empieza oculto; pwa.js lo muestra solo si el navegador permite instalar
+   (o en iOS Safari) y después de unos segundos o de un scroll. *@
+<div id="tas-install" class="tas-install" hidden>
+    <button type="button" class="tas-install__btn" id="tas-install-btn"
+            title="Instalar app" aria-label="Instalar la app de Tren al Sur">
+        <!-- Montaña con flecha hacia abajo -->
+        <svg class="tas-install__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M2 21 L9 10 L13 16 L16 12.5 L22 21 Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+            <g class="tas-install__arrow">
+                <path d="M19 2.5 V8.5 M16.5 6 L19 8.5 L21.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </g>
+        </svg>
+        <span class="tas-install__label">Llévanos contigo</span>
+    </button>
+    <button type="button" class="tas-install__close" id="tas-install-close"
+            aria-label="Ocultar">×</button>
+
+    <div class="tas-install__ios" id="tas-install-ios" hidden role="dialog"
+         aria-label="Cómo instalar en iPhone">
+        <p class="tas-install__ios-title">Instala Tren al Sur</p>
+        <p class="tas-install__ios-text">
+            Toca <strong>Compartir</strong>
+            <!-- Ícono de compartir de Safari -->
+            <svg class="tas-install__share" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3 V15 M8 7 L12 3 L16 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M8 10 H6 V21 H18 V10 H16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>
+            y luego <strong>Agregar a inicio</strong>.
+        </p>
+    </div>
+</div>

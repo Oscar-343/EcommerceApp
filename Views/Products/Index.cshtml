@@ -38,31 +38,28 @@
 
                 <div class="productos-categories__grid">
                     @{
-                        var categories = Model.AvailableCategories ?? new List<string>();
-                        // Patrón cíclico de tamaños para el efecto "mosaico" (cuadrados y
-                        // rectángulos de distinto tamaño), no depende del nombre de la categoría.
-                        var mosaicSizes = new[] { "productos-category--big", "productos-category--small", "productos-category--wide", "productos-category--tall", "productos-category--small", "productos-category--wide" };
-                        var i = 0;
+                        // Orden del collage = orden de ProductCategories.All (la primera ocupa el recuadro grande).
+                        var categories = (Model.AvailableCategories ?? new List<string>())
+                            .OrderBy(c =>
+                            {
+                                var pos = Array.IndexOf(ProductCategories.All, c);
+                                return pos < 0 ? int.MaxValue : pos;
+                            })
+                            .ToList();
+                    }
+                    @foreach (var category in categories)
+                    {
+                        var imageSrc = ProductCategories.Images.ContainsKey(category)
+                            ? ProductCategories.Images[category]
+                            : ProductCategories.DefaultImage;
 
-                        foreach (var category in categories)
-                        {
-                            var imageSrc = ProductCategories.Images.ContainsKey(category)
-                                ? ProductCategories.Images[category]
-                                : ProductCategories.DefaultImage;
-
-                            var sizeClass = mosaicSizes[i % mosaicSizes.Length];
-                            i++;
-
-                            <a asp-action="Index" asp-route-category="@category"
-                               class="productos-category @sizeClass productos-animate"
-                               style="background-image: url('@imageSrc');">
-                                <img src="@imageSrc" alt="@category" class="productos-category__image" loading="lazy" />
-                                <div class="productos-category__overlay">
-                                    <h3 class="productos-category__name">@category</h3>
-                                    <span class="productos-category__explore">EXPLORAR →</span>
-                                </div>
-                            </a>
-                        }
+                        <a asp-action="Index" asp-route-category="@category" class="productos-category productos-animate">
+                            @* alt vacío: el nombre ya está como texto. Si la foto falla, se usa la imagen por defecto. *@
+                            <img src="@imageSrc" alt="" class="productos-category__image" loading="lazy"
+                                 onerror="this.onerror=null; this.src='@ProductCategories.DefaultImage';" />
+                            <span class="productos-category__name">@category</span>
+                            <span class="productos-category__explore">Explorar <i class="fas fa-arrow-right"></i></span>
+                        </a>
                     }
                 </div>
             </div>

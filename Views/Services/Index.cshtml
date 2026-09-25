@@ -23,7 +23,7 @@
         @{
             // Rutas para el hero rotativo: las que tienen foto, ya vienen ordenadas
             // "destacadas primero" desde el controlador.
-            var heroRoutes = Model.Services.Where(s => !string.IsNullOrEmpty(s.ImageUrl)).Take(5).ToList();
+            var heroRoutes = Model.Services.Where(s => !string.IsNullOrEmpty(s.ImageUrl)).Take(4).ToList();
         }
 
         <!-- === HERO ROTATIVO DE RUTAS === -->

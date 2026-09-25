@@ -404,126 +404,181 @@ html, body {
 /* === CATEGORÍAS === */
 .productos-categories {
     background-color: var(--productos-section);
-    padding: 3rem 0;
+    padding: 2.5rem 0;
 }
 
 .productos-categories__header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 1.5rem;
 }
 
 .productos-categories__title {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     font-weight: 600;
     letter-spacing: 0.1em;
-    margin-bottom: 1rem;
+    margin-bottom: 0.4rem;
     text-transform: uppercase;
     color: var(--productos-text);
 }
 
 .productos-categories__subtitle {
-    font-size: 1.1rem;
+    margin: 0;
+    font-size: 1rem;
     color: var(--productos-text-secondary);
 }
 
-/* Grilla tipo "mosaico" (bento): columnas fijas + filas bajas, cada
-   categoría ocupa 1, 2 o 4 celdas según su clase de tamaño (asignada
-   en la vista con un patrón cíclico, no según el nombre de categoría). */
+/* Collage 5 x 3 para 10 categorías, sin huecos:
+   | 1 1 2 2 3 |
+   | 1 1 4 5 3 |
+   | 6 7 8 9 10|
+   "dense" rellena huecos si hay menos categorías. */
 .productos-categories__grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-auto-rows: 110px;
-    gap: 0.75rem;
+    grid-template-columns: repeat(5, 1fr);
+    grid-auto-rows: 125px;
+    grid-auto-flow: dense;
+    gap: 0.6rem;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 2rem;
 }
 
-.productos-category {
-    position: relative;
+.productos-category:nth-child(1) {
     grid-column: span 2;
-    grid-row: span 1;
-    border-radius: 10px;
-    overflow: hidden;
-    cursor: pointer;
-    border: 1px solid var(--productos-border);
-    transition: all 0.3s ease;
+    grid-row: span 2;
 }
 
-.productos-category--wide { grid-column: span 3; grid-row: span 1; }
-.productos-category--tall { grid-column: span 2; grid-row: span 1; }
-.productos-category--big  { grid-column: span 4; grid-row: span 1; }
-.productos-category--small{ grid-column: span 2; grid-row: span 1; }
+.productos-category:nth-child(2) {
+    grid-column: span 2;
+}
 
-.productos-category:hover {
-    border-color: var(--productos-green);
-    transform: translateY(-4px);
+.productos-category:nth-child(3) {
+    grid-row: span 2;
+}
+
+.productos-category {
+    position: relative;
+    isolation: isolate; /* los z-index negativos quedan dentro de la tarjeta */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.2rem;
+    padding: 1rem;
+    border: 1px solid var(--productos-border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #171E1A;
+    color: var(--productos-text);
+    text-decoration: none;
+    transition: transform 0.35s ease, border-color 0.35s ease;
 }
 
 .productos-category__image {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
+    z-index: -2;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    filter: saturate(0.85);
+    transition: transform 0.6s ease;
 }
 
-.productos-category:hover .productos-category__image {
-    transform: scale(1.1);
-}
-
-.productos-category__overlay {
+/* Degradado inferior: el nombre se lee sobre cualquier foto */
+.productos-category::after {
+    content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(13, 18, 16, 0.5);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 1.5rem;
-    transition: background 0.3s ease;
-}
-
-.productos-category:hover .productos-category__overlay {
-    background: rgba(47, 93, 70, 0.85);
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(11, 16, 14, 0) 35%, rgba(11, 16, 14, 0.85) 100%);
 }
 
 .productos-category__name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    margin-bottom: 0.5rem;
-    color: var(--productos-text);
+}
+
+.productos-category:nth-child(1) .productos-category__name {
+    font-size: 1.5rem;
 }
 
 .productos-category__explore {
-    font-size: 0.9rem;
-    color: var(--productos-green-light);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    color: var(--productos-green-light);
     opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.3s ease;
+    transform: translateY(6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.productos-category:hover .productos-category__explore {
-    opacity: 1;
-    transform: translateY(0);
+.productos-category:hover,
+.productos-category:focus-visible {
+    transform: translateY(-3px);
+    border-color: var(--productos-green-light);
 }
 
-.productos-category--featured {
-    grid-column: span 2;
-    height: 230px;
+    .productos-category:hover .productos-category__image {
+        transform: scale(1.06);
+    }
+
+    .productos-category:hover .productos-category__explore,
+    .productos-category:focus-visible .productos-category__explore {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+.productos-category:focus-visible {
+    outline: 2px solid var(--productos-green-light);
+    outline-offset: 2px;
 }
 
-.productos-category--featured .productos-category__name {
-    font-size: 2rem;
+@media (max-width: 1024px) {
+    .productos-categories__grid {
+        grid-auto-rows: 105px;
+        padding: 0 1.5rem;
+    }
+}
+
+/* Móvil: una fila deslizable en lugar de 5 filas apiladas */
+@media (max-width: 768px) {
+    .productos-categories {
+        padding: 2rem 0;
+    }
+
+    .productos-categories__title {
+        font-size: 1.4rem;
+    }
+
+    .productos-categories__grid {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 0.6rem;
+        padding: 0 1rem 0.5rem;
+        scrollbar-width: none;
+    }
+
+        .productos-categories__grid::-webkit-scrollbar {
+            display: none;
+        }
+
+    .productos-category {
+        flex: 0 0 42%;
+        height: 150px;
+        scroll-snap-align: start;
+    }
+
+        .productos-category:nth-child(1) .productos-category__name {
+            font-size: 1rem;
+        }
+
+    .productos-category__explore {
+        display: none;
+    }
 }
 
 /* === CATÁLOGO === */
