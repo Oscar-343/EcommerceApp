@@ -1,0 +1,168 @@
+@model List<EcommerceApp.Models.Inventario.ProveedorListaItem>
+@{
+    // Las vistas del módulo viven fuera de Views/Admin: el layout se indica con su ruta completa.
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    var marcas = ViewBag.Marcas as List<EcommerceApp.Models.Marca> ?? new();
+    var estado = ViewBag.Estado as string ?? "activos";
+    var marcaId = ViewBag.MarcaId as int?;
+    var busqueda = ViewBag.Busqueda as string;
+    var hayFiltros = !string.IsNullOrWhiteSpace(busqueda) || marcaId.HasValue || estado != "activos";
+    var urlActual = Context.Request.Path + Context.Request.QueryString;
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Proveedores</h1>
+        <p>Quiénes equipan tu tienda.</p>
+    </div>
+    <a asp-action="Crear" class="btn-admin btn-admin-primary">+ Nuevo proveedor</a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>@Model.Count proveedor(es)</h2>
+
+        @* Móvil: los filtros viven en un panel inferior que abre el botón "Filtros".
+           Desde 768px (offcanvas-md) el panel desaparece y los filtros quedan en línea. *@
+        <button type="button" class="btn-admin btn-admin-outline btn-filtros d-md-none" data-bs-toggle="offcanvas"
+                data-bs-target="#filtrosProveedores" aria-controls="filtrosProveedores">
+            Filtros@(hayFiltros ? " •" : "")
+        </button>
+        <div class="offcanvas-md offcanvas-bottom admin-offcanvas" tabindex="-1" id="filtrosProveedores" aria-labelledby="filtrosProveedoresTitulo">
+            <div class="offcanvas-header d-md-none">
+                <h2 class="offcanvas-title" id="filtrosProveedoresTitulo">Filtrar proveedores</h2>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#filtrosProveedores" aria-label="Cerrar"></button>
+            </div>
+            <div class="offcanvas-body">
+        <form method="get" asp-action="Index" class="filtros-inline">
+            <input type="search" name="busqueda" value="@busqueda" class="admin-search" placeholder="Buscar nombre o NIT..." aria-label="Buscar proveedor" />
+            <select name="marcaId" class="admin-search" aria-label="Filtrar por marca">
+                <option value="">Todas las marcas</option>
+                @foreach (var m in marcas)
+                {
+                    <option value="@m.Id" selected="@(marcaId == m.Id)">@m.Nombre</option>
+                }
+            </select>
+            <select name="estado" class="admin-search" aria-label="Filtrar por estado">
+                <option value="activos" selected="@(estado == "activos")">Activos</option>
+                <option value="inactivos" selected="@(estado == "inactivos")">Inactivos</option>
+                <option value="todos" selected="@(estado == "todos")">Todos</option>
+            </select>
+            <button type="submit" class="btn-admin btn-admin-outline btn-admin-sm">Filtrar</button>
+            @if (hayFiltros)
+            {
+                <a asp-action="Index" class="btn-admin btn-admin-outline btn-admin-sm">Limpiar</a>
+            }
+        </form>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Count == 0 && !hayFiltros)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6h11v10H2z"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>
+            <h3>Aún no registras proveedores</h3>
+            <p>Registra a quienes te entregan mercadería para poder abastecer la tienda.</p>
+            <a asp-action="Crear" class="btn-admin btn-admin-primary" style="margin-top:0.8rem;">+ Nuevo proveedor</a>
+        </div>
+    }
+    else if (Model.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <h3>Sin resultados</h3>
+            <p>Ningún proveedor coincide con los filtros. <a asp-action="Index" style="color:var(--sand);">Limpiar filtros</a></p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            @* admin-table--tarjetas: en móvil cada fila se muestra como tarjeta (usa data-label). *@
+            <table class="admin-table admin-table--tarjetas">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Contacto</th>
+                        <th>Marcas</th>
+                        <th>Último abast.</th>
+                        <th><span class="visually-hidden">Acciones</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr class="@(p.Activo ? "" : "fila-inactiva")">
+                            <td data-label="Nombre">
+                                <a asp-action="Detalle" asp-route-id="@p.Id" class="enlace-fila"><strong>@p.Nombre</strong></a>
+                                @if (!p.Activo)
+                                {
+                                    <span class="pill pill-gray">Inactivo</span>
+                                }
+                            </td>
+                            <td data-label="Contacto">
+                                @(p.PersonaContacto ?? "—")
+                                @if (!string.IsNullOrWhiteSpace(p.Telefono))
+                                {
+                                    <div class="cell-muted" style="font-size:0.76rem;">@p.Telefono</div>
+                                }
+                            </td>
+                            <td data-label="Marcas">
+                                @if (p.Marcas.Count == 0)
+                                {
+                                    <span class="cell-muted">Sin marcas</span>
+                                }
+                                else
+                                {
+                                    <div class="chip-lista">
+                                        @foreach (var nombre in p.Marcas)
+                                        {
+                                            <span class="chip">@nombre</span>
+                                        }
+                                    </div>
+                                }
+                            </td>
+                            <td data-label="Último abast." class="cell-muted">
+                                @(p.UltimoAbastecimiento?.ToLocalTime().ToString("dd/MM/yyyy") ?? "—")
+                            </td>
+                            <td class="celda-acciones">
+                                <div class="dropdown">
+                                    @* strategy fixed: el menú no queda recortado por el scroll horizontal de la tabla. *@
+                                    <button type="button" class="btn-acciones" data-bs-toggle="dropdown" aria-expanded="false"
+                                            data-bs-popper-config='{"strategy":"fixed"}' aria-label="Acciones de @p.Nombre">⋯</button>
+                                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                        <li><a class="dropdown-item" asp-action="Detalle" asp-route-id="@p.Id">Ver</a></li>
+                                        <li><a class="dropdown-item" asp-action="Editar" asp-route-id="@p.Id">Editar</a></li>
+                                        @if (p.Activo)
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Abastecimientos" asp-action="Nuevo" asp-route-proveedorId="@p.Id">Abastecer</a></li>
+                                            <li><hr class="dropdown-divider" /></li>
+                                            <li>
+                                                <button type="button" class="dropdown-item texto-peligro" data-bs-toggle="modal" data-bs-target="#modalDesactivarProveedor"
+                                                        data-proveedor-id="@p.Id" data-proveedor-nombre="@p.Nombre">Desactivar</button>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li><hr class="dropdown-divider" /></li>
+                                            <li>
+                                                <form asp-action="CambiarEstado" method="post">
+                                                    <input type="hidden" name="id" value="@p.Id" />
+                                                    <input type="hidden" name="activo" value="true" />
+                                                    <input type="hidden" name="volverA" value="@urlActual" />
+                                                    <button type="submit" class="dropdown-item">Activar</button>
+                                                </form>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<partial name="_ModalDesactivar" model="urlActual" />

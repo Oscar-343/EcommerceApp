@@ -11,7 +11,10 @@ namespace EcommerceApp.Controllers
     // Dividido en clases parciales por entidad (AdminController.Products.cs, .Services.cs, .Guides.cs,
     // .Transports.cs, .Reservations.cs); este archivo tiene el constructor, el dashboard y los helpers compartidos.
     [Authorize(Roles = "Admin")]
-    public partial class AdminController(ApplicationDbContext context, IImageStorageService imageStorage) : Controller
+    public partial class AdminController(
+        ApplicationDbContext context,
+        IImageStorageService imageStorage,
+        AbastecimientoService abastecimientos) : Controller
     {
         private static readonly string[] AllowedImageTypes = { "image/jpeg", "image/png", "image/webp", "image/gif" };
         private static readonly string[] AllowedVideoTypes = { "video/mp4", "video/webm" };
@@ -73,31 +76,8 @@ namespace EcommerceApp.Controllers
             return Json(new { success = true, urls, url = urls[0] });
         }
 
-        // Disponible en todas las vistas del panel (badge de reservas pendientes en el sidebar).
-        public override async Task OnActionExecutionAsync(
-            Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext ctx,
-            Microsoft.AspNetCore.Mvc.Filters.ActionExecutionDelegate next)
-        {
-            try
-            {
-                ViewBag.PendingReservations = await context.Reservations.CountAsync(r => r.Status == "Pendiente");
-            }
-            catch
-            {
-                ViewBag.PendingReservations = 0;
-            }
-
-            try
-            {
-                ViewBag.PendingOrders = await context.Orders.CountAsync(o => o.Status == "Pendiente");
-            }
-            catch
-            {
-                ViewBag.PendingOrders = 0;
-            }
-
-            await next();
-        }
+        // Los contadores de pendientes del menú lateral se calculan en AdminPendientesViewComponent,
+        // así también aparecen en Proveedores, Marcas y Abastecimientos.
 
         // ---------------------------------------------------------------
         // DASHBOARD
@@ -112,8 +92,15 @@ namespace EcommerceApp.Controllers
             ViewBag.GuideCount = await context.Guides.CountAsync(g => g.IsActive);
             ViewBag.TransportCount = await context.Transports.CountAsync(t => t.IsActive);
             ViewBag.ReservationCount = await context.Reservations.CountAsync();
-            ViewBag.LowStockCount = await context.Products.CountAsync(p => p.Stock <= 5);
+            ViewBag.LowStockCount = await context.Products.CountAsync(p => p.Stock <= p.StockMinimo);
             ViewBag.OrderCount = await context.Orders.CountAsync();
+
+            // Indicadores del módulo de inventario.
+            ViewBag.ProveedoresActivos = await context.Proveedores.CountAsync(p => p.Activo);
+            var (abastecimientosMes, totalAbastecidoMes) = await abastecimientos.ResumenDelMesAsync();
+            ViewBag.AbastecimientosMes = abastecimientosMes;
+            ViewBag.TotalAbastecidoMes = totalAbastecidoMes;
+            ViewBag.UltimosAbastecimientos = await abastecimientos.UltimosAsync(5);
 
             ViewBag.RecentReservations = await context.Reservations
                 .AsNoTracking()

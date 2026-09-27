@@ -1,6 +1,7 @@
 @{
     Layout = "_AdminLayout";
     var recent = ViewBag.RecentReservations as List<EcommerceApp.Models.Reservation> ?? new();
+    var ultimosAbastecimientos = ViewBag.UltimosAbastecimientos as List<EcommerceApp.Models.Abastecimiento> ?? new();
 }
 
 <div class="stat-grid">
@@ -64,22 +65,91 @@
         <div class="stat-card-label">Pedidos totales</div>
     </a>
 
-    <a asp-action="Products" class="stat-card">
+    <a asp-controller="Proveedores" asp-action="Index" class="stat-card">
         <div class="stat-card-top">
-            <div class="stat-card-icon" style="background: rgba(244,67,54,0.16); color:#f4897e;">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 6h11v10H2z"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value">@ViewBag.ProveedoresActivos</div>
+        <div class="stat-card-label">Proveedores activos</div>
+    </a>
+
+    <a asp-controller="Abastecimientos" asp-action="Index" class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+            </div>
+        </div>
+        <div class="stat-card-value">@ViewBag.AbastecimientosMes</div>
+        <div class="stat-card-sub">@PriceFormatter.Format((decimal)ViewBag.TotalAbastecidoMes)</div>
+        <div class="stat-card-label">Abastecimientos del mes</div>
+    </a>
+
+    @* Stock bajo: cada producto con Stock <= su StockMinimo. Lleva a la lista ya filtrada. *@
+    <a asp-action="Products" asp-route-stockBajo="true" class="stat-card stat-card--ocre">
+        <div class="stat-card-top">
+            <div class="stat-card-icon stat-card-icon--ocre">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.5 18a1.8 1.8 0 001.5 2.7h16a1.8 1.8 0 001.5-2.7L13.7 3.9a1.8 1.8 0 00-3.4 0z"/></svg>
             </div>
         </div>
         <div class="stat-card-value">@ViewBag.LowStockCount</div>
-        <div class="stat-card-label">Productos con poco stock</div>
+        <div class="stat-card-label">Productos con stock bajo</div>
     </a>
 </div>
 
 <div class="quick-actions">
     <a asp-action="ProductCreate" class="btn-admin btn-admin-primary">+ Nuevo producto</a>
+    <a asp-controller="Abastecimientos" asp-action="Nuevo" class="btn-admin btn-admin-primary">+ Abastecer tienda</a>
     <a asp-action="ServiceCreate" class="btn-admin btn-admin-primary">+ Nueva ruta</a>
     <a asp-action="GuideCreate" class="btn-admin btn-admin-outline">+ Nuevo guía</a>
     <a asp-action="TransportCreate" class="btn-admin btn-admin-outline">+ Nuevo transporte</a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Últimos abastecimientos</h2>
+        <a asp-controller="Abastecimientos" asp-action="Index" class="btn-admin btn-admin-outline btn-admin-sm">Ver todos</a>
+    </div>
+
+    @if (ultimosAbastecimientos.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+            <h3>Todavía no hay abastecimientos</h3>
+            <p>Cuando registres un ingreso de mercadería, va a aparecer acá.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Proveedor</th>
+                        <th>Productos</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in ultimosAbastecimientos)
+                    {
+                        <tr>
+                            <td class="cell-muted">@a.Fecha.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                            <td>@(a.Proveedor?.Nombre ?? "—")</td>
+                            <td>@a.Detalles.Count</td>
+                            <td>@PriceFormatter.Format(a.Total)</td>
+                            <td>
+                                <a asp-controller="Abastecimientos" asp-action="Detalle" asp-route-id="@a.Id" class="btn-admin btn-admin-outline btn-admin-sm">Ver</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>
 
 <div class="admin-card">

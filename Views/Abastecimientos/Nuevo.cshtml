@@ -1,0 +1,142 @@
+@model EcommerceApp.Models.Inventario.AbastecimientoFormViewModel
+@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    var proveedores = ViewBag.Proveedores as List<EcommerceApp.Models.Proveedor> ?? new();
+}
+
+<div class="admin-breadcrumb"><a asp-action="Index">Abastecimientos</a> / Nuevo</div>
+<div class="admin-page-header">
+    <div>
+        <h1>Abastecer tienda</h1>
+        <p>Registra el equipo que llega a tu tienda. El stock de cada producto se suma al guardar.</p>
+    </div>
+</div>
+
+@if (proveedores.Count == 0)
+{
+    <div class="admin-card">
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6h11v10H2z"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>
+            <h3>No hay proveedores activos</h3>
+            <p>Para abastecer la tienda primero registra un proveedor y las marcas que distribuye.</p>
+            <a asp-controller="Proveedores" asp-action="Crear" class="btn-admin btn-admin-primary" style="margin-top:0.8rem;">+ Nuevo proveedor</a>
+        </div>
+    </div>
+}
+else
+{
+    @* data-lineas-iniciales: si el servidor devolvió el formulario con un error, el JS vuelve a armar las filas. *@
+    <form asp-action="Nuevo" method="post" id="formAbastecimiento" class="admin-form abastecer-grid"
+          data-url-productos="@Url.Action("ProductosPorProveedor")"
+          data-lineas-iniciales="@Json.Serialize(Model.Lineas).ToString()"
+          data-producto-inicial="@ViewBag.ProductoInicial">
+        <div class="abastecer-principal">
+            @* "All": los errores de las filas (Lineas[i].Cantidad, ...) no tienen un span propio, así se ven igual. *@
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="admin-card">
+                <div class="admin-form-section">
+                    <h3>1. Proveedor</h3>
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label asp-for="ProveedorId">Proveedor</label>
+                            <select asp-for="ProveedorId" class="form-select">
+                                <option value="0">Selecciona proveedor...</option>
+                                @foreach (var p in proveedores)
+                                {
+                                    var nombresMarcas = p.Marcas.Where(pm => pm.Marca != null).Select(pm => pm.Marca!.Nombre).OrderBy(n => n);
+                                    <option value="@p.Id" data-marcas="@string.Join("|", nombresMarcas)">@p.Nombre</option>
+                                }
+                            </select>
+                            <span asp-validation-for="ProveedorId" class="text-danger"></span>
+                        </div>
+                        <div class="form-field">
+                            <label asp-for="NumeroComprobante">Comprobante n.º <span class="cell-muted">(opcional)</span></label>
+                            <input asp-for="NumeroComprobante" class="form-control" placeholder="Nota de entrega o factura" />
+                            <span asp-validation-for="NumeroComprobante" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="abastecer-marcas" id="marcasProveedor" aria-live="polite"></div>
+                    <p class="abastecer-aviso" id="avisoProveedor" hidden></p>
+                    @if (ViewBag.AvisoProducto != null)
+                    {
+                        <p class="abastecer-aviso">@ViewBag.AvisoProducto</p>
+                    }
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-form-section">
+                    <h3>2. Productos</h3>
+
+                    <div class="buscador-producto">
+                        <input type="search" id="buscadorProducto" class="form-control" autocomplete="off" disabled
+                               placeholder="Primero elige un proveedor" aria-label="Buscar producto" aria-controls="resultadosProducto" />
+                        <ul class="buscador-resultados" id="resultadosProducto" hidden></ul>
+                    </div>
+
+                    <div class="lineas-encabezado" aria-hidden="true">
+                        <span></span><span>Producto</span><span>Stock</span><span>Cantidad</span><span>Costo unit.</span><span>Subtotal</span><span></span>
+                    </div>
+                    <div id="lineas" class="lineas"></div>
+                    <p id="lineasVacio" class="lineas-vacio">Todavía no agregaste productos.</p>
+                    <span class="hint">El costo unitario es el precio de compra al proveedor, no el precio de venta.</span>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-form-section">
+                    <h3>3. Observaciones</h3>
+                    <div class="form-field">
+                        <label asp-for="Observaciones" class="visually-hidden">Observaciones</label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="3" placeholder="Estado de la mercadería, faltantes, etc. (opcional)"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <aside class="admin-card abastecer-resumen" aria-label="Resumen del abastecimiento">
+            <h2>Resumen</h2>
+            <dl>
+                <div><dt>Productos</dt><dd data-resumen="productos">0</dd></div>
+                <div><dt>Unidades</dt><dd data-resumen="unidades">0</dd></div>
+                <div class="abastecer-resumen__total"><dt>Total</dt><dd data-resumen="total">Bs. 0.00</dd></div>
+            </dl>
+            <button type="submit" class="btn-admin btn-admin-primary btn-registrar" disabled>Registrar abastecimiento</button>
+            <a asp-action="Index" class="btn-admin btn-admin-outline">Cancelar</a>
+        </aside>
+
+        @* Barra fija en móvil: total + botón siempre a mano. *@
+        <div class="abastecer-barra-movil">
+            <div>
+                <span class="cell-muted">Total</span>
+                <strong data-resumen="total">Bs. 0.00</strong>
+            </div>
+            <button type="submit" class="btn-admin btn-admin-primary btn-registrar" disabled>Registrar</button>
+        </div>
+    </form>
+
+    <div class="modal fade admin-modal" id="modalConfirmarAbastecimiento" tabindex="-1" aria-labelledby="modalConfirmarTitulo" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modalConfirmarTitulo">Confirmar abastecimiento</h2>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="textoConfirmacion"></p>
+                    <p class="cell-muted">Un abastecimiento registrado no se puede editar ni eliminar.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-admin btn-admin-outline" data-bs-dismiss="modal">Revisar</button>
+                    <button type="button" class="btn-admin btn-admin-primary" id="btnConfirmarAbastecimiento">Sí, registrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/abastecimiento.js" asp-append-version="true"></script>
+}

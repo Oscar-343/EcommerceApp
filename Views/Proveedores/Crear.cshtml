@@ -1,0 +1,14 @@
+@model EcommerceApp.Models.Inventario.ProveedorFormViewModel
+@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+
+<div class="admin-breadcrumb"><a asp-action="Index">Proveedores</a> / Nuevo</div>
+<div class="admin-page-header">
+    <div>
+        <h1>Nuevo proveedor</h1>
+        <p>Registra sus datos y las marcas que te entrega.</p>
+    </div>
+</div>
+
+<partial name="_Formulario" model="Model" />

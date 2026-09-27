@@ -1,0 +1,14 @@
+@model EcommerceApp.Models.Inventario.MarcaFormViewModel
+@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+
+<div class="admin-breadcrumb"><a asp-action="Index">Marcas</a> / Nueva</div>
+<div class="admin-page-header">
+    <div>
+        <h1>Nueva marca</h1>
+        <p>Después podrás asignarla a productos y proveedores.</p>
+    </div>
+</div>
+
+<partial name="_Formulario" model="Model" />

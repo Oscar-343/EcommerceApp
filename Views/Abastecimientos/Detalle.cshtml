@@ -1,0 +1,92 @@
+@model EcommerceApp.Models.Abastecimiento
+@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    var unidades = Model.Detalles.Sum(d => d.Cantidad);
+}
+
+<div class="admin-breadcrumb no-print"><a asp-action="Index">Abastecimientos</a> / #@Model.Id.ToString("D4")</div>
+
+<div class="no-print admin-export-actions comprobante-acciones">
+    <a asp-action="Index" class="btn-admin btn-admin-outline btn-admin-sm">← Volver al historial</a>
+    <button type="button" class="btn-admin btn-admin-outline btn-admin-sm" onclick="window.print()">Imprimir / Guardar como PDF</button>
+</div>
+
+<article class="admin-card comprobante">
+    <header class="comprobante-encabezado">
+        <div>
+            <p class="comprobante-marca">Tren al Sur · Ingreso de mercadería</p>
+            <h1>Abastecimiento #@Model.Id.ToString("D4")</h1>
+        </div>
+        <p class="comprobante-fecha">@Model.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</p>
+    </header>
+
+    <dl class="comprobante-datos">
+        <div>
+            <dt>Proveedor</dt>
+            <dd>
+                @if (Model.Proveedor != null)
+                {
+                    <a asp-controller="Proveedores" asp-action="Detalle" asp-route-id="@Model.ProveedorId" class="enlace-fila">@Model.Proveedor.Nombre</a>
+                    @if (!string.IsNullOrWhiteSpace(Model.Proveedor.Nit))
+                    {
+                        <span class="cell-muted"> · NIT @Model.Proveedor.Nit</span>
+                    }
+                }
+                else
+                {
+                    <span>—</span>
+                }
+            </dd>
+        </div>
+        <div><dt>Comprobante del proveedor</dt><dd>@(Model.NumeroComprobante ?? "—")</dd></div>
+        <div><dt>Registrado por</dt><dd>@Model.RegistradoPor</dd></div>
+    </dl>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Observaciones))
+    {
+        <p class="ficha-notas">@Model.Observaciones</p>
+    }
+
+    @* Tabla normal (sin modo tarjetas): así también se imprime como tabla. *@
+    <div class="admin-table-wrap">
+        <table class="admin-table comprobante-tabla">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th class="num">Cantidad</th>
+                    <th class="num">Costo unit.</th>
+                    <th class="num">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in Model.Detalles.OrderBy(d => d.NombreProducto))
+                {
+                    <tr>
+                        <td>
+                            <strong>@d.NombreProducto</strong>
+                            @if (d.Producto == null)
+                            {
+                                <span class="cell-muted">(producto eliminado)</span>
+                            }
+                            else if (d.Producto.Marca != null)
+                            {
+                                <div class="cell-muted" style="font-size:0.76rem;">@d.Producto.Marca.Nombre</div>
+                            }
+                        </td>
+                        <td class="num">@d.Cantidad</td>
+                        <td class="num">@PriceFormatter.Format(d.CostoUnitario)</td>
+                        <td class="num">@PriceFormatter.Format(d.Subtotal)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="comprobante-total">
+        <span class="cell-muted">@Model.Detalles.Count producto(s) · @unidades unidades</span>
+        <div>
+            <span>Total</span>
+            <strong>@PriceFormatter.Format(Model.Total)</strong>
+        </div>
+    </footer>
+</article>

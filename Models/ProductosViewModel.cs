@@ -18,8 +18,8 @@ namespace EcommerceApp.Models
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
 
-        // Marca seleccionada
-        public string? SelectedBrand { get; set; }
+        // Marca seleccionada (Id de Marca)
+        public int? SelectedMarcaId { get; set; }
 
         // Filtro de ofertas activo (solo productos con precio promocional)
         public bool OnlyOffers { get; set; }
@@ -27,8 +27,8 @@ namespace EcommerceApp.Models
         // Todas las categorías disponibles
         public List<string> AvailableCategories { get; set; } = new();
 
-        // Todas las marcas disponibles
-        public List<string> AvailableBrands { get; set; } = new();
+        // Marcas activas con productos, para el filtro
+        public List<Marca> AvailableMarcas { get; set; } = new();
 
         // Total de productos disponibles (sin filtro de página)
         public int TotalProducts { get; set; }

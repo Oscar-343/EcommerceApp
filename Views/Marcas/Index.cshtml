@@ -1,0 +1,75 @@
+@model List<EcommerceApp.Models.Inventario.MarcaListaItem>
+@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Marcas</h1>
+        <p>@Model.Count marca(s). Cada producto pertenece a una marca y cada proveedor distribuye algunas.</p>
+    </div>
+    <a asp-action="Crear" class="btn-admin btn-admin-primary">+ Nueva marca</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="admin-card">
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12V4h8l10 10-8 8L3 12z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg>
+            <h3>Aún no hay marcas</h3>
+            <p>Crea las marcas que vendes para asignarlas a productos y proveedores.</p>
+            <a asp-action="Crear" class="btn-admin btn-admin-primary" style="margin-top:0.8rem;">+ Nueva marca</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="marcas-grid">
+        @foreach (var m in Model)
+        {
+            <article class="marca-card @(m.Activo ? "" : "marca-card--inactiva")">
+                <div class="marca-card__logo">
+                    @if (!string.IsNullOrWhiteSpace(m.LogoUrl))
+                    {
+                        <img src="@m.LogoUrl" alt="Logo de @m.Nombre" loading="lazy" />
+                    }
+                    else
+                    {
+                        @* Sin logo: la inicial de la marca. *@
+                        <span aria-hidden="true">@m.Nombre.Substring(0, 1).ToUpper()</span>
+                    }
+                </div>
+
+                <div class="marca-card__cuerpo">
+                    <h2>@m.Nombre</h2>
+                    @if (!m.Activo)
+                    {
+                        <span class="pill pill-gray">Inactiva</span>
+                    }
+                    <p class="cell-muted">
+                        <a asp-controller="Products" asp-action="Index" asp-route-marcaId="@m.Id" target="_blank" class="enlace-fila">@m.CantidadProductos producto(s)</a>
+                        ·
+                        <a asp-controller="Proveedores" asp-action="Index" asp-route-marcaId="@m.Id" asp-route-estado="todos" class="enlace-fila">@m.CantidadProveedores proveedor(es)</a>
+                    </p>
+                </div>
+
+                <div class="marca-card__acciones">
+                    <a asp-action="Editar" asp-route-id="@m.Id" class="btn-admin btn-admin-outline btn-admin-sm">Editar</a>
+                    <form asp-action="CambiarEstado" method="post">
+                        <input type="hidden" name="id" value="@m.Id" />
+                        <input type="hidden" name="activo" value="@(m.Activo ? "false" : "true")" />
+                        @if (m.Activo)
+                        {
+                            @* Si tiene productos, el servidor no lo permite y muestra por qué. *@
+                            <button type="submit" class="btn-admin btn-admin-outline btn-admin-sm">Desactivar</button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn-admin btn-admin-primary btn-admin-sm">Activar</button>
+                        }
+                    </form>
+                </div>
+            </article>
+        }
+    </div>
+}

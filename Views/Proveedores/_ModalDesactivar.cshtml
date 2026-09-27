@@ -1,0 +1,35 @@
+@model string
+@* Modal de confirmación para desactivar un proveedor (lo usan Index y Detalle).
+   El botón que lo abre lleva data-proveedor-id y data-proveedor-nombre; el script los copia al formulario.
+   Model = URL a la que volver después de desactivar. *@
+
+<div class="modal fade admin-modal" id="modalDesactivarProveedor" tabindex="-1" aria-labelledby="modalDesactivarTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form asp-controller="Proveedores" asp-action="CambiarEstado" method="post" class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalDesactivarTitulo">Desactivar proveedor</h2>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Desactivar a <strong data-modal-nombre></strong>?</p>
+                <p class="cell-muted">Ya no aparecerá al abastecer la tienda, pero su historial seguirá disponible. Puedes volver a activarlo cuando quieras.</p>
+                <input type="hidden" name="id" data-modal-id />
+                <input type="hidden" name="activo" value="false" />
+                <input type="hidden" name="volverA" value="@Model" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-admin btn-admin-outline" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn-admin btn-admin-danger">Desactivar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Bootstrap dispara show.bs.modal con el botón que abrió el modal en relatedTarget.
+    document.getElementById('modalDesactivarProveedor').addEventListener('show.bs.modal', function (e) {
+        const boton = e.relatedTarget;
+        this.querySelector('[data-modal-id]').value = boton.dataset.proveedorId;
+        this.querySelector('[data-modal-nombre]').textContent = boton.dataset.proveedorNombre;
+    });
+</script>

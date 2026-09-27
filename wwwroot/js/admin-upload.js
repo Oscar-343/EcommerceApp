@@ -101,14 +101,20 @@
     function wireForm(form) {
         if (!form) return;
 
-        form.addEventListener("submit", function () {
-            const button = form.querySelector('button[type="submit"]');
-            if (button) {
-                button.disabled = true;
-                button.classList.add("is-loading");
-                button.dataset.originalText = button.textContent.trim();
-                button.textContent = "Guardando y subiendo…";
-            }
+        form.addEventListener("submit", function (e) {
+            // Se espera a que terminen los demás manejadores del submit: si alguno canceló el envío
+            // (validación con errores, modal de confirmación), el botón no debe quedar en "Guardando…".
+            setTimeout(function () {
+                if (e.defaultPrevented) return;
+
+                const button = form.querySelector('button[type="submit"]');
+                if (button) {
+                    button.disabled = true;
+                    button.classList.add("is-loading");
+                    button.dataset.originalText = button.textContent.trim();
+                    button.textContent = "Guardando y subiendo…";
+                }
+            }, 0);
         });
     }
 

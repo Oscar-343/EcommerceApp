@@ -1,0 +1,139 @@
+@model List<EcommerceApp.Models.Abastecimiento>
+@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    var proveedores = ViewBag.Proveedores as List<EcommerceApp.Models.Inventario.ProveedorListaItem> ?? new();
+    var marcas = ViewBag.Marcas as List<EcommerceApp.Models.Marca> ?? new();
+    var proveedorId = ViewBag.ProveedorId as int?;
+    var marcaId = ViewBag.MarcaId as int?;
+    var desde = ViewBag.Desde as DateOnly?;
+    var hasta = ViewBag.Hasta as DateOnly?;
+    var hayFiltros = proveedorId.HasValue || marcaId.HasValue || desde.HasValue || hasta.HasValue;
+
+    // Totales del período filtrado (fila final de la tabla).
+    var totalUnidades = Model.Sum(a => a.Detalles.Sum(d => d.Cantidad));
+    var totalMonto = Model.Sum(a => a.Total);
+}
+
+<div class="admin-page-header">
+    <div>
+        <h1>Abastecimientos</h1>
+        <p>Historial de la mercadería que llegó a la tienda.</p>
+    </div>
+    <a asp-action="Nuevo" class="btn-admin btn-admin-primary">+ Abastecer tienda</a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>@Model.Count abastecimiento(s)</h2>
+
+        @* Móvil: filtros en un panel inferior (offcanvas); desde 768px, en línea. *@
+        <button type="button" class="btn-admin btn-admin-outline btn-filtros d-md-none" data-bs-toggle="offcanvas"
+                data-bs-target="#filtrosAbastecimientos" aria-controls="filtrosAbastecimientos">
+            Filtros@(hayFiltros ? " •" : "")
+        </button>
+        <div class="offcanvas-md offcanvas-bottom admin-offcanvas" tabindex="-1" id="filtrosAbastecimientos" aria-labelledby="filtrosAbastecimientosTitulo">
+            <div class="offcanvas-header d-md-none">
+                <h2 class="offcanvas-title" id="filtrosAbastecimientosTitulo">Filtrar historial</h2>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#filtrosAbastecimientos" aria-label="Cerrar"></button>
+            </div>
+            <div class="offcanvas-body">
+        <form method="get" asp-action="Index" class="filtros-inline">
+            <select name="proveedorId" class="admin-search" aria-label="Filtrar por proveedor">
+                <option value="">Todos los proveedores</option>
+                @foreach (var p in proveedores)
+                {
+                    <option value="@p.Id" selected="@(proveedorId == p.Id)">@p.Nombre@(p.Activo ? "" : " (inactivo)")</option>
+                }
+            </select>
+            <select name="marcaId" class="admin-search" aria-label="Filtrar por marca">
+                <option value="">Todas las marcas</option>
+                @foreach (var m in marcas)
+                {
+                    <option value="@m.Id" selected="@(marcaId == m.Id)">@m.Nombre</option>
+                }
+            </select>
+            <label class="filtro-fecha">
+                <span>Desde</span>
+                <input type="date" name="desde" value="@desde?.ToString("yyyy-MM-dd")" class="admin-search" />
+            </label>
+            <label class="filtro-fecha">
+                <span>Hasta</span>
+                <input type="date" name="hasta" value="@hasta?.ToString("yyyy-MM-dd")" class="admin-search" />
+            </label>
+            <button type="submit" class="btn-admin btn-admin-outline btn-admin-sm">Filtrar</button>
+            @if (hayFiltros)
+            {
+                <a asp-action="Index" class="btn-admin btn-admin-outline btn-admin-sm">Limpiar</a>
+            }
+        </form>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+            @if (hayFiltros)
+            {
+                <h3>Sin resultados</h3>
+                <p>No hay abastecimientos con estos filtros. <a asp-action="Index" style="color:var(--sand);">Ver todos</a></p>
+            }
+            else
+            {
+                <h3>Todavía no hay abastecimientos</h3>
+                <p>Registra la primera entrega de mercadería de un proveedor.</p>
+                <a asp-action="Nuevo" class="btn-admin btn-admin-primary" style="margin-top:0.8rem;">+ Abastecer tienda</a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table admin-table--tarjetas">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Proveedor</th>
+                        <th>Comprobante</th>
+                        <th>Productos</th>
+                        <th>Unidades</th>
+                        <th>Total</th>
+                        <th>Registrado por</th>
+                        <th><span class="visually-hidden">Acciones</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in Model)
+                    {
+                        <tr>
+                            <td data-label="Fecha">
+                                <a asp-action="Detalle" asp-route-id="@a.Id" class="enlace-fila">
+                                    <strong>#@a.Id.ToString("D4")</strong>
+                                    <span class="cell-muted">· @a.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                </a>
+                            </td>
+                            <td data-label="Proveedor">@(a.Proveedor?.Nombre ?? "—")</td>
+                            <td data-label="Comprobante" class="cell-muted">@(a.NumeroComprobante ?? "—")</td>
+                            <td data-label="Productos">@a.Detalles.Count</td>
+                            <td data-label="Unidades">@a.Detalles.Sum(d => d.Cantidad)</td>
+                            <td data-label="Total"><strong>@PriceFormatter.Format(a.Total)</strong></td>
+                            <td data-label="Registrado por" class="cell-muted">@a.RegistradoPor</td>
+                            <td class="celda-acciones">
+                                <a asp-action="Detalle" asp-route-id="@a.Id" class="btn-admin btn-admin-outline btn-admin-sm">Ver</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="fila-totales">
+                        <td colspan="4">Total del período</td>
+                        <td data-label="Unidades">@totalUnidades</td>
+                        <td data-label="Total">@PriceFormatter.Format(totalMonto)</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+</div>

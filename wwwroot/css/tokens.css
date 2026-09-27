@@ -15,6 +15,8 @@
     --color-green: #315D45;
     --color-green-accent: #557F63;
     --color-tierra: #7C7058;
+    --color-warning: #B8923E;  /* ocre: stock bajo */
+    --color-error: #C9694F;
 
     /* Anchos de corte (solo referencia: CSS no permite variables dentro de @media).
        Siempre min-width, de menor a mayor:

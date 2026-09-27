@@ -36,9 +36,13 @@ namespace EcommerceApp.Models
         [MaxLength(2000)]
         public string? GalleryImages { get; set; }
 
-        // Marca del producto
-        [MaxLength(100)]
-        public string? Brand { get; set; }
+        // Umbral de stock bajo propio de cada producto: con Stock <= StockMinimo se marca en ocre.
+        [Range(0, 10000, ErrorMessage = "El stock mínimo no puede ser negativo.")]
+        public int StockMinimo { get; set; } = 5;
+
+        // Marca del producto (entidad). Opcional: puede haber productos sin marca.
+        public int? MarcaId { get; set; }
+        public Marca? Marca { get; set; }
 
         public string? Category { get; set; }
 

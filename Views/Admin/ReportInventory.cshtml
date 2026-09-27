@@ -18,7 +18,7 @@
 <div class="stat-grid">
     <div class="stat-card">
         <div class="stat-card-value">@Model.StockBajo.Count</div>
-        <div class="stat-card-label">Productos con poco stock (≤ 5)</div>
+        <div class="stat-card-label">Productos con poco stock (≤ su stock mínimo)</div>
     </div>
     <div class="stat-card">
         <div class="stat-card-value">@Model.Agotados.Count</div>
@@ -46,7 +46,7 @@
         <div class="empty-state">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.5 18a1.8 1.8 0 001.5 2.7h16a1.8 1.8 0 001.5-2.7L13.7 3.9a1.8 1.8 0 00-3.4 0z"/></svg>
             <h3>Todo el catálogo tiene stock suficiente</h3>
-            <p>Ningún producto está en 5 unidades o menos.</p>
+            <p>Ningún producto está en su stock mínimo o por debajo.</p>
         </div>
     }
     else

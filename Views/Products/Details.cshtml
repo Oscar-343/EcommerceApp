@@ -60,9 +60,9 @@
 
             <!-- === INFORMACIÓN === -->
             <div class="producto-info">
-                @if (!string.IsNullOrEmpty(Model.Brand))
+                @if (Model.Marca != null)
                 {
-                    <p class="producto-info__brand">@Model.Brand</p>
+                    <p class="producto-info__brand">@Model.Marca.Nombre</p>
                 }
 
                 <h1 class="producto-info__title">@Model.Name</h1>

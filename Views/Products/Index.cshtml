@@ -129,15 +129,15 @@
                                 </div>
                             </div>
 
-                            @if (Model.AvailableBrands?.Any() == true)
+                            @if (Model.AvailableMarcas.Any())
                             {
                                 <div class="productos-filters__group">
                                     <label class="productos-filters__label">Marca</label>
-                                    <select name="brand" class="productos-filters__select" onchange="document.getElementById('filtros-form').submit();">
+                                    <select name="marcaId" class="productos-filters__select" onchange="document.getElementById('filtros-form').submit();">
                                         <option value="">Todas las marcas</option>
-                                        @foreach (var b in Model.AvailableBrands)
+                                        @foreach (var m in Model.AvailableMarcas)
                                         {
-                                            <option value="@b" selected="@(Model.SelectedBrand == b)">@b</option>
+                                            <option value="@m.Id" selected="@(Model.SelectedMarcaId == m.Id)">@m.Nombre</option>
                                         }
                                     </select>
                                 </div>

@@ -10,7 +10,8 @@ namespace EcommerceApp.Services
     {
         // Bolivia es UTC-4 sin horario de verano; se resta a mano en vez de usar TimeZoneInfo
         // (mismo criterio que ya usa ReservationsController para "desde mañana").
-        private const int BoliviaOffsetHours = -4;
+        // Público: también lo usa AbastecimientoService para filtrar el historial por fechas.
+        public const int BoliviaOffsetHours = -4;
 
         // Si no vienen fechas, usa el mes en curso (hora Bolivia).
         public static (DateOnly desde, DateOnly hasta) DefaultRange(DateOnly? desde, DateOnly? hasta)
@@ -214,7 +215,7 @@ namespace EcommerceApp.Services
         public async Task<InventoryReportViewModel> GetInventoryReportAsync()
         {
             var stockBajo = await context.Products.AsNoTracking()
-                .Where(p => p.Stock > 0 && p.Stock <= 5)
+                .Where(p => p.Stock > 0 && p.Stock <= p.StockMinimo)
                 .OrderBy(p => p.Stock)
                 .ToListAsync();
 
@@ -233,7 +234,7 @@ namespace EcommerceApp.Services
                 .ToListAsync();
 
             var porMarca = await context.Products.AsNoTracking()
-                .GroupBy(p => p.Brand ?? "Sin marca")
+                .GroupBy(p => p.Marca != null ? p.Marca.Nombre : "Sin marca")
                 .Select(g => new BrandCountRow { Brand = g.Key, Count = g.Count() })
                 .OrderByDescending(r => r.Count)
                 .ToListAsync();

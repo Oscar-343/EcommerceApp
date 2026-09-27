@@ -1,0 +1,158 @@
+@model EcommerceApp.Models.Proveedor
+@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+
+    var historial = Model.Abastecimientos.ToList();   // ya viene ordenado del más reciente al más antiguo
+    var totalComprado = historial.Sum(a => a.Total);
+    var ultimo = historial.FirstOrDefault()?.Fecha;
+    var marcas = Model.Marcas.Where(pm => pm.Marca != null).Select(pm => pm.Marca!).OrderBy(m => m.Nombre).ToList();
+
+    // WhatsApp necesita el número solo con dígitos y código de país; los celulares de Bolivia tienen 8 dígitos (+591).
+    var digitosTelefono = new string((Model.Telefono ?? "").Where(char.IsDigit).ToArray());
+    if (digitosTelefono.Length == 8) { digitosTelefono = "591" + digitosTelefono; }
+
+    var urlActual = Context.Request.Path.ToString();
+}
+
+<div class="admin-breadcrumb"><a asp-action="Index">Proveedores</a> / @Model.Nombre</div>
+
+<div class="ficha-grid">
+    <div class="admin-card ficha-principal">
+        <div class="ficha-titulo">
+            <h1>@Model.Nombre</h1>
+            @if (Model.Activo)
+            {
+                <span class="pill pill-green">Activo</span>
+            }
+            else
+            {
+                <span class="pill pill-gray">Inactivo</span>
+            }
+        </div>
+
+        <dl class="ficha-datos">
+            <div><dt>NIT</dt><dd>@(Model.Nit ?? "—")</dd></div>
+            <div><dt>Contacto</dt><dd>@(Model.PersonaContacto ?? "—")</dd></div>
+            <div><dt>Teléfono</dt><dd>@(Model.Telefono ?? "—")</dd></div>
+            <div><dt>Email</dt><dd>@(Model.Email ?? "—")</dd></div>
+            <div><dt>Ciudad</dt><dd>@(Model.Ciudad ?? "—")</dd></div>
+            <div><dt>Dirección</dt><dd>@(Model.Direccion ?? "—")</dd></div>
+        </dl>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Notas))
+        {
+            <p class="ficha-notas">@Model.Notas</p>
+        }
+
+        <div class="ficha-marcas">
+            <span class="cell-muted">Marcas:</span>
+            @if (marcas.Count == 0)
+            {
+                <span class="cell-muted">ninguna todavía</span>
+            }
+            else
+            {
+                <div class="chip-lista">
+                    @foreach (var m in marcas)
+                    {
+                        <span class="chip @(m.Activo ? "" : "chip--inactivo")" title="@(m.Activo ? "" : "Marca inactiva")">@m.Nombre</span>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="ficha-acciones">
+            <a asp-action="Editar" asp-route-id="@Model.Id" class="btn-admin btn-admin-outline">Editar</a>
+            @if (Model.Activo)
+            {
+                <a asp-controller="Abastecimientos" asp-action="Nuevo" asp-route-proveedorId="@Model.Id" class="btn-admin btn-admin-primary">Abastecer</a>
+            }
+            @if (digitosTelefono.Length > 0)
+            {
+                <a href="https://wa.me/@digitosTelefono" target="_blank" rel="noopener" class="btn-admin btn-admin-outline">WhatsApp</a>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Email))
+            {
+                <a href="mailto:@Model.Email" class="btn-admin btn-admin-outline">Email</a>
+            }
+
+            @if (Model.Activo)
+            {
+                <button type="button" class="btn-admin btn-admin-danger" data-bs-toggle="modal" data-bs-target="#modalDesactivarProveedor"
+                        data-proveedor-id="@Model.Id" data-proveedor-nombre="@Model.Nombre">Desactivar</button>
+            }
+            else
+            {
+                <form asp-action="CambiarEstado" method="post">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="activo" value="true" />
+                    <input type="hidden" name="volverA" value="@urlActual" />
+                    <button type="submit" class="btn-admin btn-admin-primary">Activar</button>
+                </form>
+            }
+        </div>
+    </div>
+
+    <aside class="admin-card ficha-resumen" aria-label="Resumen de compras">
+        <h2>Resumen</h2>
+        <dl>
+            <div><dt>Abastecimientos</dt><dd>@historial.Count</dd></div>
+            <div><dt>Total comprado</dt><dd>@PriceFormatter.Format(totalComprado)</dd></div>
+            <div><dt>Último</dt><dd>@(ultimo?.ToLocalTime().ToString("dd/MM/yyyy") ?? "—")</dd></div>
+        </dl>
+    </aside>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>Historial de abastecimientos</h2>
+        @if (historial.Count > 0)
+        {
+            <a asp-controller="Abastecimientos" asp-action="Index" asp-route-proveedorId="@Model.Id" class="btn-admin btn-admin-outline btn-admin-sm">Filtrar en el historial</a>
+        }
+    </div>
+
+    @if (historial.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+            <h3>Sin abastecimientos</h3>
+            <p>Este proveedor todavía no entregó mercadería.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table admin-table--tarjetas">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Comprobante</th>
+                        <th>Productos</th>
+                        <th>Total</th>
+                        <th><span class="visually-hidden">Acciones</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in historial)
+                    {
+                        <tr>
+                            <td data-label="Fecha">@a.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                            <td data-label="Comprobante" class="cell-muted">@(a.NumeroComprobante ?? "—")</td>
+                            <td data-label="Productos">@a.Detalles.Count</td>
+                            <td data-label="Total"><strong>@PriceFormatter.Format(a.Total)</strong></td>
+                            <td class="celda-acciones">
+                                <a asp-controller="Abastecimientos" asp-action="Detalle" asp-route-id="@a.Id" class="btn-admin btn-admin-outline btn-admin-sm">Ver</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@if (Model.Activo)
+{
+    <partial name="_ModalDesactivar" model="urlActual" />
+}

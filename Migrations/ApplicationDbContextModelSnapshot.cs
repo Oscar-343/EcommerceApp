@@ -22,6 +22,46 @@ namespace EcommerceApp.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("EcommerceApp.Models.Abastecimiento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NumeroComprobante")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Observaciones")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("ProveedorId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RegistradoPor")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<decimal>("Total")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Fecha");
+
+                    b.HasIndex("ProveedorId");
+
+                    b.ToTable("Abastecimientos");
+                });
+
             modelBuilder.Entity("EcommerceApp.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -129,6 +169,44 @@ namespace EcommerceApp.Migrations
                     b.ToTable("CartItems");
                 });
 
+            modelBuilder.Entity("EcommerceApp.Models.DetalleAbastecimiento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AbastecimientoId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("CostoUnitario")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("NombreProducto")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ProductoId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AbastecimientoId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("DetallesAbastecimiento");
+                });
+
             modelBuilder.Entity("EcommerceApp.Models.FavoriteItem", b =>
                 {
                     b.Property<int>("Id")
@@ -200,6 +278,33 @@ namespace EcommerceApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Guides");
+                });
+
+            modelBuilder.Entity("EcommerceApp.Models.Marca", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LogoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
+
+                    b.ToTable("Marcas");
                 });
 
             modelBuilder.Entity("EcommerceApp.Models.Order", b =>
@@ -321,10 +426,6 @@ namespace EcommerceApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Brand")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<string>("Category")
                         .HasColumnType("text");
 
@@ -352,6 +453,9 @@ namespace EcommerceApp.Migrations
                     b.Property<bool>("IsNew")
                         .HasColumnType("boolean");
 
+                    b.Property<int?>("MarcaId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -371,12 +475,86 @@ namespace EcommerceApp.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("integer");
 
+                    b.Property<int>("StockMinimo")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MarcaId");
+
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("EcommerceApp.Models.Proveedor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Ciudad")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<string>("Direccion")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Nit")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("Notas")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("PersonaContacto")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Telefono")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre");
+
+                    b.ToTable("Proveedores");
+                });
+
+            modelBuilder.Entity("EcommerceApp.Models.ProveedorMarca", b =>
+                {
+                    b.Property<int>("ProveedorId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MarcaId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ProveedorId", "MarcaId");
+
+                    b.HasIndex("MarcaId");
+
+                    b.ToTable("ProveedorMarcas");
                 });
 
             modelBuilder.Entity("EcommerceApp.Models.Reservation", b =>
@@ -752,6 +930,17 @@ namespace EcommerceApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("EcommerceApp.Models.Abastecimiento", b =>
+                {
+                    b.HasOne("EcommerceApp.Models.Proveedor", "Proveedor")
+                        .WithMany("Abastecimientos")
+                        .HasForeignKey("ProveedorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Proveedor");
+                });
+
             modelBuilder.Entity("EcommerceApp.Models.CartItem", b =>
                 {
                     b.HasOne("EcommerceApp.Models.Product", "Product")
@@ -769,6 +958,24 @@ namespace EcommerceApp.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EcommerceApp.Models.DetalleAbastecimiento", b =>
+                {
+                    b.HasOne("EcommerceApp.Models.Abastecimiento", "Abastecimiento")
+                        .WithMany("Detalles")
+                        .HasForeignKey("AbastecimientoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EcommerceApp.Models.Product", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Abastecimiento");
+
+                    b.Navigation("Producto");
                 });
 
             modelBuilder.Entity("EcommerceApp.Models.FavoriteItem", b =>
@@ -809,6 +1016,35 @@ namespace EcommerceApp.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("EcommerceApp.Models.Product", b =>
+                {
+                    b.HasOne("EcommerceApp.Models.Marca", "Marca")
+                        .WithMany("Productos")
+                        .HasForeignKey("MarcaId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Marca");
+                });
+
+            modelBuilder.Entity("EcommerceApp.Models.ProveedorMarca", b =>
+                {
+                    b.HasOne("EcommerceApp.Models.Marca", "Marca")
+                        .WithMany("Proveedores")
+                        .HasForeignKey("MarcaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EcommerceApp.Models.Proveedor", "Proveedor")
+                        .WithMany("Marcas")
+                        .HasForeignKey("ProveedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Marca");
+
+                    b.Navigation("Proveedor");
                 });
 
             modelBuilder.Entity("EcommerceApp.Models.Reservation", b =>
@@ -915,9 +1151,28 @@ namespace EcommerceApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("EcommerceApp.Models.Abastecimiento", b =>
+                {
+                    b.Navigation("Detalles");
+                });
+
+            modelBuilder.Entity("EcommerceApp.Models.Marca", b =>
+                {
+                    b.Navigation("Productos");
+
+                    b.Navigation("Proveedores");
+                });
+
             modelBuilder.Entity("EcommerceApp.Models.Order", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("EcommerceApp.Models.Proveedor", b =>
+                {
+                    b.Navigation("Abastecimientos");
+
+                    b.Navigation("Marcas");
                 });
 #pragma warning restore 612, 618
         }

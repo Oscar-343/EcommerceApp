@@ -249,9 +249,9 @@
                             <div class="product-curated-info">
                                 <p class="product-curated-category">@product.Category</p>
                                 <h3 class="product-curated-name">@product.Name</h3>
-                                @if (!string.IsNullOrEmpty(product.Brand))
+                                @if (product.Marca != null)
                                 {
-                                    <p class="product-curated-brand">@product.Brand</p>
+                                    <p class="product-curated-brand">@product.Marca.Nombre</p>
                                 }
                                 <div class="product-curated-price">
                                     @if (product.PromotionalPrice.HasValue && product.PromotionalPrice < product.Price)

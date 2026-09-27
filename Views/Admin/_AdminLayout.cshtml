@@ -1,5 +1,8 @@
 @{
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    // En AdminController la sección sale del prefijo de la acción (ProductEdit → products);
+    // los controladores del módulo de inventario son una sección cada uno.
     string SectionOf(string action) => action switch
     {
         "Index" => "dashboard",
@@ -12,7 +15,14 @@
         var a when a.StartsWith("Report") => "reports",
         _ => ""
     };
-    var activeSection = SectionOf(currentAction);
+    var activeSection = currentController switch
+    {
+        "Admin" => SectionOf(currentAction),
+        "Proveedores" => "proveedores",
+        "Marcas" => "marcas",
+        "Abastecimientos" => "abastecimientos",
+        _ => ""
+    };
     string NavClass(string section) => "admin-nav-link" + (activeSection == section ? " active" : "");
 
     var userName = User.Identity?.Name ?? "Admin";
@@ -54,49 +64,57 @@
 
             <nav class="admin-nav">
                 <div class="admin-nav-label">General</div>
-                <a class="@NavClass("dashboard")" asp-action="Index">
+                <a class="@NavClass("dashboard")" asp-controller="Admin" asp-action="Index">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
                     Resumen
                 </a>
 
                 <div class="admin-nav-label">Catálogo</div>
-                <a class="@NavClass("products")" asp-action="Products">
+                <a class="@NavClass("products")" asp-controller="Admin" asp-action="Products">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 8l-8-5-8 5v8l8 5 8-5V8z"/><path d="M4 8l8 5 8-5"/><path d="M12 13v8"/></svg>
                     Productos
                 </a>
-                <a class="@NavClass("services")" asp-action="Services">
+                <a class="@NavClass("services")" asp-controller="Admin" asp-action="Services">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
                     Rutas / Servicios
                 </a>
 
                 <div class="admin-nav-label">Operación</div>
-                <a class="@NavClass("guides")" asp-action="Guides">
+                <a class="@NavClass("guides")" asp-controller="Admin" asp-action="Guides">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
                     Guías
                 </a>
-                <a class="@NavClass("transports")" asp-action="Transports">
+                <a class="@NavClass("transports")" asp-controller="Admin" asp-action="Transports">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="8" rx="2"/><circle cx="7.5" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/><path d="M3 12h18"/></svg>
                     Transporte
                 </a>
-                <a class="@NavClass("reservations")" asp-action="Reservations">
+                <a class="@NavClass("reservations")" asp-controller="Admin" asp-action="Reservations">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>
                     Reservas
-                    @if ((int?)ViewBag.PendingReservations > 0)
-                    {
-                        <span class="admin-nav-badge">@ViewBag.PendingReservations</span>
-                    }
+                    @await Component.InvokeAsync("AdminPendientes", new { tipo = "reservas" })
                 </a>
-                <a class="@NavClass("orders")" asp-action="Orders">
+                <a class="@NavClass("orders")" asp-controller="Admin" asp-action="Orders">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.6 12.2a2 2 0 01-2 1.8H7.1a2 2 0 01-2-1.8L3.5 7z"/></svg>
                     Pedidos
-                    @if ((int?)ViewBag.PendingOrders > 0)
-                    {
-                        <span class="admin-nav-badge">@ViewBag.PendingOrders</span>
-                    }
+                    @await Component.InvokeAsync("AdminPendientes", new { tipo = "pedidos" })
+                </a>
+
+                <div class="admin-nav-label">Inventario</div>
+                <a class="@NavClass("proveedores")" asp-controller="Proveedores" asp-action="Index">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 6h11v10H2z"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>
+                    Proveedores
+                </a>
+                <a class="@NavClass("marcas")" asp-controller="Marcas" asp-action="Index">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12V4h8l10 10-8 8L3 12z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg>
+                    Marcas
+                </a>
+                <a class="@NavClass("abastecimientos")" asp-controller="Abastecimientos" asp-action="Index">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/><path d="M7.5 5.5l9 5"/></svg>
+                    Abastecimientos
                 </a>
 
                 <div class="admin-nav-label">Reportes</div>
-                <a class="@NavClass("reports")" asp-action="Reports">
+                <a class="@NavClass("reports")" asp-controller="Admin" asp-action="Reports">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 4 5-8"/></svg>
                     Reportes
                 </a>
@@ -141,6 +159,13 @@
             <span style="font-size: 1.2rem;">⚠</span>
             <span>@TempData["Success"]</span>
         </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="admin-toast admin-toast-error" role="alert">
+                        <span aria-hidden="true">✕</span>
+                        <span>@TempData["Error"]</span>
+                    </div>
                 }
                 @RenderBody()
             </div>

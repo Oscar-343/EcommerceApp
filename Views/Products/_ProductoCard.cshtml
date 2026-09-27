@@ -51,9 +51,9 @@
             <p class="producto-card__category">@Model.Category</p>
         }
 
-        @if (!string.IsNullOrEmpty(Model.Brand))
+        @if (Model.Marca != null)
         {
-            <p class="producto-card__brand">@Model.Brand</p>
+            <p class="producto-card__brand">@Model.Marca.Nombre</p>
         }
 
         <h3 class="producto-card__name">@Model.Name</h3>

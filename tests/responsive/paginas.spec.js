@@ -33,7 +33,15 @@ const ADMIN = [
     { nombre: 'admin-guias', url: '/Admin/Guides' },
     { nombre: 'admin-transportes', url: '/Admin/Transports' },
     { nombre: 'admin-reportes', url: '/Admin/Reports' },
-    { nombre: 'admin-reporte-ingresos', url: '/Admin/ReportIncome' }
+    { nombre: 'admin-reporte-ingresos', url: '/Admin/ReportIncome' },
+    { nombre: 'admin-proveedores', url: '/Proveedores' },
+    { nombre: 'admin-proveedor-nuevo', url: '/Proveedores/Crear' },
+    { nombre: 'admin-proveedor-detalle', desde: '/Proveedores', enlace: 'a[href*="/Proveedores/Detalle/"]' },
+    { nombre: 'admin-marcas', url: '/Marcas' },
+    { nombre: 'admin-marca-nueva', url: '/Marcas/Crear' },
+    { nombre: 'admin-abastecimientos', url: '/Abastecimientos' },
+    { nombre: 'admin-abastecer', url: '/Abastecimientos/Nuevo' },
+    { nombre: 'admin-abastecimiento-detalle', desde: '/Abastecimientos', enlace: 'a[href*="/Abastecimientos/Detalle/"]' }
 ];
 
 // Filtro opcional para probar solo una sección: SOLO=productos npx playwright test

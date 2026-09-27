@@ -1,0 +1,66 @@
+@model EcommerceApp.Models.Inventario.MarcaFormViewModel
+@* Formulario compartido por Crear y Editar: si Model.Id tiene valor, se está editando. *@
+@{
+    var editando = Model.Id.HasValue;
+}
+
+<div class="admin-card">
+    <form asp-action="@(editando ? "Editar" : "Crear")" asp-route-id="@Model.Id" method="post" class="admin-form" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="admin-form-section">
+            <h3>Datos de la marca</h3>
+            <div class="form-grid">
+                <div class="form-field form-span-2">
+                    <label asp-for="Nombre">Nombre</label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Ej: The North Face" />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Logo <span class="section-note">opcional · JPG · PNG · WEBP · GIF · máx. 5 MB</span></h3>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label asp-for="LogoUrl">URL del logo</label>
+                    <input asp-for="LogoUrl" class="form-control" placeholder="https://..." id="logoUrl" />
+                    <input type="file" name="logoFile" accept="image/png,image/jpeg,image/webp,image/gif" class="form-control" style="margin-top:0.4rem; padding:0.35rem;" />
+                    <span class="hint">Elige una imagen de tu equipo o pega una URL. El archivo se sube a Supabase al guardar.</span>
+                </div>
+                <div class="form-field">
+                    <span class="linea__etiqueta">Vista previa</span>
+                    <div class="marca-card__logo marca-card__logo--grande" id="logoPreview"><span>?</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-footer">
+            <a asp-action="Index" class="btn-admin btn-admin-outline">Cancelar</a>
+            <button type="submit" class="btn-admin btn-admin-primary">Guardar</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Vista previa del logo al pegar una URL (sin innerHTML para no inyectar lo que se pegue).
+    (function () {
+        const input = document.getElementById('logoUrl');
+        const box = document.getElementById('logoPreview');
+        function actualizar() {
+            box.replaceChildren();
+            if (input.value.trim()) {
+                const img = document.createElement('img');
+                img.alt = 'Vista previa del logo';
+                img.src = input.value.trim();
+                img.onerror = function () { box.replaceChildren(Object.assign(document.createElement('span'), { textContent: '✕' })); };
+                box.appendChild(img);
+            } else {
+                box.appendChild(Object.assign(document.createElement('span'), { textContent: '?' }));
+            }
+        }
+        input.addEventListener('input', actualizar);
+        actualizar();
+    })();
+</script>

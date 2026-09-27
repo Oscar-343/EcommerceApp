@@ -18,6 +18,11 @@ namespace EcommerceApp.Data
         public DbSet<ServiceProduct> ServiceProducts { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<Marca> Marcas { get; set; }
+        public DbSet<Proveedor> Proveedores { get; set; }
+        public DbSet<ProveedorMarca> ProveedorMarcas { get; set; }
+        public DbSet<Abastecimiento> Abastecimientos { get; set; }
+        public DbSet<DetalleAbastecimiento> DetallesAbastecimiento { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -111,6 +116,70 @@ namespace EcommerceApp.Data
             modelBuilder.Entity<CartItem>()
                 .HasIndex(c => new { c.UserId, c.ProductId })
                 .IsUnique();
+
+            // ---------------- PROVEEDORES Y ABASTECIMIENTOS ----------------
+
+            // Nombre de marca único. Restrict: una marca con productos no se puede borrar
+            // (igual la app solo desactiva marcas).
+            modelBuilder.Entity<Marca>(m =>
+            {
+                m.HasIndex(x => x.Nombre).IsUnique();
+
+                m.HasMany(x => x.Productos)
+                    .WithOne(p => p.Marca)
+                    .HasForeignKey(p => p.MarcaId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Proveedor>()
+                .HasIndex(p => p.Nombre);
+
+            // Clave compuesta (ProveedorId, MarcaId): relación muchos a muchos.
+            // Cascade: si se borra el proveedor o la marca, solo desaparece el vínculo.
+            modelBuilder.Entity<ProveedorMarca>(pm =>
+            {
+                pm.HasKey(x => new { x.ProveedorId, x.MarcaId });
+
+                pm.HasOne(x => x.Proveedor)
+                    .WithMany(p => p.Marcas)
+                    .HasForeignKey(x => x.ProveedorId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                pm.HasOne(x => x.Marca)
+                    .WithMany(m => m.Proveedores)
+                    .HasForeignKey(x => x.MarcaId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Restrict: un proveedor con abastecimientos no se puede borrar (se desactiva).
+            modelBuilder.Entity<Abastecimiento>(a =>
+            {
+                a.Property(x => x.Total).HasPrecision(18, 2);
+
+                a.HasOne(x => x.Proveedor)
+                    .WithMany(p => p.Abastecimientos)
+                    .HasForeignKey(x => x.ProveedorId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                a.HasIndex(x => x.Fecha);
+            });
+
+            // Igual que OrderItem: si se borra el producto, la línea conserva su nombre (ProductoId en null).
+            modelBuilder.Entity<DetalleAbastecimiento>(d =>
+            {
+                d.Property(x => x.CostoUnitario).HasPrecision(18, 2);
+                d.Property(x => x.Subtotal).HasPrecision(18, 2);
+
+                d.HasOne(x => x.Abastecimiento)
+                    .WithMany(a => a.Detalles)
+                    .HasForeignKey(x => x.AbastecimientoId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                d.HasOne(x => x.Producto)
+                    .WithMany()
+                    .HasForeignKey(x => x.ProductoId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
         }
     }
 }

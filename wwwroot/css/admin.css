@@ -1224,3 +1224,1354 @@ input[type="file"].form-control::file-selector-button {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
+
+/* =========================================================
+   MÓDULO DE INVENTARIO — proveedores, marcas, abastecimientos
+   ========================================================= */
+
+/* Aviso de error (TempData["Error"]): mismo formato que el de éxito, en tono terracota. */
+.admin-toast-error {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    border-color: rgba(201, 105, 79, 0.45);
+    background: rgba(201, 105, 79, 0.12);
+    color: #f0c2b4;
+    font-weight: 600;
+}
+
+/* Tarjeta de indicador en ocre (stock bajo). */
+.stat-card-icon--ocre {
+    background: rgba(184, 146, 62, 0.18);
+    color: var(--color-warning);
+}
+
+.stat-card--ocre .stat-card-value {
+    color: var(--color-warning);
+}
+
+/* Dato secundario debajo del número grande (ej.: total del mes en Bs). */
+.stat-card-sub {
+    color: var(--color-text);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.pill-ocre { background: rgba(184, 146, 62, 0.16); color: var(--color-warning); }
+
+/* ---------- Chips de marcas ---------- */
+.chip-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.18rem 0.6rem;
+    border-radius: 999px;
+    background: var(--color-section);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-size: 0.74rem;
+    white-space: nowrap;
+}
+
+.chip--inactivo {
+    opacity: 0.55;
+    text-decoration: line-through;
+}
+
+/* Chips seleccionables del formulario de proveedor: checkbox oculto + label estilizado. */
+.chip-lista--seleccion {
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.chip-check {
+    cursor: pointer;
+    margin: 0;
+}
+
+.chip-check input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chip-check span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 44px;               /* área táctil cómoda */
+    padding: 0.4rem 0.95rem;
+    border-radius: 999px;
+    background: var(--color-section);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.chip-check:hover span {
+    border-color: var(--color-green-accent);
+}
+
+.chip-check input:checked + span {
+    border-color: var(--color-green-accent);
+    background: rgba(85, 127, 99, 0.16);
+    color: var(--color-text);
+}
+
+.chip-check input:checked + span::before {
+    content: "\2713";   /* ✓ */
+    color: var(--color-green-accent);
+    font-weight: 700;
+}
+
+.chip-check input:focus-visible + span {
+    outline: 2px solid var(--color-green-accent);
+    outline-offset: 2px;
+}
+
+.chip-buscador {
+    width: 100%;
+    margin-bottom: 0.8rem;
+}
+
+/* ---------- Listados del módulo ---------- */
+.filtros-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.filtros-inline .admin-search {
+    flex: 1 1 160px;
+}
+
+.fila-inactiva {
+    opacity: 0.55;
+}
+
+.enlace-fila {
+    color: inherit;
+    text-decoration: none;
+}
+
+.enlace-fila:hover {
+    color: var(--sand);
+}
+
+/* Botón ⋯ que abre el menú de acciones de una fila. */
+.btn-acciones {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--color-text);
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+.btn-acciones:hover,
+.btn-acciones[aria-expanded="true"] {
+    border-color: var(--color-border);
+    background: rgba(242, 241, 234, 0.05);
+}
+
+.dropdown-menu-dark {
+    --bs-dropdown-bg: var(--color-card);
+    --bs-dropdown-border-color: var(--color-border);
+    --bs-dropdown-link-hover-bg: rgba(85, 127, 99, 0.2);
+    --bs-dropdown-link-active-bg: var(--color-green);
+}
+
+.dropdown-item.texto-peligro {
+    color: var(--color-error);
+}
+
+/* Modales del panel (confirmaciones) con el tema oscuro. */
+.admin-modal .modal-content {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    color: var(--color-text);
+}
+
+.admin-modal .modal-header,
+.admin-modal .modal-footer {
+    border-color: var(--color-border);
+}
+
+.admin-modal .modal-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Tabla que en móvil se muestra como tarjetas apiladas: cada celda usa su data-label como título.
+   Desde 768px vuelve a ser una tabla normal. */
+.admin-table-wrap:has(.admin-table--tarjetas) {
+    background: transparent;
+}
+
+.admin-table-wrap .admin-table--tarjetas {
+    min-width: 0;
+}
+
+.admin-table--tarjetas thead {
+    display: none;
+}
+
+.admin-table--tarjetas tbody,
+.admin-table--tarjetas tr,
+.admin-table--tarjetas td {
+    display: block;
+    width: 100%;
+}
+
+.admin-table--tarjetas tbody tr {
+    position: relative;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.8rem 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.admin-table--tarjetas tbody td,
+.admin-table--tarjetas tbody tr:last-child td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.3rem 0;
+    border: none;
+    text-align: right;
+}
+
+.admin-table--tarjetas tbody td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: left;
+    padding-top: 0.15rem;
+}
+
+.admin-table--tarjetas .chip-lista {
+    justify-content: flex-end;
+}
+
+/* La primera celda es el título de la tarjeta; las acciones van arriba a la derecha. */
+.admin-table--tarjetas tbody td:first-child,
+.admin-table--tarjetas tbody tr:last-child td:first-child {
+    display: block;
+    text-align: left;
+    padding-right: 3rem;
+    font-size: 0.95rem;
+}
+
+.admin-table--tarjetas tbody td:first-child::before {
+    display: none;
+}
+
+.admin-table--tarjetas tbody td.celda-acciones {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    width: auto;
+    padding: 0;
+}
+
+/* ---------- Ficha del proveedor ---------- */
+.ficha-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0 1.5rem;
+}
+
+.ficha-titulo {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+}
+
+.ficha-titulo h1 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 0;
+}
+
+.ficha-datos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+    gap: 0.8rem 1.2rem;
+    margin: 0 0 1rem;
+}
+
+.ficha-datos dt,
+.ficha-resumen dt {
+    color: var(--color-text-secondary);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ficha-datos dd {
+    margin: 0.15rem 0 0;
+    overflow-wrap: anywhere;
+}
+
+.ficha-notas {
+    background: var(--color-section);
+    border-left: 3px solid var(--color-tierra);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 0.7rem 0.9rem;
+    color: var(--color-text-secondary);
+    font-size: 0.87rem;
+    white-space: pre-line;
+}
+
+.ficha-marcas {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+}
+
+.ficha-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.ficha-acciones form {
+    display: inline;
+}
+
+.ficha-resumen h2 {
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    color: var(--sand);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 1rem;
+}
+
+.ficha-resumen dl {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+}
+
+.ficha-resumen dd {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0.1rem 0 0;
+}
+
+@media (min-width: 768px) {
+    .admin-table-wrap:has(.admin-table--tarjetas) {
+        background: rgba(17, 26, 22, .75);
+    }
+
+    .admin-table-wrap .admin-table--tarjetas {
+        display: table;
+        min-width: 720px;
+    }
+
+    .admin-table--tarjetas thead {
+        display: table-header-group;
+    }
+
+    /* La regla móvil "tr { display: block }" también alcanza a la fila del encabezado. */
+    .admin-table--tarjetas thead tr {
+        display: table-row;
+        width: auto;
+    }
+
+    .admin-table--tarjetas tbody {
+        display: table-row-group;
+    }
+
+    .admin-table--tarjetas tbody tr {
+        display: table-row;
+        position: static;
+        background: none;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        margin: 0;
+    }
+
+    .admin-table--tarjetas tbody td,
+    .admin-table--tarjetas tbody td:first-child,
+    .admin-table--tarjetas tbody tr:last-child td,
+    .admin-table--tarjetas tbody tr:last-child td:first-child {
+        display: table-cell;
+        width: auto;
+        padding: 0.75rem 0.85rem;
+        border-bottom: 1px solid rgba(242, 241, 234, 0.06);
+        text-align: left;
+        font-size: inherit;
+    }
+
+    .admin-table--tarjetas tbody tr:last-child td,
+    .admin-table--tarjetas tbody tr:last-child td:first-child {
+        border-bottom: none;
+    }
+
+    .admin-table--tarjetas tbody td[data-label]::before {
+        content: none;
+    }
+
+    .admin-table--tarjetas .chip-lista {
+        justify-content: flex-start;
+    }
+
+    .admin-table--tarjetas tbody td.celda-acciones {
+        position: static;
+        text-align: right;
+        width: 1%;
+        white-space: nowrap;
+    }
+}
+
+@media (min-width: 992px) {
+    /* Ficha a la izquierda, resumen fijo a la derecha. */
+    .ficha-grid {
+        grid-template-columns: minmax(0, 1fr) 280px;
+        align-items: start;
+    }
+
+    .ficha-resumen {
+        position: sticky;
+        top: 1.5rem;
+    }
+}
+
+/* ---------- Historial de abastecimientos ---------- */
+.filtro-fecha {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 1 1 170px;
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+}
+
+.filtro-fecha .admin-search {
+    flex: 1;
+    color-scheme: dark;              /* calendario nativo en tema oscuro */
+}
+
+/* Fila de totales del período. En móvil es una tarjeta más, en ocre suave. */
+.admin-table--tarjetas tfoot tr {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.3rem 1rem;
+    background: rgba(184, 146, 62, 0.1);
+    border: 1px solid rgba(184, 146, 62, 0.35);
+    border-radius: var(--radius-sm);
+    padding: 0.8rem 0.9rem;
+}
+
+.admin-table--tarjetas tfoot td {
+    display: block;
+    width: auto;
+    padding: 0;
+    border: none;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.admin-table--tarjetas tfoot td:first-child {
+    width: 100%;
+    color: var(--color-warning);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.admin-table--tarjetas tfoot td[data-label]::before {
+    content: attr(data-label) ": ";
+    color: var(--color-text-secondary);
+    font-weight: 400;
+}
+
+.admin-table--tarjetas tfoot td:empty {
+    display: none;
+}
+
+/* ---------- Formulario "Abastecer tienda" ---------- */
+.abastecer-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0 1.5rem;
+    padding-bottom: 5rem;            /* espacio para la barra fija de móvil */
+}
+
+.abastecer-marcas {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+}
+
+.abastecer-aviso {
+    margin: 0.8rem 0 0;
+    color: var(--color-warning);
+    font-size: 0.82rem;
+}
+
+/* Buscador con lista de resultados desplegable. */
+.buscador-producto {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.buscador-resultados {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 320px;
+    overflow-y: auto;
+    list-style: none;
+    margin: 0;
+    padding: 0.3rem;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.buscador-resultados__item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    min-height: 48px;
+    padding: 0.4rem 0.5rem;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text);
+    text-align: left;
+}
+
+.buscador-resultados__item:hover,
+.buscador-resultados__item:focus-visible {
+    background: rgba(85, 127, 99, 0.18);
+    outline: none;
+}
+
+.buscador-resultados__item img {
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--color-section);
+}
+
+.buscador-resultados__texto {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.buscador-resultados__texto small {
+    color: var(--color-text-secondary);
+    font-size: 0.74rem;
+}
+
+.buscador-resultados__vacio {
+    padding: 0.7rem;
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Filas de productos. Móvil: cada fila es una tarjeta. Desde 992px: grilla tipo tabla. */
+.lineas-encabezado {
+    display: none;
+}
+
+.lineas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.linea {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) 44px;
+    grid-template-areas:
+        "img info quitar"
+        "stock stock stock"
+        "cant costo costo"
+        "sub sub sub";
+    gap: 0.6rem 0.8rem;
+    align-items: center;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.8rem;
+}
+
+.linea__img {
+    grid-area: img;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--color-section);
+}
+
+.linea__info {
+    grid-area: info;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.linea__info strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.linea__stock {
+    grid-area: stock;
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+}
+
+.linea__stock-nuevo {
+    display: inline-block;
+    color: var(--color-green-accent);
+}
+
+.linea__stock-nuevo.cambio {
+    animation: stock-cambio 0.35s ease;
+}
+
+.linea__campo {
+    margin: 0;
+}
+
+.linea__campo:nth-of-type(1) { grid-area: cant; }
+.linea__campo:nth-of-type(2) { grid-area: costo; }
+
+.linea__etiqueta {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+}
+
+.linea__stock .linea__etiqueta {
+    display: inline;
+    margin: 0 0.2rem 0 0;
+}
+
+.admin-form .linea .form-control {
+    min-height: 44px;
+}
+
+.admin-form .linea .form-control.is-invalid {
+    border-color: var(--color-error);
+}
+
+.linea__subtotal {
+    grid-area: sub;
+    text-align: right;
+    font-weight: 700;
+}
+
+.linea__quitar {
+    grid-area: quitar;
+    width: 44px;
+    height: 44px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+}
+
+.linea__quitar:hover {
+    color: var(--color-error);
+    border-color: rgba(201, 105, 79, 0.4);
+}
+
+.linea--nueva {
+    animation: linea-entra 0.3s ease;
+}
+
+.linea--saliendo {
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.linea--resaltada {
+    animation: linea-resalta 0.8s ease;
+}
+
+.lineas-vacio {
+    margin: 0 0 0.6rem;
+    padding: 1rem;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    text-align: center;
+    font-size: 0.87rem;
+}
+
+@keyframes linea-entra {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+@keyframes linea-resalta {
+    0%, 100% { border-color: var(--color-border); }
+    30%      { border-color: var(--color-green-accent); }
+}
+
+@keyframes stock-cambio {
+    from { opacity: 0.3; transform: translateY(-3px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* Resumen: en móvil y tablet va arriba del formulario... */
+.abastecer-resumen {
+    order: -1;
+}
+
+.abastecer-resumen h2 {
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    color: var(--sand);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.8rem;
+}
+
+.abastecer-resumen dl {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin: 0;
+}
+
+.abastecer-resumen dt {
+    color: var(--color-text-secondary);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.abastecer-resumen dd {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0.1rem 0 0;
+}
+
+/* ...con los botones escondidos: en móvil se usa la barra fija de abajo. */
+.abastecer-resumen .btn-admin {
+    display: none;
+}
+
+.abastecer-barra-movil {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-floating);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem var(--page-gutter) calc(0.7rem + env(safe-area-inset-bottom));
+    background: var(--color-section);
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.abastecer-barra-movil div {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75rem;
+}
+
+.abastecer-barra-movil strong {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+}
+
+.abastecer-barra-movil .btn-admin {
+    min-height: 48px;
+    padding-inline: 1.4rem;
+}
+
+@media (min-width: 992px) {
+    .abastecer-grid {
+        grid-template-columns: minmax(0, 1fr) 300px;
+        align-items: start;
+        padding-bottom: 0;
+    }
+
+    /* Escritorio: el resumen va a la derecha, fijo al hacer scroll, con sus botones. */
+    .abastecer-resumen {
+        order: 0;
+        position: sticky;
+        top: 1.5rem;
+    }
+
+    .abastecer-resumen dl {
+        grid-template-columns: minmax(0, 1fr);
+        margin-bottom: 1.2rem;
+    }
+
+    .abastecer-resumen__total dd {
+        font-size: 1.6rem;
+        color: var(--color-green-accent);
+    }
+
+    .abastecer-resumen .btn-admin {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .abastecer-barra-movil {
+        display: none;
+    }
+}
+
+/* Nota bajo las filas ("El costo unitario es..."): mismo estilo que las demás notas del formulario. */
+.admin-form-section > .hint {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+/* Desde tablet: cada fila en dos renglones (producto y stock arriba; cantidad, costo y subtotal abajo). */
+@media (min-width: 768px) {
+    .linea {
+        grid-template-columns: 48px repeat(3, minmax(0, 1fr)) 44px;
+        grid-template-areas:
+            "img info info stock quitar"
+            "img cant costo sub sub";
+    }
+
+    .linea__img {
+        align-self: start;
+    }
+
+    .linea__stock {
+        justify-content: flex-end;
+    }
+
+    .linea__subtotal {
+        align-self: end;
+        padding-bottom: 0.6rem;
+    }
+}
+
+/* Pantallas anchas: una sola fila tipo tabla, con encabezado. Antes no entra: con el menú lateral
+   y el resumen, la columna del formulario queda angosta y el nombre del producto desaparecía. */
+@media (min-width: 1400px) {
+    .lineas-encabezado.visible,
+    .linea {
+        display: grid;
+        grid-template-columns: 48px minmax(0, 1fr) 90px 90px 110px 100px 44px;
+        grid-template-areas: "img info stock cant costo sub quitar";
+        gap: 0.8rem;
+        align-items: center;
+    }
+
+    .lineas-encabezado.visible {
+        padding: 0 0.8rem 0.4rem;
+        color: var(--sand);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .linea__img {
+        align-self: center;
+    }
+
+    .linea__stock {
+        justify-content: flex-start;
+    }
+
+    .linea__subtotal {
+        align-self: center;
+        padding-bottom: 0;
+    }
+
+    .linea__etiqueta,
+    .linea__stock .linea__etiqueta {
+        display: none;
+    }
+}
+
+/* ---------- Comprobante del abastecimiento ---------- */
+.comprobante-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.comprobante {
+    max-width: 900px;
+}
+
+.comprobante-encabezado {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.comprobante-marca {
+    margin: 0 0 0.2rem;
+    color: var(--sand);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.comprobante-encabezado h1 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.comprobante-fecha {
+    margin: 0;
+    color: var(--color-text-secondary);
+}
+
+.comprobante-datos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+    gap: 0.8rem 1.2rem;
+    margin: 0 0 1rem;
+}
+
+.comprobante-datos dt {
+    color: var(--color-text-secondary);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.comprobante-datos dd {
+    margin: 0.15rem 0 0;
+}
+
+.admin-table-wrap .comprobante-tabla {
+    min-width: 520px;
+}
+
+.comprobante-tabla .num {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.comprobante-total {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.comprobante-total div {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+}
+
+.comprobante-total strong {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--color-green-accent);
+}
+
+@media (min-width: 768px) {
+    .admin-table--tarjetas tfoot {
+        display: table-footer-group;
+    }
+
+    .admin-table--tarjetas tfoot tr {
+        display: table-row;
+        background: rgba(184, 146, 62, 0.08);
+        border: none;
+        padding: 0;
+    }
+
+    .admin-table--tarjetas tfoot td,
+    .admin-table--tarjetas tfoot td:first-child,
+    .admin-table--tarjetas tfoot td:empty {
+        display: table-cell;
+        width: auto;
+        padding: 0.75rem 0.85rem;
+        border-top: 1px solid rgba(184, 146, 62, 0.35);
+    }
+
+    .admin-table--tarjetas tfoot td[data-label]::before {
+        content: none;
+    }
+}
+
+@media print {
+    .comprobante {
+        max-width: none;
+    }
+
+    .comprobante,
+    .comprobante-datos dd,
+    .comprobante-encabezado h1,
+    .comprobante-total strong,
+    .comprobante-tabla strong,
+    .enlace-fila {
+        color: #14201a !important;
+    }
+
+    .comprobante-marca,
+    .comprobante-fecha,
+    .comprobante-datos dt,
+    .ficha-notas {
+        color: #4a544e !important;
+    }
+
+    .ficha-notas {
+        background: none !important;
+    }
+
+    .admin-table-wrap {
+        background: none !important;
+        overflow: visible;
+    }
+}
+
+/* Menos movimiento si el sistema lo pide. */
+@media (prefers-reduced-motion: reduce) {
+    .linea--nueva,
+    .linea--resaltada,
+    .linea__stock-nuevo.cambio {
+        animation: none;
+    }
+
+    .linea--saliendo {
+        transition: none;
+    }
+}
+
+/* ---------- Marcas: grid de tarjetas ---------- */
+.marcas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+    gap: 1rem;
+}
+
+.marca-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    animation: linea-entra 0.3s ease;
+}
+
+.marca-card:hover {
+    border-color: var(--color-green-accent);
+    background: #1b231e;
+}
+
+.marca-card--inactiva {
+    opacity: 0.6;
+}
+
+.marca-card__logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--color-section);
+    border: 1px solid var(--color-border);
+    color: var(--sand);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.marca-card__logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #fff;
+}
+
+.marca-card__logo--grande {
+    width: 110px;
+    height: 110px;
+    font-size: 2.4rem;
+}
+
+.marca-card__cuerpo h2 {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 0.3rem;
+}
+
+.marca-card__cuerpo p {
+    margin: 0.3rem 0 0;
+    font-size: 0.82rem;
+}
+
+.marca-card__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: auto;
+}
+
+.marca-card__acciones form {
+    display: inline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .marca-card {
+        animation: none;
+    }
+}
+
+/* ---------- Módulo de inventario: responsive (Fase 11) ---------- */
+
+/* Filtros en móvil: panel inferior de Bootstrap (offcanvas-bottom) con el tema oscuro. */
+.admin-offcanvas {
+    --bs-offcanvas-bg: var(--color-card);
+    --bs-offcanvas-color: var(--color-text);
+    --bs-offcanvas-height: auto;
+    --bs-offcanvas-border-color: var(--color-border);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 85vh;
+}
+
+.admin-offcanvas .offcanvas-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.admin-offcanvas .offcanvas-body {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}
+
+/* En el panel los filtros van uno debajo de otro, a lo ancho. */
+.admin-offcanvas .filtros-inline {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.admin-offcanvas .filtros-inline .admin-search,
+.admin-offcanvas .filtros-inline .filtro-fecha {
+    flex: none;
+}
+
+.btn-filtros {
+    margin-left: auto;
+}
+
+/* Áreas táctiles de al menos 44px en móvil (los btn-admin-sm son más bajos en escritorio). */
+.filtros-inline .admin-search,
+.filtros-inline .btn-admin,
+.admin-table--tarjetas .btn-admin,
+.marca-card__acciones .btn-admin,
+.ficha-acciones .btn-admin,
+.comprobante-acciones .btn-admin,
+.btn-filtros {
+    min-height: 44px;
+    justify-content: center;
+}
+
+.admin-offcanvas .dropdown-item,
+.dropdown-menu-dark .dropdown-item {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    /* En línea: el contenedor del offcanvas ocupa el resto de la cabecera de la tarjeta. */
+    .admin-offcanvas {
+        flex: 1 1 auto;
+        border-radius: 0;
+        max-height: none;
+    }
+
+    .admin-offcanvas .offcanvas-body {
+        padding-bottom: 0;
+    }
+
+    .admin-offcanvas .filtros-inline {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .admin-offcanvas .filtros-inline .admin-search {
+        flex: 1 1 160px;
+    }
+
+    .admin-offcanvas .filtros-inline .filtro-fecha {
+        flex: 1 1 170px;
+    }
+
+    /* Con mouse ya no hace falta el área táctil grande. */
+    .filtros-inline .btn-admin,
+    .admin-table--tarjetas .btn-admin,
+    .comprobante-acciones .btn-admin {
+        min-height: 38px;
+    }
+}
+
+/* ---------- Módulo de inventario: animaciones sutiles (Fase 12) ----------
+   Solo en las pantallas del módulo, para no cambiar el resto del panel. */
+
+@keyframes tarjeta-aparece {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+@keyframes resultados-aparecen {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* Aparición de tarjetas: fade + 8px hacia arriba en 0.3s. */
+.ficha-grid > .admin-card,
+.abastecer-grid .admin-card,
+.admin-card:has(.admin-table--tarjetas),
+.comprobante,
+.marca-card {
+    animation: tarjeta-aparece 0.3s ease both;
+}
+
+/* Escalonado leve: la segunda y tercera tarjeta llegan un poco después. */
+.ficha-grid > .admin-card:nth-child(2),
+.abastecer-grid .admin-card:nth-child(2) { animation-delay: 0.05s; }
+.abastecer-grid .admin-card:nth-child(3) { animation-delay: 0.1s; }
+
+.marcas-grid .marca-card:nth-child(2) { animation-delay: 0.04s; }
+.marcas-grid .marca-card:nth-child(3) { animation-delay: 0.08s; }
+.marcas-grid .marca-card:nth-child(n+4) { animation-delay: 0.12s; }
+
+/* Hover: fondo apenas más claro en filas, tarjetas y líneas. */
+.admin-table--tarjetas tbody tr {
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-table--tarjetas tbody tr:hover {
+    background: #1b231e;
+}
+
+.linea {
+    /* opacity y transform también: los usa .linea--saliendo para el fade-out al quitar una fila. */
+    transition: background 0.15s ease, border-color 0.15s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.linea:hover {
+    background: #1b231e;
+}
+
+.chip {
+    transition: border-color 0.15s ease;
+}
+
+.buscador-resultados:not([hidden]) {
+    animation: resultados-aparecen 0.15s ease;
+}
+
+/* El número de stock resultante cambia con una transición suave de color además del deslizamiento. */
+.linea__stock-nuevo {
+    transition: color 0.3s ease;
+}
+
+@media (min-width: 768px) {
+    .admin-table--tarjetas tbody tr:hover {
+        background: rgba(79, 138, 104, 0.07);
+    }
+}
+
+/* Menos movimiento: sin animaciones ni transiciones en el módulo. */
+@media (prefers-reduced-motion: reduce) {
+    .ficha-grid > .admin-card,
+    .abastecer-grid .admin-card,
+    .admin-card:has(.admin-table--tarjetas),
+    .comprobante,
+    .marca-card,
+    .buscador-resultados:not([hidden]) {
+        animation: none;
+    }
+
+    .admin-table--tarjetas tbody tr,
+    .linea,
+    .chip,
+    .chip-check span,
+    .linea__stock-nuevo {
+        transition: none;
+    }
+}

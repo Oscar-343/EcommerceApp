@@ -1,4 +1,6 @@
+using System.Globalization;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
@@ -72,6 +74,11 @@ builder.Services.AddScoped<IPagoService, PagoSimuladoService>();
 // Crea pedidos desde el carrito (lo usan Orders y Checkout).
 builder.Services.AddScoped<PedidoService>();
 
+// Módulo de inventario: proveedores, marcas y abastecimientos (suman stock).
+builder.Services.AddScoped<ProveedorService>();
+builder.Services.AddScoped<MarcaService>();
+builder.Services.AddScoped<AbastecimientoService>();
+
 // Lee enlaces de Google Maps en el admin. AllowAutoRedirect = false:
 // cada redirección se revisa a mano para no salir de los dominios de Google.
 builder.Services.AddHttpClient<MapLinkService>(client =>
@@ -108,6 +115,37 @@ app.UseHttpsRedirection();
 var staticContentTypes = new FileExtensionContentTypeProvider();
 staticContentTypes.Mappings[".webmanifest"] = "application/manifest+json";
 app.UseStaticFiles(new StaticFileOptions { ContentTypeProvider = staticContentTypes });
+
+// Cultura de la app: español de Bolivia, pero con PUNTO decimal. Los <input type="number"> del
+// navegador siempre envían "120.50"; con la coma de es-BO el model binding leía ese punto como
+// separador de miles y guardaba 12050. Fijarla aquí además evita depender de la cultura del
+// servidor (Windows en es-BO en local, otra distinta en Render).
+CultureInfo culturaApp;
+try
+{
+    culturaApp = (CultureInfo)CultureInfo.GetCultureInfo("es-BO").Clone();
+}
+catch (CultureNotFoundException)
+{
+    culturaApp = (CultureInfo)CultureInfo.InvariantCulture.Clone();   // servidor sin datos de culturas
+}
+culturaApp.NumberFormat.NumberDecimalSeparator = ".";
+culturaApp.NumberFormat.NumberGroupSeparator = ",";
+culturaApp.NumberFormat.CurrencyDecimalSeparator = ".";
+culturaApp.NumberFormat.CurrencyGroupSeparator = ",";
+culturaApp.NumberFormat.PercentDecimalSeparator = ".";
+culturaApp.NumberFormat.PercentGroupSeparator = ",";
+CultureInfo.DefaultThreadCurrentCulture = culturaApp;
+CultureInfo.DefaultThreadCurrentUICulture = culturaApp;
+
+var opcionesCultura = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(culturaApp),
+    SupportedCultures = new List<CultureInfo> { culturaApp },
+    SupportedUICultures = new List<CultureInfo> { culturaApp }
+};
+opcionesCultura.RequestCultureProviders.Clear();   // siempre la misma, sin importar el idioma del navegador
+app.UseRequestLocalization(opcionesCultura);
 
 app.UseRouting();
 

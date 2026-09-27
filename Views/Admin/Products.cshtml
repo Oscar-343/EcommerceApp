@@ -6,7 +6,14 @@
 <div class="admin-page-header">
     <div>
         <h1>Productos</h1>
-        <p>@Model.Count producto(s) en el catálogo de la tienda.</p>
+        @if (ViewBag.StockBajo == true)
+        {
+            <p>@Model.Count producto(s) con stock bajo. <a asp-action="Products" style="color:var(--sand);">Ver todos</a></p>
+        }
+        else
+        {
+            <p>@Model.Count producto(s) en el catálogo de la tienda.</p>
+        }
     </div>
     <a asp-action="ProductCreate" class="btn-admin btn-admin-primary">+ Nuevo producto</a>
 </div>
@@ -16,6 +23,10 @@
         <h2>Catálogo</h2>
         <form method="get" asp-action="Products">
             <input type="text" name="q" value="@ViewBag.Query" class="admin-search" placeholder="Buscar por nombre o marca..." />
+            @if (ViewBag.StockBajo == true)
+            {
+                <input type="hidden" name="stockBajo" value="true" />
+            }
         </form>
     </div>
 
@@ -58,9 +69,9 @@
                             </td>
                             <td>
                                 <strong>@product.Name</strong>
-                                @if (!string.IsNullOrWhiteSpace(product.Brand))
+                                @if (product.Marca != null)
                                 {
-                                    <div class="cell-muted" style="font-size:0.76rem;">@product.Brand</div>
+                                    <div class="cell-muted" style="font-size:0.76rem;">@product.Marca.Nombre</div>
                                 }
                             </td>
                             <td class="cell-muted">@(product.Category ?? "—")</td>
@@ -76,9 +87,14 @@
                                 }
                             </td>
                             <td>
-                                @if (product.Stock <= 5)
+                                @* Agotado en rojo; en su stock mínimo o por debajo, en ocre. *@
+                                @if (product.Stock == 0)
                                 {
-                                    <span class="pill pill-red">@product.Stock</span>
+                                    <span class="pill pill-red" title="Agotado">0 · Agotado</span>
+                                }
+                                else if (product.Stock <= product.StockMinimo)
+                                {
+                                    <span class="pill pill-ocre" title="Stock mínimo: @product.StockMinimo">@product.Stock · Bajo</span>
                                 }
                                 else
                                 {
@@ -92,6 +108,12 @@
                             </td>
                             <td>
                                 <div class="row-actions">
+                                    @* Abastecer necesita la marca: solo se le compra a proveedores que la distribuyen. *@
+                                    @if (product.MarcaId != null)
+                                    {
+                                        <a asp-controller="Abastecimientos" asp-action="Nuevo" asp-route-productoId="@product.Id"
+                                           class="btn-admin @(product.Stock <= product.StockMinimo ? "btn-admin-primary" : "btn-admin-outline") btn-admin-sm">Abastecer</a>
+                                    }
                                     <a asp-action="ProductEdit" asp-route-id="@product.Id" class="btn-admin btn-admin-outline btn-admin-sm">Editar</a>
                                     <form asp-action="ProductDelete" asp-route-id="@product.Id" method="post"
                                           onsubmit="return confirm('¿Eliminar el producto \'@product.Name.Replace("'", "\\'")\'? Esta acción no se puede deshacer.');">

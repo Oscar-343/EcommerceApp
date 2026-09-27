@@ -1,0 +1,106 @@
+@model EcommerceApp.Models.Inventario.ProveedorFormViewModel
+@* Formulario compartido por Crear y Editar: si Model.Id tiene valor, se está editando. *@
+@{
+    var editando = Model.Id.HasValue;
+}
+
+<form asp-action="@(editando ? "Editar" : "Crear")" asp-route-id="@Model.Id" method="post" class="admin-form">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="admin-card">
+        <div class="admin-form-section">
+            <h3>Datos del proveedor</h3>
+            <div class="form-grid">
+                <div class="form-field form-span-2">
+                    <label asp-for="Nombre">Nombre o razón social</label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Ej: Andes Gear S.R.L." />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Nit">NIT</label>
+                    <input asp-for="Nit" class="form-control" inputmode="numeric" />
+                    <span asp-validation-for="Nit" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="PersonaContacto">Persona de contacto</label>
+                    <input asp-for="PersonaContacto" class="form-control" />
+                    <span asp-validation-for="PersonaContacto" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Telefono">Teléfono / WhatsApp</label>
+                    <input asp-for="Telefono" class="form-control" type="tel" inputmode="tel" placeholder="Ej: 71234567" />
+                    <span asp-validation-for="Telefono" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Email">Email</label>
+                    <input asp-for="Email" class="form-control" type="email" inputmode="email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Ciudad">Ciudad</label>
+                    <input asp-for="Ciudad" class="form-control" />
+                    <span asp-validation-for="Ciudad" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Direccion">Dirección</label>
+                    <input asp-for="Direccion" class="form-control" />
+                    <span asp-validation-for="Direccion" class="text-danger"></span>
+                </div>
+                <div class="form-field form-span-2">
+                    <label asp-for="Notas">Notas</label>
+                    <textarea asp-for="Notas" class="form-control" rows="3" placeholder="Horarios de entrega, condiciones, etc."></textarea>
+                    <span asp-validation-for="Notas" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="admin-form-section">
+            <h3>Marcas que distribuye</h3>
+
+            @if (Model.MarcasDisponibles.Count == 0)
+            {
+                <p class="cell-muted">
+                    Todavía no hay marcas registradas.
+                    <a asp-controller="Marcas" asp-action="Crear" style="color:var(--sand);">Crea una marca</a> y vuelve a este formulario.
+                </p>
+            }
+            else
+            {
+                @if (Model.MarcasDisponibles.Count > 8)
+                {
+                    <input type="search" class="admin-search chip-buscador" placeholder="Buscar marca..." aria-label="Buscar marca" data-chip-buscador />
+                }
+
+                @* Chips seleccionables: checkbox oculto + label estilizado. Todos se envían como MarcasSeleccionadas. *@
+                <div class="chip-lista chip-lista--seleccion">
+                    @foreach (var marca in Model.MarcasDisponibles)
+                    {
+                        <label class="chip-check" data-chip-nombre="@marca.Text.ToLower()">
+                            <input type="checkbox" name="MarcasSeleccionadas" value="@marca.Value" checked="@marca.Selected" />
+                            <span>@marca.Text</span>
+                        </label>
+                    }
+                </div>
+                <span class="hint">Al abastecer, solo podrás elegir productos de estas marcas.</span>
+            }
+        </div>
+
+        <div class="admin-form-footer">
+            <a asp-action="@(editando ? "Detalle" : "Index")" asp-route-id="@Model.Id" class="btn-admin btn-admin-outline">Cancelar</a>
+            <button type="submit" class="btn-admin btn-admin-primary">Guardar</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    // Buscador rápido de marcas: oculta los chips que no coinciden (los marcados se envían igual).
+    document.querySelector('[data-chip-buscador]')?.addEventListener('input', function () {
+        const texto = this.value.trim().toLowerCase();
+        document.querySelectorAll('[data-chip-nombre]').forEach(function (chip) {
+            chip.hidden = texto !== '' && !chip.dataset.chipNombre.includes(texto);
+        });
+    });
+</script>

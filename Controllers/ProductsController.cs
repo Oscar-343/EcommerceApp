@@ -18,12 +18,12 @@ namespace EcommerceApp.Controllers
             string? search = null,
             decimal? minPrice = null,
             decimal? maxPrice = null,
-            string? brand = null,
+            int? marcaId = null,
             bool onlyOffers = false,
             string? orderBy = "featured")
         {
             // Consulta base: todos los productos
-            var productsQuery = context.Products.AsNoTracking();
+            var productsQuery = context.Products.AsNoTracking().Include(p => p.Marca).AsQueryable();
 
             // Filtro por categoría
             if (!string.IsNullOrEmpty(category))
@@ -44,13 +44,13 @@ namespace EcommerceApp.Controllers
                 productsQuery = productsQuery.Where(p =>
                     p.Name.ToLower().Contains(searchLower) ||
                     p.Description.ToLower().Contains(searchLower) ||
-                    (p.Brand != null && p.Brand.ToLower().Contains(searchLower)));
+                    (p.Marca != null && p.Marca.Nombre.ToLower().Contains(searchLower)));
             }
 
             // Filtro por marca
-            if (!string.IsNullOrEmpty(brand))
+            if (marcaId.HasValue)
             {
-                productsQuery = productsQuery.Where(p => p.Brand == brand);
+                productsQuery = productsQuery.Where(p => p.MarcaId == marcaId.Value);
             }
 
             // Filtro por rango de precios
@@ -92,11 +92,10 @@ namespace EcommerceApp.Controllers
                 .OrderBy(c => c)
                 .ToListAsync();
 
-            var allBrands = await context.Products.AsNoTracking()
-                .Where(p => p.Brand != null)
-                .Select(p => p.Brand)
-                .Distinct()
-                .OrderBy(b => b)
+            // Solo marcas activas que tienen al menos un producto.
+            var allMarcas = await context.Marcas.AsNoTracking()
+                .Where(m => m.Activo && m.Productos.Any())
+                .OrderBy(m => m.Nombre)
                 .ToListAsync();
 
             // Calcular el precio máximo en la tienda
@@ -124,10 +123,10 @@ namespace EcommerceApp.Controllers
                 SearchTerm = search,
                 MinPrice = minPrice,
                 MaxPrice = maxPrice,
-                SelectedBrand = brand,
+                SelectedMarcaId = marcaId,
                 OnlyOffers = onlyOffers,
                 AvailableCategories = allCategories ?? new List<string>(),
-                AvailableBrands = allBrands ?? new List<string>(),
+                AvailableMarcas = allMarcas,
                 TotalProducts = totalProducts,
                 MaxPriceInStore = maxPriceInStore,
                 OrderBy = orderBy
@@ -140,7 +139,9 @@ namespace EcommerceApp.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
-            var product = await context.Products.FindAsync(id);
+            var product = await context.Products.AsNoTracking()
+                .Include(p => p.Marca)
+                .FirstOrDefaultAsync(p => p.Id == id);
             if (product == null) return NotFound();
             return View(product);
         }

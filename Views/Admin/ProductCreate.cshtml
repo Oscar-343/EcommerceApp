@@ -1,6 +1,7 @@
 @model EcommerceApp.Models.Product
 @{
     Layout = "_AdminLayout";
+    var marcas = ViewBag.Marcas as List<EcommerceApp.Models.Marca> ?? new();
 }
 
 <div class="admin-breadcrumb"><a asp-action="Products">Productos</a> / Nuevo</div>
@@ -39,15 +40,23 @@
                     </select>
                 </div>
                 <div class="form-field">
-                    <label asp-for="Brand">Marca</label>
-                    <input asp-for="Brand" class="form-control" placeholder="Ej: The North Face" />
+                    <label asp-for="MarcaId">Marca</label>
+                    <select asp-for="MarcaId" class="form-select">
+                        <option value="">Sin marca</option>
+                        @foreach (var marca in marcas)
+                        {
+                            <option value="@marca.Id">@marca.Nombre@(marca.Activo ? "" : " (inactiva)")</option>
+                        }
+                    </select>
+                    <span class="hint">¿No está la marca? <a asp-controller="Marcas" asp-action="Crear" target="_blank" style="color:var(--sand);">Créala aquí</a> y recarga.</span>
+                    <span asp-validation-for="MarcaId" class="text-danger"></span>
                 </div>
             </div>
         </div>
 
         <div class="admin-form-section">
             <h3>Precio e inventario</h3>
-            <div class="form-grid form-grid-3">
+            <div class="form-grid">
                 <div class="form-field">
                     <label asp-for="Price">Precio (Bs.)</label>
                     <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.01" />
@@ -62,6 +71,12 @@
                     <label asp-for="Stock">Stock</label>
                     <input asp-for="Stock" class="form-control" type="number" min="0" />
                     <span asp-validation-for="Stock" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="StockMinimo">Stock mínimo</label>
+                    <input asp-for="StockMinimo" class="form-control" type="number" min="0" inputmode="numeric" />
+                    <span class="hint">Con este stock o menos, el producto se marca como stock bajo.</span>
+                    <span asp-validation-for="StockMinimo" class="text-danger"></span>
                 </div>
             </div>
         </div>

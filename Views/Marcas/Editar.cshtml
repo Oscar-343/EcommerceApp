@@ -1,0 +1,14 @@
+@model EcommerceApp.Models.Inventario.MarcaFormViewModel
+@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+
+<div class="admin-breadcrumb"><a asp-action="Index">Marcas</a> / @Model.Nombre / Editar</div>
+<div class="admin-page-header">
+    <div>
+        <h1>Editar marca</h1>
+        <p>El cambio de nombre se ve en todo el catálogo.</p>
+    </div>
+</div>
+
+<partial name="_Formulario" model="Model" />

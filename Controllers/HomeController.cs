@@ -29,6 +29,7 @@ namespace EcommerceApp.Controllers
 
             // Obtener productos destacados (máximo 4)
             var featuredProducts = await _context.Products.AsNoTracking()
+                .Include(p => p.Marca)
                 .Where(p => p.Stock > 0)
                 .OrderByDescending(p => p.IsFeatured)
                 .ThenByDescending(p => p.IsBestSeller)

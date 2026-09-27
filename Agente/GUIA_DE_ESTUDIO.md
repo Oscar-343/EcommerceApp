@@ -2,11 +2,11 @@
 
 ## Qué hace cada carpeta
 
-- **`Controllers/`**: un controlador MVC por sección (`HomeController`, `ProductsController`, `ServicesController`, `CartController`, `CheckoutController`, `OrdersController`, `ReservationsController`, `FavoritesController`, `AccountController`, `AdminController` dividido en clases parciales: `AdminController.cs`, `.Products.cs`, `.Services.cs`, `.Guides.cs`, `.Transports.cs`, `.Reservations.cs`, `.Orders.cs`, `.Reports.cs`).
-- **`Models/`**: entidades de EF Core (`Product`, `Service`, `Guide`, `Transport`, `Reservation`, `Order`, `OrderItem`, `CartItem`, `FavoriteItem`, `ServiceProduct`, `ApplicationUser`) y ViewModels de página (`HomeViewModel`, `ProductosViewModel`, `ServiciosViewModel`, `CatalogViewModel`, `CheckoutViewModel`, `ResumenCompraViewModel`, etc.). `Models/Reports/` tiene un ViewModel por reporte (`IncomeReportViewModel`, `ReservationsReportViewModel`, `ProductSalesReportViewModel`, `InventoryReportViewModel`, `DemandReportViewModel`, `UsersReportViewModel`, `GuidesTransportReportViewModel`).
+- **`Controllers/`**: un controlador MVC por sección (`HomeController`, `ProductsController`, `ServicesController`, `CartController`, `CheckoutController`, `OrdersController`, `ReservationsController`, `FavoritesController`, `AccountController`, `AdminController` dividido en clases parciales: `AdminController.cs`, `.Products.cs`, `.Services.cs`, `.Guides.cs`, `.Transports.cs`, `.Reservations.cs`, `.Orders.cs`, `.Reports.cs`), más `ProveedoresController`, `MarcasController` y `AbastecimientosController` del módulo de inventario (también solo Admin).
+- **`Models/`**: entidades de EF Core (`Product`, `Service`, `Guide`, `Transport`, `Reservation`, `Order`, `OrderItem`, `CartItem`, `FavoriteItem`, `ServiceProduct`, `ApplicationUser`, y del inventario: `Marca`, `Proveedor`, `ProveedorMarca`, `Abastecimiento`, `DetalleAbastecimiento`) y ViewModels de página (`HomeViewModel`, `ProductosViewModel`, `ServiciosViewModel`, `CatalogViewModel`, `CheckoutViewModel`, `ResumenCompraViewModel`, etc.). `Models/Reports/` tiene un ViewModel por reporte (`IncomeReportViewModel`, `ReservationsReportViewModel`, `ProductSalesReportViewModel`, `InventoryReportViewModel`, `DemandReportViewModel`, `UsersReportViewModel`, `GuidesTransportReportViewModel`). `Models/Inventario/` tiene los formularios y filas del módulo de proveedores (`ProveedorFormViewModel`, `ProveedorListaItem`, `MarcaFormViewModel`, `MarcaListaItem`, `AbastecimientoFormViewModel` + `LineaAbastecimiento`).
 - **`Views/`**: una carpeta por controlador con sus `.cshtml` (incluye `Views/Orders/`, `Views/Reservations/` y las vistas de reportes en `Views/Admin/`, junto al resto del panel), más `Views/Shared/` para `_Layout.cshtml` (parte pública), `_AdminLayout.cshtml` (panel admin), `_AuthLayout.cshtml` (login/registro) y parciales reutilizables (`_Navbar`, `_ProductoCard`, `_Aviso` —el mensaje emergente de `TempData["Success"]`—, etc.).
 - **`Data/`**: `ApplicationDbContext` (mapeo EF Core) y los *seeders* (`ProductSeeder`, `ServiceSeeder`, `AdminSeeder`) que cargan datos iniciales al arrancar.
-- **`Services/`**: `IImageStorageService`/`SupabaseImageStorageService` (sube archivos a Supabase Storage), `IEmailSender`/`SmtpEmailSender` (correo de recuperación de contraseña), `PedidoService` (convierte el carrito en pedido; lo usan `OrdersController` y `CheckoutController`), `IPagoService`/`PagoSimuladoService` (pago simulado del checkout) y `ReportService` (`AddScoped`, calcula los 7 reportes del panel admin a partir de EF Core).
+- **`Services/`**: `IImageStorageService`/`SupabaseImageStorageService` (sube archivos a Supabase Storage), `IEmailSender`/`SmtpEmailSender` (correo de recuperación de contraseña), `PedidoService` (convierte el carrito en pedido; lo usan `OrdersController` y `CheckoutController`), `IPagoService`/`PagoSimuladoService` (pago simulado del checkout) `ReportService` (`AddScoped`, calcula los 7 reportes del panel admin a partir de EF Core) y, del inventario, `ProveedorService`, `MarcaService` y `AbastecimientoService` (devuelven un `ResultadoOperacion`: el Id creado o el mensaje de error para el usuario).
 - **`Helpers/`**: `PriceFormatter` (formatea precios como `"Bs. " + N2` en un solo lugar) y `CsvHelper` (arma el CSV de cada reporte).
 - **`Migrations/`**: historial de cambios de esquema generado por EF Core (no se editan a mano).
 - **`wwwroot/`**: CSS, JS e imágenes estáticas servidas directamente.
@@ -43,6 +43,11 @@ Service N---1 Transport (TransportId opcional)
 Service N---N Product  vía ServiceProduct (PK compuesta ServiceId+ProductId)
    "Equipamiento recomendado" de una ruta. Cascade: si se borra la ruta
    o el producto, el vínculo desaparece solo.
+
+Marca 1---N Product          (MarcaId opcional; reemplazó al texto Product.Brand)
+Proveedor N---N Marca        vía ProveedorMarca (PK compuesta ProveedorId+MarcaId)
+Proveedor 1---N Abastecimiento 1---N DetalleAbastecimiento N---1 Product
+   (explicado en "Proveedores, marcas y abastecimiento")
 ```
 
 `CartItem` y `FavoriteItem` no tienen clave foránea real hacia `Product`/`Service` (guardan `Type` + `ItemId` a mano), así que al borrar un producto o ruta en `AdminController` hay que borrar también sus filas en `FavoriteItems`/`CartItems` explícitamente — no lo hace la base de datos sola. `OrderItem.ProductId` sí es una FK real, pero nullable con `DeleteBehavior.SetNull`: borrar un producto no rompe el historial de pedidos, solo desconecta la fila (el snapshot de nombre/categoría/precio sigue mostrándose).
@@ -158,13 +163,101 @@ El dinero solo se cuenta como ingreso cuando termina el ciclo: una reserva en `A
 
 **Exportar e imprimir:** cada reporte tiene un botón de CSV (`Helpers/CsvHelper.cs`: separador `;`, UTF-8 con BOM para que Excel en español lo abra bien, y escapa con `'` las celdas que empiezan con `=`, `+`, `-` o `@` para evitar inyección de fórmulas) y un botón "Imprimir / Guardar como PDF" que usa el bloque `@media print` de `wwwroot/css/admin.css` (oculta sidebar/topbar/botones al imprimir; no hay una vista ni librería de PDF aparte).
 
+## Proveedores, marcas y abastecimiento
+
+Módulo del panel admin (grupo **Inventario** del menú) para registrar a quién le compra la tienda y **abastecer**: cargar la mercadería que llega, lo que suma stock a los productos. Lo usa solo el administrador; los proveedores no tienen login.
+
+### El modelo de datos
+
+```
+Proveedor 1 ─── * ProveedorMarca * ─── 1 Marca 1 ─── * Product
+    │
+    1
+    │
+    * Abastecimiento 1 ─── * DetalleAbastecimiento * ─── 1 Product
+```
+
+- **`Marca`**: nombre (único), logo opcional y `Activo`. Antes la marca era un texto libre en `Product.Brand`; la migración `AgregarProveedoresYAbastecimientos` creó una fila de `Marcas` por cada texto distinto y enlazó cada producto con su `MarcaId`, y `QuitarBrandDeProductos` borró la columna vieja. Así "Columbia" y "columbia " ya no son dos marcas distintas, y el catálogo filtra por `?marcaId=`.
+- **`Proveedor`**: datos de contacto (NIT, teléfono, email…) y `Activo`.
+- **`ProveedorMarca`**: qué marcas distribuye cada proveedor (ver "muchos a muchos" abajo).
+- **`Abastecimiento`** (la cabecera): qué proveedor entregó, cuándo, el número de comprobante del proveedor, `Total` y `RegistradoPor`.
+- **`DetalleAbastecimiento`** (las líneas): producto, `Cantidad`, `CostoUnitario` y `Subtotal`. Guarda también `NombreProducto`: igual que `OrderItem`, si el producto se borra después, `ProductoId` queda en `null` (`SetNull`) pero el historial sigue diciendo qué se compró.
+- **`Product.StockMinimo`**: umbral de stock bajo propio de cada producto (antes era un 5 fijo en tres lugares). Con `Stock <= StockMinimo` el producto sale en ocre en el panel y cuenta en la tarjeta "Productos con stock bajo" del resumen.
+
+Ni proveedores ni marcas se borran: se **desactivan**. Un proveedor inactivo no aparece al abastecer, pero su historial sigue visible. Una marca no se puede desactivar mientras tenga productos.
+
+### Qué es una relación muchos a muchos y por qué existe `ProveedorMarca`
+
+Un proveedor distribuye **varias** marcas (Andes Gear trae Osprey y Columbia) y una marca puede venir de **varios** proveedores (Columbia la traen dos distribuidores). Eso es una relación *muchos a muchos* (N a N).
+
+Una tabla relacional no puede guardar "una lista de marcas" dentro de una fila de `Proveedores`. La solución es una **tabla intermedia** donde cada fila es un vínculo:
+
+| ProveedorId | MarcaId |
+|---|---|
+| 1 (Andes Gear) | 5 (Osprey) |
+| 1 (Andes Gear) | 10 (Columbia) |
+| 2 (Otro) | 10 (Columbia) |
+
+Su clave primaria es **compuesta** (`ProveedorId` + `MarcaId`, configurada con `HasKey(x => new { x.ProveedorId, x.MarcaId })` en `ApplicationDbContext`): así el mismo vínculo no puede repetirse. Es el mismo patrón que ya usaba `ServiceProduct` (equipamiento recomendado de una ruta).
+
+Para qué sirve en la práctica: al abastecer, el formulario solo ofrece los productos de las marcas del proveedor elegido, y el servidor rechaza un producto de otra marca.
+
+### Qué es una transacción y por qué el abastecimiento la necesita
+
+Registrar un abastecimiento son varias escrituras: la cabecera, una fila de detalle por producto y un aumento de stock por producto. Si el servidor fallara a la mitad (se corta la conexión, un producto se borró justo antes…), podrían quedar **sumados unos stocks sin su abastecimiento**, o un abastecimiento que dice 10 unidades cuando el stock no cambió.
+
+Una **transacción** agrupa todas esas escrituras en una sola unidad: o se guardan **todas** (`CommitAsync`) o **ninguna** (se deshacen si hay un error o si el código llama a `RollbackAsync`). En `AbastecimientoService.RegistrarAsync`:
+
+1. Primero valida todo **antes** de abrir la transacción: el proveedor existe y está activo, hay al menos una línea (y como máximo 100), no hay productos repetidos, cada producto existe y es de una marca del proveedor, y cantidades y costos están en rango.
+2. Abre la transacción (`BeginTransactionAsync`).
+3. Por cada línea suma el stock con **una sola operación en la base** (`ExecuteUpdateAsync(Stock = Stock + cantidad)`), igual que al cancelar un pedido. Así no pisa una venta que ocurra al mismo tiempo. Si el producto ya no existe, hace `RollbackAsync` y no se guarda nada.
+4. Calcula `Subtotal` y `Total` en el servidor, guarda cabecera y detalles (`SaveChangesAsync`) y confirma (`CommitAsync`).
+
+### Por qué los abastecimientos no se editan ni se eliminan
+
+El stock actual de un producto es el resultado de todo lo que entró (abastecimientos) menos todo lo que salió (ventas). Si se pudiera editar un abastecimiento de 10 unidades a 5, o borrarlo, el historial diría una cosa y el stock otra, y ya no se podría explicar de dónde salió cada unidad.
+
+Por eso `AbastecimientosController` no tiene acciones de editar ni borrar, y la base de datos impide borrar un proveedor que tenga abastecimientos (`DeleteBehavior.Restrict`). Si hubo un error de carga, se corrige con un **ajuste manual de stock** en el formulario del producto: el historial queda intacto. Es el mismo criterio de un libro contable: no se borra un asiento, se hace uno de corrección.
+
+### Cómo funciona el formulario dinámico (`Lineas[i]`) y el model binding
+
+`Views/Abastecimientos/Nuevo.cshtml` + `wwwroot/js/abastecimiento.js` (jQuery):
+
+1. Al elegir el proveedor, el JS pide por AJAX `GET /Abastecimientos/ProductosPorProveedor?proveedorId=…`, que devuelve en JSON solo los productos de sus marcas.
+2. El buscador filtra esa lista; al elegir un producto se agrega una **fila** con sus inputs. Si ya estaba, no se duplica: se resalta la fila existente.
+3. El resumen (productos, unidades, total) y el "stock actual → stock resultante" se recalculan en vivo, pero es **solo una vista previa**: el servidor vuelve a calcular todo.
+4. Antes de enviar, un modal pide confirmación ("Se sumarán 42 unidades al stock de 3 productos. ¿Confirmas?").
+
+El truco está en los **nombres** de los inputs:
+
+```html
+<input name="Lineas[0].ProductoId" value="3">
+<input name="Lineas[0].Cantidad" value="10">
+<input name="Lineas[0].CostoUnitario" value="120.50">
+<input name="Lineas[1].ProductoId" value="20">
+...
+```
+
+El *model binding* de ASP.NET lee esos nombres y arma solo la lista `AbastecimientoFormViewModel.Lineas`: `Lineas[0]` es el primer `LineaAbastecimiento`, `Lineas[1]` el segundo, etc. Los índices deben ser **consecutivos desde 0**: si falta uno (por ejemplo quedan `Lineas[0]` y `Lineas[2]` al quitar la fila del medio), el binder se detiene en el hueco y las filas siguientes se pierden. Por eso la función `reindexar()` renumera todas las filas cada vez que se agrega o quita una.
+
+`RegistradoPor` no está en el formulario: el controlador lo toma de `User.Identity.Name`, así nadie puede registrar un abastecimiento a nombre de otro. Si el servidor rechaza el envío, el formulario vuelve con el error y las filas se vuelven a armar desde `data-lineas-iniciales`.
+
+**Decimales:** un `<input type="number">` siempre envía el punto decimal (`120.50`). Con la cultura `es-BO` (coma decimal) el servidor leía ese punto como separador de miles y guardaba `12050`. Por eso `Program.cs` fija para toda la app una cultura `es-BO` con **punto** decimal (`UseRequestLocalization`), sin depender del idioma de Windows ni del servidor de Render.
+
+### Costo unitario vs. precio
+
+- **`CostoUnitario`** (en `DetalleAbastecimiento`): lo que la tienda **le paga al proveedor** por cada unidad. Es un dato histórico de esa compra y puede cambiar de una entrega a otra.
+- **`Price`** / **`PromotionalPrice`** (en `Product`): lo que **paga el cliente** en la tienda.
+
+Son independientes a propósito: abastecer **no cambia** el precio de venta, y el módulo no calcula márgenes ni ganancias. Tampoco suma nada a los reportes de ingresos: un abastecimiento es un gasto de la tienda, no un ingreso.
+
 ## Login (ASP.NET Identity)
 
 - `Program.cs` registra Identity (`AddIdentity<ApplicationUser, IdentityRole>`) y siembra los roles `Admin`/`User` al arrancar si no existen.
 - `AdminSeeder` crea (o promueve a Admin) la cuenta definida por configuración (`Admin:Email`/`Admin:Password`), nunca hardcodeada.
 - Login social: Google y GitHub se registran en `Program.cs` **solo si** hay `ClientId`/`ClientSecret` configurados; si faltan, la app sigue funcionando sin esos botones.
 - `AccountController.Login` respeta `returnUrl` (validado con `Url.IsLocalUrl`) y usa `lockoutOnFailure: true`.
-- `[Authorize(Roles = "Admin")]` en `AdminController` protege todo el panel.
+- `[Authorize(Roles = "Admin")]` en `AdminController` (y en `ProveedoresController`, `MarcasController` y `AbastecimientosController`) protege todo el panel.
 
 ## Cómo correr el proyecto
 
