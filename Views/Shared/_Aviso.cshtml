@@ -1,0 +1,16 @@
+@* Aviso emergente con el mensaje que deja un controlador al redirigir (TempData["Success"]).
+   Esa clave se usa tanto para éxitos como para problemas ("sin stock", "carrito vacío"),
+   por eso el estilo es neutro. site.js lo cierra con la × o solo a los pocos segundos. *@
+@{
+    var mensaje = TempData["Success"] as string;
+}
+@if (!string.IsNullOrWhiteSpace(mensaje))
+{
+    <div class="tas-aviso" id="tasAviso" role="status" aria-live="polite">
+        <i class="fa-solid fa-circle-info tas-aviso__icono" aria-hidden="true"></i>
+        <span class="tas-aviso__texto">@mensaje</span>
+        <button type="button" class="tas-aviso__cerrar" aria-label="Cerrar aviso">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+    </div>
+}

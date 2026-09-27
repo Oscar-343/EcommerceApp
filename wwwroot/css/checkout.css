@@ -1,0 +1,1327 @@
+/* ============================================
+   CHECKOUT — "Prepárate para salir"
+   Lo usan: Checkout/Index y Checkout/Confirmacion.
+   Móvil primero: la base es el teléfono y lo más grande se agrega
+   en la sección RESPONSIVE del final (anchos 768/992).
+   Se completa en las Fases 6 a 11.
+   ============================================ */
+
+:root {
+  /* Apuntan a wwwroot/css/tokens.css: paleta única del sitio */
+  --tas-bg: var(--color-bg);
+  --tas-section: var(--color-section);
+  --tas-card: var(--color-card);
+  --tas-border: var(--color-border);
+  --tas-text: var(--color-text);
+  --tas-text-muted: var(--color-text-secondary);
+  --tas-green: var(--color-green);
+  --tas-green-light: var(--color-green-accent);
+  --tas-earth: var(--color-tierra);
+
+  /* Propios del checkout */
+  --tas-error: #C9694F;   /* tono tierra rojizo, no rojo chillón */
+  --tas-radius: 14px;
+}
+
+/* ---------- Página ---------- */
+.checkout-page {
+  background: var(--tas-bg);
+  color: var(--tas-text);
+  font-family: 'Open Sans', 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+.checkout-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--page-gutter);
+}
+
+/* ---------- Banda superior ---------- */
+.checkout-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 120px;
+  padding: 1.5rem var(--page-gutter);
+  background:
+    linear-gradient(180deg, rgba(11, 16, 14, 0.55) 0%, var(--tas-bg) 100%),
+    url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&h=500&fit=crop') center 40% / cover no-repeat;
+}
+
+.checkout-hero__content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.checkout-hero__title {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.checkout-hero__sub {
+  color: var(--tas-text-muted);
+  margin: 0.25rem 0 0;
+}
+
+/* ---------- Stepper ---------- */
+.checkout-stepper {
+  display: flex;
+  list-style: none;
+  margin: 1.5rem 0 2rem;
+  padding: 0;
+}
+
+.checkout-step {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--tas-text-muted);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Línea fina que une cada círculo con el anterior */
+.checkout-step + .checkout-step::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  right: calc(50% + 24px);
+  left: calc(-50% + 24px);
+  height: 1px;
+  background: var(--tas-border);
+}
+
+.checkout-step__link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.checkout-step__circle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--tas-border);
+  border-radius: 50%;
+  background: var(--tas-section);
+  font-weight: 600;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.checkout-step.is-current {
+  color: var(--tas-text);
+}
+
+.checkout-step.is-current .checkout-step__circle {
+  border: 2px solid var(--tas-green-light);
+}
+
+.checkout-step.is-done .checkout-step__circle {
+  background: var(--tas-green);
+  border-color: var(--tas-green);
+  color: var(--tas-text);
+}
+
+.checkout-step.is-done .checkout-step__link:hover {
+  color: var(--tas-text);
+}
+
+/* ---------- Tarjetas de formulario ---------- */
+.checkout-card {
+  background: var(--tas-card);
+  border: 1px solid var(--tas-border);
+  border-radius: var(--tas-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.checkout-card__title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 1.25rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tas-text);
+}
+
+.checkout-card__title i {
+  color: var(--tas-green-light);
+}
+
+/* Etiquetas siempre visibles arriba del campo */
+.checkout-page .form-label {
+  color: var(--tas-text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.checkout-page .form-control {
+  min-height: 48px;
+  background: var(--tas-section);
+  border: 1px solid var(--tas-border);
+  border-radius: 10px;
+  color: var(--tas-text);
+}
+
+.checkout-page .form-control::placeholder {
+  color: var(--tas-text-muted);
+  opacity: 0.6;
+}
+
+.checkout-page .form-control:focus {
+  background: var(--tas-section);
+  border-color: var(--tas-green-light);
+  box-shadow: 0 0 0 3px rgba(85, 127, 99, 0.2);
+  color: var(--tas-text);
+}
+
+.checkout-page .form-control.input-validation-error {
+  border-color: var(--tas-error);
+}
+
+/* Errores debajo del campo */
+.checkout-page .field-validation-error {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--tas-error);
+  font-size: 0.8rem;
+}
+
+/* Errores generales (pago rechazado, etc.) */
+.checkout-alert.validation-summary-errors {
+  margin-bottom: 1.5rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--tas-error);
+  border-radius: var(--tas-radius);
+  color: var(--tas-error);
+}
+
+.checkout-alert ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.checkout-alert.validation-summary-valid {
+  display: none;
+}
+
+/* ---------- Resumen lateral "Tu equipo" ---------- */
+.checkout-summary {
+  background: var(--tas-card);
+  border: 1px solid var(--tas-border);
+  border-radius: var(--tas-radius);
+  padding: 1.5rem;
+}
+
+.checkout-summary__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.checkout-summary__edit {
+  color: var(--tas-text-muted);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.checkout-summary__edit:hover {
+  color: var(--tas-text);
+}
+
+/* Máximo ~4 ítems visibles; si hay más, scroll interno */
+.checkout-summary__items {
+  list-style: none;
+  margin: 0;
+  padding: 0 0.25rem 0 0;
+  max-height: 336px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.checkout-summary__item {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.5rem 0;
+}
+
+.checkout-summary__img {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--tas-section);
+}
+
+.checkout-summary__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hasta 2 líneas: en móvil una sola cortaba demasiado el nombre */
+.checkout-summary__name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.checkout-summary__qty {
+  color: var(--tas-text-muted);
+  font-size: 0.8rem;
+}
+
+.checkout-summary__price {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.checkout-summary__line {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--tas-border);
+  color: var(--tas-text-muted);
+}
+
+.checkout-summary__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.checkout-demo-note {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.25rem 0 0;
+  color: var(--tas-text-muted);
+  font-size: 0.8rem;
+}
+
+.checkout-demo-note i {
+  color: var(--tas-earth);
+}
+
+/* Más aire en las tarjetas desde tablet (el resto del responsive está al final, Fase 10) */
+@media (min-width: 768px) {
+  .checkout-card {
+    padding: 2rem;
+  }
+}
+
+/* ---------- Paso "Datos de entrega" (Fase 7) ---------- */
+/* Al usar scrollIntoView, la sección no queda tapada por la navbar fija */
+.checkout-card {
+  scroll-margin-top: calc(var(--nav-height) + 1rem);
+}
+
+.checkout-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Sección colapsada: el título ya no necesita separación extra */
+.checkout-card.is-collapsed .checkout-card__title {
+  margin-bottom: 0.5rem;
+}
+
+.checkout-entrega-resumen {
+  margin: 0;
+  color: var(--tas-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.checkout-optional {
+  opacity: 0.7;
+}
+
+.checkout-page textarea.form-control {
+  resize: vertical;
+}
+
+/* Botón principal verde: ancho completo en móvil, a su medida desde 576px */
+.checkout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.75rem;
+  border: 1px solid var(--tas-green-light);
+  border-radius: 10px;
+  background: var(--tas-green);
+  color: var(--tas-text);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.checkout-btn:hover {
+  background: var(--tas-green-light);
+  color: var(--tas-text); /* también cuando es un enlace (Bootstrap cambia el color de a:hover) */
+}
+
+@media (hover: hover) {
+  .checkout-btn:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.checkout-btn:focus-visible,
+.checkout-link-btn:focus-visible {
+  outline: 2px solid var(--tas-green-light);
+  outline-offset: 3px;
+}
+
+/* Botón con aspecto de enlace ("Editar") */
+.checkout-link-btn {
+  min-height: 48px;
+  padding: 0 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--tas-green-light);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.checkout-link-btn:hover {
+  color: var(--tas-text);
+}
+
+/* Aparición de secciones: fade + 12px hacia arriba */
+.checkout-reveal {
+  animation: checkout-reveal 0.4s ease-out;
+}
+
+@keyframes checkout-reveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 576px) {
+  .checkout-btn {
+    width: auto;
+  }
+}
+
+/* ---------- Paso "Método de pago" (Fase 8) ---------- */
+/* Selector: tres tarjetas de opción; apiladas en móvil, en fila desde 768px */
+.checkout-metodos {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* El radio queda oculto a la vista pero sigue siendo accesible con teclado */
+.checkout-metodo__radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkout-metodo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-height: 48px;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--tas-border);
+  border-radius: var(--tas-radius);
+  background: var(--tas-section);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+/* Solo con mouse: en pantallas táctiles el hover queda "pegado" después de tocar */
+@media (hover: hover) {
+  .checkout-metodo:hover {
+    transform: translateY(-2px);
+    border-color: var(--tas-text-muted);
+  }
+}
+
+.checkout-metodo__icono {
+  color: var(--tas-green-light);
+  font-size: 1.3rem;
+  margin-bottom: 0.25rem;
+}
+
+.checkout-metodo__nombre {
+  font-weight: 600;
+  line-height: 1.3;
+  padding-right: 1.5rem; /* espacio para el check de la esquina */
+}
+
+.checkout-metodo__detalle {
+  color: var(--tas-text-muted);
+  font-size: 0.8rem;
+}
+
+/* Seleccionado: borde verde, fondo un poco más claro y check en la esquina */
+.checkout-metodo__radio:checked + .checkout-metodo {
+  border-color: var(--tas-green-light);
+  background: #1D2621;
+}
+
+.checkout-metodo__radio:checked + .checkout-metodo::after {
+  content: "\f00c"; /* check de Font Awesome */
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--tas-green);
+  color: var(--tas-text);
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 0.7rem;
+}
+
+.checkout-metodo__radio:focus-visible + .checkout-metodo {
+  outline: 2px solid var(--tas-green-light);
+  outline-offset: 3px;
+}
+
+/* Panel del método elegido */
+.checkout-panel {
+  margin-top: 1.5rem;
+}
+
+/* Tarjeta: vista previa arriba en móvil; a la izquierda del formulario desde 768px */
+.checkout-tarjeta {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.checkout-error {
+  display: block;
+  min-height: 1rem;
+  margin-top: 0.3rem;
+  color: var(--tas-error);
+  font-size: 0.8rem;
+}
+
+.checkout-hint {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin: 1rem 0 0;
+  color: var(--tas-text-muted);
+  font-size: 0.8rem;
+}
+
+/* ----- Vista previa de la tarjeta ----- */
+.tarjeta {
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  perspective: 1000px;
+}
+
+.tarjeta__inner {
+  position: relative;
+  aspect-ratio: 1.586; /* proporción de una tarjeta real */
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+.tarjeta__inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.tarjeta__cara {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.1rem 1.3rem;
+  border: 1px solid rgba(241, 243, 241, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  color: var(--tas-text);
+  /* Degradado verde bosque → casi negro, con curvas de nivel topográficas muy suaves encima */
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 214' fill='none' stroke='%23F1F3F1' stroke-opacity='0.07' stroke-width='1'%3E%3Cpath d='M-20 170c40-30 80-10 120-30s60-60 110-50 90 50 150 30'/%3E%3Cpath d='M-20 190c50-25 90 0 130-20s70-55 115-45 80 45 135 30'/%3E%3Cpath d='M-20 210c55-20 100 5 140-15s75-45 120-38 75 40 130 28'/%3E%3Cpath d='M-20 150c35-35 75-20 110-40s55-65 105-58 95 55 165 32'/%3E%3Cpath d='M-20 128c30-40 70-28 100-50s50-70 100-65 100 60 180 35'/%3E%3Cellipse cx='250' cy='62' rx='46' ry='24'/%3E%3Cellipse cx='250' cy='62' rx='30' ry='14'/%3E%3Cellipse cx='250' cy='62' rx='14' ry='6'/%3E%3Cpath d='M-20 40c40 10 70-15 110-5s50 30 90 20'/%3E%3Cpath d='M-20 20c45 12 75-12 115-2s55 28 95 18'/%3E%3C/svg%3E") center / cover no-repeat,
+    linear-gradient(135deg, #1E3A2B 0%, #0B100E 100%);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.tarjeta__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tarjeta__logo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--tas-text-muted);
+}
+
+.tarjeta__marca {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  font-size: 0.95rem;
+}
+
+/* Chip dibujado con CSS (sin brillos) */
+.tarjeta__chip {
+  position: relative;
+  width: 40px;
+  height: 30px;
+  margin-top: 0.9rem;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #A89A73, #7C7058);
+}
+
+.tarjeta__chip::before {
+  content: "";
+  position: absolute;
+  inset: 6px 8px;
+  border: 1px solid rgba(11, 16, 14, 0.35);
+  border-radius: 3px;
+}
+
+.tarjeta__numero {
+  margin-top: auto;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(0.95rem, 4.4vw, 1.2rem);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.tarjeta__pie {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.8rem;
+}
+
+.tarjeta__dato {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tarjeta__dato small {
+  color: var(--tas-text-muted);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tarjeta__dato span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.tarjeta__dato--vence {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+/* Reverso: banda magnética y recuadro de firma con el CVV */
+.tarjeta__reverso {
+  transform: rotateY(180deg);
+  padding: 0;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.tarjeta__banda {
+  height: 42px;
+  background: #050807;
+}
+
+.tarjeta__firma {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 1.3rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 4px;
+  background: #D9DDD9;
+  color: #0B100E;
+}
+
+.tarjeta__firma small {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+}
+
+.tarjeta__firma span {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+/* ----- Panel QR ----- */
+.checkout-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  border: 1px solid var(--tas-border);
+  border-radius: var(--tas-radius);
+  background: var(--tas-section);
+  text-align: center;
+}
+
+.checkout-qr__codigo {
+  width: 180px;
+  height: 180px;
+  border-radius: 8px;
+}
+
+.checkout-qr__monto {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.checkout-qr__texto {
+  margin: 0;
+  color: var(--tas-text-muted);
+  font-size: 0.85rem;
+}
+
+/* Etiqueta visible "de demostración" */
+.checkout-badge {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--tas-earth);
+  border-radius: 999px;
+  color: #CFC4A8;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ----- Panel Transferencia ----- */
+.checkout-cuenta {
+  margin: 1rem 0 0;
+  border: 1px solid var(--tas-border);
+  border-radius: var(--tas-radius);
+  background: var(--tas-section);
+}
+
+.checkout-cuenta__fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.6rem 1rem;
+}
+
+.checkout-cuenta__fila + .checkout-cuenta__fila {
+  border-top: 1px solid var(--tas-border);
+}
+
+.checkout-cuenta dt {
+  color: var(--tas-text-muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.checkout-cuenta dd {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.checkout-copiar {
+  min-height: 48px;
+  padding: 0 0.7rem;
+  border: 1px solid var(--tas-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--tas-text-muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.checkout-copiar:hover {
+  color: var(--tas-text);
+  border-color: var(--tas-green-light);
+}
+
+/* ----- Checkbox "Ya realicé el pago" ----- */
+.checkout-check {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  margin-top: 1rem;
+  padding-left: 0;
+}
+
+.checkout-check .form-check-input {
+  width: 1.3rem;
+  height: 1.3rem;
+  margin: 0;
+  flex-shrink: 0;
+  background-color: var(--tas-section);
+  border-color: var(--tas-border);
+  cursor: pointer;
+}
+
+.checkout-check .form-check-input:checked {
+  background-color: var(--tas-green);
+  border-color: var(--tas-green-light);
+}
+
+.checkout-check .form-check-input:focus {
+  border-color: var(--tas-green-light);
+  box-shadow: 0 0 0 3px rgba(85, 127, 99, 0.2);
+}
+
+.checkout-check .form-check-label {
+  cursor: pointer;
+}
+
+/* ----- Botón final (siempre a lo ancho de la tarjeta) ----- */
+.checkout-page .checkout-btn--pagar {
+  width: 100%;
+  font-size: 1.05rem;
+}
+
+.checkout-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  background: var(--tas-green);
+}
+
+.checkout-seguro {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+  margin: 0.9rem 0 0;
+  color: var(--tas-text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.checkout-seguro i {
+  color: var(--tas-green-light);
+}
+
+.checkout-seguro__demo {
+  flex-basis: 100%;
+}
+
+@media (min-width: 768px) {
+  .checkout-metodos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .checkout-tarjeta {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+/* ---------- Overlay "Procesando pago" (Fase 9) ---------- */
+.checkout-procesando {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: var(--page-gutter);
+  background: rgba(11, 16, 14, 0.92);
+  color: var(--tas-text);
+  text-align: center;
+}
+
+.checkout-procesando[hidden] {
+  display: none;
+}
+
+.checkout-procesando__brujula {
+  margin-bottom: 1rem;
+  color: var(--tas-green-light);
+  font-size: 3.5rem;
+  animation: checkout-girar 3s linear infinite; /* una vuelta lenta cada 3 s */
+}
+
+@keyframes checkout-girar {
+  to { transform: rotate(360deg); }
+}
+
+.checkout-procesando__titulo {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.checkout-procesando__sub {
+  margin: 0;
+  color: var(--tas-text-muted);
+}
+
+/* ---------- Página de confirmación "En camino" (Fase 9) ---------- */
+.checkout-confirmacion__hero {
+  padding: 3rem var(--page-gutter) 2.5rem;
+  background:
+    linear-gradient(180deg, rgba(11, 16, 14, 0.5) 0%, rgba(11, 16, 14, 0.75) 60%, var(--tas-bg) 100%),
+    url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=900&fit=crop') center / cover no-repeat;
+  text-align: center;
+}
+
+.checkout-confirmacion__contenido {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Check que se dibuja: el trazo empieza "escondido" (dashoffset = largo) y se revela */
+.checkout-check-animado {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 1.25rem;
+}
+
+.checkout-check-animado circle {
+  fill: var(--tas-green);
+  stroke: var(--tas-green-light);
+  stroke-width: 2;
+}
+
+.checkout-check-animado path {
+  fill: none;
+  stroke: var(--tas-text);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: checkout-trazo 0.8s ease-out 0.2s forwards;
+}
+
+@keyframes checkout-trazo {
+  to { stroke-dashoffset: 0; }
+}
+
+.checkout-confirmacion__titulo {
+  margin: 0;
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(1.7rem, 5vw, 2.6rem);
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.checkout-confirmacion__sub {
+  margin: 0.75rem 0 0;
+  font-size: 1.05rem;
+}
+
+.checkout-confirmacion__codigo {
+  margin: 0.4rem 0 0;
+  color: var(--tas-text-muted);
+}
+
+.checkout-confirmacion__codigo span {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  color: var(--tas-text);
+  letter-spacing: 0.05em;
+}
+
+.checkout-confirmacion__cuerpo {
+  max-width: 760px;
+  padding-top: 1.5rem;
+}
+
+.checkout-confirmacion__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.checkout-confirmacion__items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+}
+
+.checkout-confirmacion__items li + li {
+  border-top: 1px solid var(--tas-border);
+}
+
+.checkout-confirmacion__producto {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.checkout-confirmacion__cantidad {
+  color: var(--tas-text-muted);
+}
+
+.checkout-confirmacion__items li > span:last-child {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.checkout-confirmacion__cuerpo .checkout-summary__total {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--tas-border);
+}
+
+.checkout-confirmacion__datos {
+  display: grid;
+  gap: 0.9rem;
+  margin: 1.5rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--tas-border);
+}
+
+.checkout-confirmacion__datos dt {
+  color: var(--tas-text-muted);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.checkout-confirmacion__datos dd {
+  margin: 0.15rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+/* Estado real del pedido (Pendiente, etc.) */
+.checkout-estado {
+  display: inline-block;
+  padding: 0.15rem 0.65rem;
+  border: 1px solid var(--tas-earth);
+  border-radius: 999px;
+  color: #CFC4A8;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.checkout-confirmacion__nota {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--tas-text-muted);
+  font-size: 0.85rem;
+}
+
+/* Botones: apilados en móvil, en fila desde 576px */
+.checkout-confirmacion__acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.checkout-confirmacion__acciones .checkout-btn {
+  margin-top: 0;
+  text-decoration: none;
+}
+
+.checkout-btn--secundario {
+  background: transparent;
+  border-color: var(--tas-border);
+}
+
+.checkout-btn--secundario:hover {
+  background: var(--tas-section);
+  border-color: var(--tas-green-light);
+}
+
+.checkout-confirmacion__demo {
+  justify-content: center;
+}
+
+@media (min-width: 576px) {
+  .checkout-confirmacion__acciones {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .checkout-confirmacion__hero {
+    padding: 4.5rem var(--page-gutter) 3.5rem;
+  }
+
+  .checkout-confirmacion__datos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   RESPONSIVE (Fase 10)
+   Base = móvil (<768px). Tablet 768–991: una columna, resumen
+   arriba y colapsable. Escritorio ≥992: dos columnas, resumen fijo.
+   ========================================================= */
+
+/* ----- Stepper: en móvil solo números (el nombre sigue disponible para lectores de pantalla) ----- */
+.checkout-step__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ----- Resumen como acordeón: "Ver resumen (3) — Bs. 450.00" ----- */
+.checkout-summary {
+  padding: 0.5rem 1.25rem 1rem;
+}
+
+.checkout-summary__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--tas-text);
+  text-align: left;
+}
+
+.checkout-summary__chevron {
+  color: var(--tas-green-light);
+  transition: transform 0.3s ease;
+}
+
+.checkout-summary.is-open .checkout-summary__chevron {
+  transform: rotate(180deg);
+}
+
+.checkout-summary__toggle:focus-visible {
+  outline: 2px solid var(--tas-green-light);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.checkout-summary__contenido {
+  display: none;
+  padding-top: 1rem;
+  border-top: 1px solid var(--tas-border);
+}
+
+.checkout-summary.is-open .checkout-summary__contenido {
+  display: block;
+  animation: checkout-reveal 0.4s ease-out;
+}
+
+.checkout-summary .checkout-demo-note {
+  margin-top: 0.75rem;
+}
+
+/* ----- Botón de pago fijo abajo mientras se ve el paso de pago ----- */
+.checkout-pagar-barra {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin: 1.5rem -1.5rem -1.5rem;
+  padding: 0.75rem 1rem calc(0.6rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--tas-border);
+  border-radius: 0 0 var(--tas-radius) var(--tas-radius);
+  background: var(--tas-card);
+}
+
+/* Botón compacto para que "Pagar Bs. 3,320.00" entre en una línea desde 320px */
+.checkout-pagar-barra .checkout-btn {
+  margin-top: 0;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+}
+
+.checkout-pagar-barra .checkout-seguro {
+  margin-top: 0.4rem;
+}
+
+/* En la barra fija solo queda "Tus datos están protegidos": la nota de
+   "Modo demostración" ya se ve siempre en el resumen, arriba. */
+.checkout-pagar-barra .checkout-seguro__demo {
+  display: none;
+}
+
+/* El botón del asistente de voz sube para no tapar la barra de pago */
+body:has(#paso-pago:not([hidden])) .asistente-voz {
+  bottom: calc(6.5rem + env(safe-area-inset-bottom));
+}
+
+/* ----- Tablet ----- */
+@media (min-width: 768px) {
+  .checkout-hero {
+    min-height: 180px;
+  }
+
+  .checkout-step__label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+  }
+
+  .checkout-summary {
+    padding: 0.75rem 2rem 1.5rem;
+  }
+
+  /* La barra deja de ser fija: el botón vuelve a su lugar dentro de la tarjeta */
+  .checkout-pagar-barra {
+    position: static;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .checkout-pagar-barra .checkout-btn {
+    padding: 0.75rem 1.75rem;
+    font-size: 1.05rem;
+  }
+
+  .checkout-pagar-barra .checkout-seguro__demo {
+    display: inline;
+    flex-basis: 100%;
+  }
+
+  body:has(#paso-pago:not([hidden])) .asistente-voz {
+    bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* ----- Escritorio: dos columnas, resumen siempre abierto y fijo al hacer scroll ----- */
+@media (min-width: 992px) {
+  .checkout-summary {
+    position: sticky;
+    top: 100px;
+    padding: 2rem;
+  }
+
+  .checkout-summary__toggle {
+    display: none;
+  }
+
+  .checkout-summary__contenido {
+    display: block;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .checkout-summary .checkout-demo-note {
+    margin-top: 1.25rem;
+  }
+}
+
+/* =========================================================
+   ANIMACIONES (Fase 11) — resumen de las que usa el checkout:
+   · Aparición de secciones: checkout-reveal (fade + 12px, 0.4s ease-out)
+   · Hover en métodos de pago y botones: sube 2px, 0.2s (solo con mouse)
+   · Giro de la tarjeta al enfocar el CVV: 0.6s
+   · Brújula del overlay: una vuelta cada 3s
+   · Check de la confirmación: trazo animado 0.8s
+   Con "reducir movimiento" activado se desactivan todas y cada
+   elemento queda directamente en su estado final.
+   (tokens.css ya acorta las animaciones de todo el sitio; aquí se
+   deja explícito qué pasa con cada una del checkout.)
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .checkout-reveal,
+  .checkout-summary.is-open .checkout-summary__contenido,
+  .checkout-procesando__brujula {
+    animation: none;
+  }
+
+  /* El check aparece ya dibujado */
+  .checkout-check-animado path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+
+  /* La tarjeta cambia de cara sin girar; nada se eleva al pasar el mouse */
+  .tarjeta__inner,
+  .checkout-metodo,
+  .checkout-btn,
+  .checkout-summary__chevron {
+    transition: none;
+  }
+
+  .checkout-metodo:hover,
+  .checkout-btn:hover {
+    transform: none;
+  }
+
+  .checkout-summary__items {
+    scroll-behavior: auto;
+  }
+}

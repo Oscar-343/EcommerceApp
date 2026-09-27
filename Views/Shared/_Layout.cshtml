@@ -28,6 +28,7 @@
     <header>
         <partial name="_Navbar" />
     </header>
+    <partial name="_Aviso" />
     <main role="main" class="@(ViewData["FullBleed"] as bool? == true ? "main-fullbleed" : "")">
         @RenderBody()
     </main>

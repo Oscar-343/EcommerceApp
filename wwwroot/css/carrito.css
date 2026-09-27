@@ -291,6 +291,14 @@
   box-shadow: 0 8px 28px rgba(79,138,104,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
   border-color: rgba(79,138,104,0.8);
 }
+/* Deshabilitado (carrito con problemas de stock): sin elevación ni brillo */
+.cart-btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+  box-shadow: none;
+}
 
 /* === ESTADO VACÍO === */
 .cart-empty-state {

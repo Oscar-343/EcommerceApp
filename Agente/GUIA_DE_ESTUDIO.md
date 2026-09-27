@@ -2,11 +2,11 @@
 
 ## Qué hace cada carpeta
 
-- **`Controllers/`**: un controlador MVC por sección (`HomeController`, `ProductsController`, `ServicesController`, `CartController`, `OrdersController`, `ReservationsController`, `FavoritesController`, `AccountController`, `AdminController` dividido en clases parciales: `AdminController.cs`, `.Products.cs`, `.Services.cs`, `.Guides.cs`, `.Transports.cs`, `.Reservations.cs`, `.Orders.cs`, `.Reports.cs`).
-- **`Models/`**: entidades de EF Core (`Product`, `Service`, `Guide`, `Transport`, `Reservation`, `Order`, `OrderItem`, `CartItem`, `FavoriteItem`, `ServiceProduct`, `ApplicationUser`) y ViewModels de página (`HomeViewModel`, `ProductosViewModel`, `ServiciosViewModel`, `CatalogViewModel`, etc.). `Models/Reports/` tiene un ViewModel por reporte (`IncomeReportViewModel`, `ReservationsReportViewModel`, `ProductSalesReportViewModel`, `InventoryReportViewModel`, `DemandReportViewModel`, `UsersReportViewModel`, `GuidesTransportReportViewModel`).
-- **`Views/`**: una carpeta por controlador con sus `.cshtml` (incluye `Views/Orders/`, `Views/Reservations/` y las vistas de reportes en `Views/Admin/`, junto al resto del panel), más `Views/Shared/` para `_Layout.cshtml` (parte pública), `_AdminLayout.cshtml` (panel admin), `_AuthLayout.cshtml` (login/registro) y parciales reutilizables (`_Navbar`, `_ProductoCard`, etc.).
+- **`Controllers/`**: un controlador MVC por sección (`HomeController`, `ProductsController`, `ServicesController`, `CartController`, `CheckoutController`, `OrdersController`, `ReservationsController`, `FavoritesController`, `AccountController`, `AdminController` dividido en clases parciales: `AdminController.cs`, `.Products.cs`, `.Services.cs`, `.Guides.cs`, `.Transports.cs`, `.Reservations.cs`, `.Orders.cs`, `.Reports.cs`).
+- **`Models/`**: entidades de EF Core (`Product`, `Service`, `Guide`, `Transport`, `Reservation`, `Order`, `OrderItem`, `CartItem`, `FavoriteItem`, `ServiceProduct`, `ApplicationUser`) y ViewModels de página (`HomeViewModel`, `ProductosViewModel`, `ServiciosViewModel`, `CatalogViewModel`, `CheckoutViewModel`, `ResumenCompraViewModel`, etc.). `Models/Reports/` tiene un ViewModel por reporte (`IncomeReportViewModel`, `ReservationsReportViewModel`, `ProductSalesReportViewModel`, `InventoryReportViewModel`, `DemandReportViewModel`, `UsersReportViewModel`, `GuidesTransportReportViewModel`).
+- **`Views/`**: una carpeta por controlador con sus `.cshtml` (incluye `Views/Orders/`, `Views/Reservations/` y las vistas de reportes en `Views/Admin/`, junto al resto del panel), más `Views/Shared/` para `_Layout.cshtml` (parte pública), `_AdminLayout.cshtml` (panel admin), `_AuthLayout.cshtml` (login/registro) y parciales reutilizables (`_Navbar`, `_ProductoCard`, `_Aviso` —el mensaje emergente de `TempData["Success"]`—, etc.).
 - **`Data/`**: `ApplicationDbContext` (mapeo EF Core) y los *seeders* (`ProductSeeder`, `ServiceSeeder`, `AdminSeeder`) que cargan datos iniciales al arrancar.
-- **`Services/`**: `IImageStorageService`/`SupabaseImageStorageService` (sube archivos a Supabase Storage), `IEmailSender`/`SmtpEmailSender` (correo de recuperación de contraseña) y `ReportService` (`AddScoped`, calcula los 7 reportes del panel admin a partir de EF Core).
+- **`Services/`**: `IImageStorageService`/`SupabaseImageStorageService` (sube archivos a Supabase Storage), `IEmailSender`/`SmtpEmailSender` (correo de recuperación de contraseña), `PedidoService` (convierte el carrito en pedido; lo usan `OrdersController` y `CheckoutController`), `IPagoService`/`PagoSimuladoService` (pago simulado del checkout) y `ReportService` (`AddScoped`, calcula los 7 reportes del panel admin a partir de EF Core).
 - **`Helpers/`**: `PriceFormatter` (formatea precios como `"Bs. " + N2` en un solo lugar) y `CsvHelper` (arma el CSV de cada reporte).
 - **`Migrations/`**: historial de cambios de esquema generado por EF Core (no se editan a mano).
 - **`wwwroot/`**: CSS, JS e imágenes estáticas servidas directamente.
@@ -25,6 +25,10 @@ ApplicationUser 1---N Order 1---N OrderItem N---1 Product (opcional, SetNull)
    OrderItem es una "foto" del producto al momento de comprar
    (ProductName, ProductCategory, UnitPrice quedan guardados aunque
    el producto original se edite o se borre después).
+   Si el pedido vino del checkout, también guarda los datos de entrega
+   (NombreEntrega, TelefonoEntrega, EmailEntrega, CiudadEntrega,
+   DireccionEntrega, ReferenciaEntrega) y del pago simulado (MetodoPago,
+   TarjetaMarca, TarjetaUltimos4, CodigoTransaccion). Todos son opcionales.
 
 ApplicationUser 1---N Reservation N---1 Service
    PK propia Id (ya no compuesta). Índice único (UserId, ServiceId, TripDate):
@@ -55,10 +59,81 @@ El resto de páginas públicas (`Home`, `Services`, `Cart`, `Favorites`) siguen 
 
 ## Flujo carrito → pedido
 
-1. `Views/Cart/Index.cshtml` tiene un `<form asp-controller="Orders" asp-action="Checkout">` con el botón "Confirmar pedido" (deshabilitado si el carrito está vacío o algún ítem quedó sin stock suficiente).
-2. `OrdersController.Checkout` (`[Authorize]`) abre una transacción, revalida el stock de cada `CartItem` del usuario, crea un `Order` y un `OrderItem` por línea (snapshot de `ProductName`/`ProductCategory`/`UnitPrice` con el precio vigente), descuenta el stock de cada `Product`, calcula `Order.Total` en el servidor y vacía el carrito.
+1. `Views/Cart/Index.cshtml` tiene el botón "Continuar con la compra" que lleva al **checkout** (`/Checkout`); está deshabilitado si el carrito está vacío o algún ítem quedó sin stock suficiente. El checkout se explica en la sección siguiente.
+2. La creación del pedido está en `PedidoService.CrearDesdeCarritoAsync` (antes estaba dentro de `OrdersController.Checkout`, que sigue existiendo y ahora solo llama al servicio): abre una transacción, revalida el stock de cada `CartItem` del usuario, descuenta el stock con una sola operación en la BD por producto, crea un `Order` en estado `Pendiente` y un `OrderItem` por línea (snapshot de `ProductName`/`ProductCategory`/`UnitPrice` con el precio vigente), calcula `Order.Total` en el servidor y vacía el carrito.
 3. `Views/Orders/Index.cshtml` ("Mis pedidos") y `Details.cshtml` muestran los pedidos propios. `Cancel` solo funciona si el pedido sigue `Pendiente` y devuelve el stock.
 4. En el panel admin, `AdminController.Orders.cs` lista y filtra pedidos por estado; `OrderUpdateStatus` solo permite `Pendiente → Entregado` (guarda `DeliveredAt = UtcNow`) o `Pendiente → Cancelado` (devuelve stock). Ambos son estados finales.
+
+## Checkout y pago simulado
+
+El checkout es la pantalla de compra: datos de entrega → método de pago → confirmación. **El pago es simulado**: no hay pasarela real, no se cobra dinero y ningún dato de tarjeta sale del navegador. La interfaz se comporta como una tienda real, pero por dentro el servidor solo "imita" la respuesta de una pasarela.
+
+### El flujo completo
+
+```
+Carrito ──► Checkout ──► Pago simulado ──► Pedido ──► Confirmación
+/Cart       GET /Checkout   IPagoService     PedidoService   GET /Checkout/Confirmacion/{id}
+            POST /Checkout/Pagar
+```
+
+1. **Carrito** (`/Cart`): el botón "Continuar con la compra" lleva a `GET /Checkout`.
+2. **Checkout** (`CheckoutController.Index`, `[Authorize]`): lee el carrito con `PedidoService.ObtenerCarritoAsync`. Si está vacío o falta stock, vuelve al carrito con un aviso. Si no, arma el resumen con precios de la base de datos (`PedidoService.ArmarResumen`) y prellena nombre, email, teléfono y dirección del usuario.
+3. **En la página** (`Views/Checkout/Index.cshtml` + `wwwroot/js/checkout.js`), sin recargar:
+   - paso "Destino": los datos de entrega se validan en el navegador (jQuery Validation, con las reglas del `CheckoutViewModel`);
+   - paso "Pago": se elige Tarjeta, QR o Transferencia. El botón "Pagar" solo se habilita cuando el método está completo (tarjeta válida o la casilla "Ya realicé el pago" marcada).
+4. **Pago simulado** (`POST /Checkout/Pagar`):
+   - el servidor **vuelve a leer el carrito y recalcula el total**;
+   - valida los datos de entrega;
+   - limpia `TarjetaMarca`/`TarjetaUltimos4`;
+   - llama a `IPagoService.ProcesarAsync(metodo, total)`. `PagoSimuladoService` espera 1,2 segundos (como una pasarela) y devuelve un código tipo `TAS-20260927-1877`.
+5. **Pedido**: `PedidoService.CrearDesdeCarritoAsync` crea el pedido con el **mismo flujo que ya existía** (descuenta stock, guarda las líneas y vacía el carrito) y además guarda los datos de entrega, el método de pago y el código. El pedido nace **`Pendiente`**, aunque el pago simulado se haya "aprobado": según la regla de ingresos, solo cuenta como dinero cuando el admin lo marca `Entregado`.
+6. **Confirmación** (`CheckoutController.Confirmacion`): muestra el pedido **solo si es del usuario actual** (si no, 404), con su estado real.
+
+### Por qué existe `IPagoService`
+
+`CheckoutController` no conoce la clase `PagoSimuladoService`: solo pide "algo que implemente `IPagoService`". Quien decide cuál se usa es `Program.cs`:
+
+```csharp
+builder.Services.AddScoped<IPagoService, PagoSimuladoService>();
+```
+
+Si algún día se integra una pasarela real, se crea otra clase (por ejemplo `PagoStripeService : IPagoService`) y se cambia **solo esa línea**. El controlador, las vistas y el pedido no se tocan. Esto se llama **inyección de dependencias**: el controlador depende de un "contrato" (la interfaz), no de una clase concreta.
+
+### Por qué los datos de la tarjeta nunca llegan al servidor
+
+Un formulario HTML solo envía los campos que tienen atributo **`name`**. Los cuatro inputs de la tarjeta (número, titular, vencimiento y CVV, en `_PasoPago.cshtml`) **no tienen `name`**: el navegador los usa para validar y para la vista previa animada, pero nunca los incluye en el POST. Además:
+
+- tienen `autocomplete="off"` (el navegador no los guarda) y no tienen el micrófono del dictado por voz, que manda el audio a un servicio externo;
+- al pagar, `checkout.js` llena solo dos campos ocultos: `TarjetaMarca` ("VISA") y `TarjetaUltimos4` ("4242"), lo mínimo para mostrar "VISA •••• 4242";
+- el servidor no confía ni en esos dos: `CheckoutController.Pagar` solo acepta una marca conocida y exactamente 4 dígitos, y todo lo demás lo descarta;
+- `checkout.js` nunca escribe nada en `console.log`.
+
+Se puede comprobar en DevTools → Network → la petición `Pagar` → Payload: no aparece el número completo, ni la fecha ni el CVV.
+
+Por la misma idea, el **total nunca viene del formulario**: `CheckoutViewModel.Resumen` tiene `[BindNever]`, así que aunque alguien envíe `Resumen.Total=1`, el servidor lo ignora y calcula el total con los precios de la base de datos.
+
+### Qué hace el algoritmo de Luhn
+
+Es una cuenta rápida para detectar **errores de tipeo** en números de tarjeta: un dígito equivocado o dos dígitos invertidos. No dice si la tarjeta existe ni si tiene saldo; solo si el número "tiene forma" de tarjeta válida. Está en `luhnValido()`, dentro de `checkout.js`:
+
+1. Se recorre el número de **derecha a izquierda**.
+2. Uno de cada dos dígitos (el 2.º, el 4.º, el 6.º…) se **multiplica por 2**. Si el resultado es mayor que 9, se le **resta 9**.
+3. Se **suman** todos los dígitos, los cambiados y los que no.
+4. Si la suma termina en **0** (es múltiplo de 10), el número es válido.
+
+Por eso `4242 4242 4242 4242` pasa (suma 80) y `1234 5678 9012 3456` no (suma 64). Además de Luhn, la marca se detecta por el comienzo del número: `4` es VISA; `51–55` o `2221–2720` es MASTERCARD.
+
+### Qué es el patrón Post-Redirect-Get (PRG)
+
+Si una página que se cargó con un **POST** se recarga, el navegador vuelve a enviar ese POST. En una compra, eso crearía **otro pedido**.
+
+PRG lo evita en tres pasos:
+
+1. **Post**: el formulario envía `POST /Checkout/Pagar`.
+2. **Redirect**: al terminar, el servidor no devuelve una página. Responde "andá a `/Checkout/Confirmacion/5`" (`RedirectToAction`).
+3. **Get**: el navegador pide esa página con un **GET**.
+
+Ahora la página que el usuario ve vino de un GET, que solo *lee* el pedido. Recargarla, o volver con "Atrás", no crea nada nuevo. Solo cuando hay un error (datos de entrega inválidos, pago rechazado), `Pagar` devuelve la vista directamente, porque en ese caso no se creó ningún pedido.
 
 ## Flujo de reserva
 

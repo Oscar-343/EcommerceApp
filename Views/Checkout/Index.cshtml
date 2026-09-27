@@ -1,0 +1,73 @@
+@model EcommerceApp.Models.CheckoutViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Checkout";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/checkout.css" asp-append-version="true" />
+}
+
+@* Checkout: etapa "Prepárate para salir".
+   Paso 1 = carrito existente · Pasos 2 y 3 en esta página (JS, sin recargar) · Paso 4 = Confirmacion. *@
+<div class="checkout-page">
+    <section class="checkout-hero">
+        <div class="checkout-hero__content">
+            <h1 class="checkout-hero__title">Prepárate para salir</h1>
+            <p class="checkout-hero__sub">Revisa tu equipo y completa tu pedido.</p>
+        </div>
+    </section>
+
+    <div class="checkout-container">
+        <ol class="checkout-stepper" aria-label="Pasos de la compra">
+            <li class="checkout-step is-done">
+                <a asp-controller="Cart" asp-action="Index" class="checkout-step__link">
+                    <span class="checkout-step__circle"><i class="fa-solid fa-check" aria-hidden="true"></i></span>
+                    <span class="checkout-step__label">Equipo</span>
+                </a>
+            </li>
+            <li class="checkout-step is-current" data-step="2" aria-current="step">
+                <span class="checkout-step__circle">2</span>
+                <span class="checkout-step__label">Destino</span>
+            </li>
+            <li class="checkout-step" data-step="3">
+                <span class="checkout-step__circle">3</span>
+                <span class="checkout-step__label">Pago</span>
+            </li>
+            <li class="checkout-step" data-step="4">
+                <span class="checkout-step__circle">4</span>
+                <span class="checkout-step__label">En camino</span>
+            </li>
+        </ol>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                @* data-enviado: la página vuelve de un POST con errores; checkout.js decide qué paso abrir. *@
+                <form asp-action="Pagar" method="post" id="checkout-form" class="checkout-form" novalidate
+                      data-enviado="@(HttpMethods.IsPost(Context.Request.Method) ? "true" : "false")">
+                    @* Errores generales (p. ej. pago rechazado); los de cada campo van debajo del campo. *@
+                    <div asp-validation-summary="ModelOnly" class="checkout-alert"></div>
+
+                    <partial name="_PasoEntrega" model="Model" />
+                    <partial name="_PasoPago" model="Model" />
+                </form>
+            </div>
+
+            @* order-first: en tablet y móvil el resumen va arriba del formulario; en escritorio, a la derecha. *@
+            <aside class="col-lg-5 order-first order-lg-0">
+                <partial name="_ResumenCompra" model="Model.Resumen" />
+            </aside>
+        </div>
+    </div>
+</div>
+
+@* Overlay a pantalla completa mientras el servidor procesa el pago simulado (checkout.js lo muestra al enviar). *@
+<div class="checkout-procesando" id="checkout-procesando" hidden role="status" aria-live="polite">
+    <i class="fa-regular fa-compass checkout-procesando__brujula" aria-hidden="true"></i>
+    <p class="checkout-procesando__titulo">Procesando tu pago…</p>
+    <p class="checkout-procesando__sub">Preparando tu equipo para la ruta.</p>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/checkout.js" asp-append-version="true"></script>
+}

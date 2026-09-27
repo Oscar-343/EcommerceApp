@@ -8,7 +8,18 @@ document.addEventListener('DOMContentLoaded', function () {
     initMobileMenu();
     initNavSearch();
     initNavUserMenu();
+    initAviso();
 });
+
+// Aviso emergente (_Aviso.cshtml): se cierra con la × o solo a los 6 segundos.
+function initAviso() {
+    const aviso = document.getElementById('tasAviso');
+    if (!aviso) return;
+
+    const cerrar = () => aviso.remove();
+    aviso.querySelector('.tas-aviso__cerrar').addEventListener('click', cerrar);
+    setTimeout(cerrar, 6000);
+}
 
 // Buscador de la navbar: el ícono despliega el input; Escape o clic afuera lo cierra.
 function initNavSearch() {

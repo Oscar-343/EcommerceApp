@@ -1,0 +1,57 @@
+@model EcommerceApp.Models.CheckoutViewModel
+@* Paso 2 "Destino": datos de entrega y contacto.
+   checkout.js valida estos campos al pulsar "Continuar al pago" y, si están bien,
+   colapsa la sección en una línea de resumen con un botón "Editar". *@
+<section class="checkout-card" id="paso-entrega" aria-labelledby="paso-entrega-titulo">
+    <div class="checkout-card__head">
+        <h2 class="checkout-card__title" id="paso-entrega-titulo"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Datos de entrega</h2>
+        <button type="button" class="checkout-link-btn" id="entrega-editar" hidden>Editar</button>
+    </div>
+
+    @* Resumen de una línea que se muestra cuando la sección está colapsada. *@
+    <p class="checkout-entrega-resumen" id="entrega-resumen" hidden></p>
+
+    <div id="entrega-campos">
+        <div class="row g-3">
+            <div class="col-12">
+                <label asp-for="NombreCompleto" class="form-label">Nombre completo</label>
+                <input asp-for="NombreCompleto" class="form-control" autocomplete="name" placeholder="Ej.: Juan Pérez" />
+                <span asp-validation-for="NombreCompleto"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Telefono" class="form-label">Teléfono</label>
+                <input asp-for="Telefono" class="form-control" autocomplete="tel" inputmode="tel" placeholder="Ej.: 70012345" />
+                <span asp-validation-for="Telefono"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label">Email</label>
+                <input asp-for="Email" class="form-control" autocomplete="email" placeholder="tucorreo@ejemplo.com" />
+                <span asp-validation-for="Email"></span>
+            </div>
+
+            <div class="col-md-5">
+                <label asp-for="Ciudad" class="form-label">Ciudad</label>
+                <input asp-for="Ciudad" class="form-control" autocomplete="address-level2" placeholder="Ej.: Cochabamba" />
+                <span asp-validation-for="Ciudad"></span>
+            </div>
+
+            <div class="col-md-7">
+                <label asp-for="Direccion" class="form-label">Dirección</label>
+                <input asp-for="Direccion" class="form-control" autocomplete="street-address" placeholder="Calle, número, zona" />
+                <span asp-validation-for="Direccion"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Referencia" class="form-label">Referencia <span class="checkout-optional">(opcional)</span></label>
+                <textarea asp-for="Referencia" class="form-control" rows="2" placeholder="Ej.: portón verde, frente a la plaza"></textarea>
+                <span asp-validation-for="Referencia"></span>
+            </div>
+        </div>
+
+        <button type="button" class="checkout-btn" id="entrega-continuar">
+            Continuar al pago <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </button>
+    </div>
+</section>

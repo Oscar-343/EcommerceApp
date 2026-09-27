@@ -1,0 +1,45 @@
+@model EcommerceApp.Models.ResumenCompraViewModel
+@* Resumen lateral "Tu equipo". Todos los montos vienen del servidor (precios de la BD).
+   Por debajo de 992px se muestra arriba del formulario, colapsado: el botón lo abre (checkout.js). *@
+<div class="checkout-summary">
+    <button type="button" class="checkout-summary__toggle" aria-expanded="false" aria-controls="resumen-contenido">
+        <span>Ver resumen (@Model.CantidadProductos) — <strong>@PriceFormatter.Format(Model.Total)</strong></span>
+        <i class="fa-solid fa-chevron-down checkout-summary__chevron" aria-hidden="true"></i>
+    </button>
+
+    <div class="checkout-summary__contenido" id="resumen-contenido">
+        <div class="checkout-summary__head">
+            <h2 class="checkout-card__title"><i class="fa-solid fa-mountain" aria-hidden="true"></i> Tu equipo</h2>
+            <a asp-controller="Cart" asp-action="Index" class="checkout-summary__edit">Editar carrito</a>
+        </div>
+
+        <ul class="checkout-summary__items">
+            @foreach (var item in Model.Items)
+            {
+                <li class="checkout-summary__item">
+                    <img src="@(item.ImagenUrl ?? "/images/default-product.svg")" alt="" class="checkout-summary__img" loading="lazy" />
+                    <div class="checkout-summary__info">
+                        <span class="checkout-summary__name">@item.Nombre</span>
+                        <span class="checkout-summary__qty">x@(item.Cantidad) · @PriceFormatter.Format(item.PrecioUnitario) c/u</span>
+                    </div>
+                    <span class="checkout-summary__price">@PriceFormatter.Format(item.Subtotal)</span>
+                </li>
+            }
+        </ul>
+
+        <div class="checkout-summary__line">
+            <span>Subtotal (@Model.CantidadProductos @(Model.CantidadProductos == 1 ? "producto" : "productos"))</span>
+            <span>@PriceFormatter.Format(Model.Subtotal)</span>
+        </div>
+        <div class="checkout-summary__total">
+            <span>Total</span>
+            <span>@PriceFormatter.Format(Model.Total)</span>
+        </div>
+    </div>
+
+    @* Siempre visible, aunque el resumen esté colapsado. *@
+    <p class="checkout-demo-note">
+        <i class="fa-solid fa-lock" aria-hidden="true"></i>
+        Modo demostración — no se realizan cargos reales.
+    </p>
+</div>

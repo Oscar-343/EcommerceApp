@@ -1,0 +1,33 @@
+@* Vista previa de la tarjeta (solo decorativa: aria-hidden).
+   checkout.js actualiza los textos en vivo y la gira (clase is-flipped) al enfocar el CVV.
+   Los datos nunca salen del navegador. *@
+<div class="tarjeta" aria-hidden="true">
+    <div class="tarjeta__inner" id="tarjeta-preview">
+        <div class="tarjeta__cara tarjeta__frente">
+            <div class="tarjeta__top">
+                <span class="tarjeta__logo">TREN AL SUR</span>
+                <span class="tarjeta__marca" id="preview-marca"></span>
+            </div>
+            <span class="tarjeta__chip"></span>
+            <span class="tarjeta__numero" id="preview-numero">•••• •••• •••• ••••</span>
+            <div class="tarjeta__pie">
+                <div class="tarjeta__dato">
+                    <small>Titular</small>
+                    <span id="preview-nombre">NOMBRE APELLIDO</span>
+                </div>
+                <div class="tarjeta__dato tarjeta__dato--vence">
+                    <small>Vence</small>
+                    <span id="preview-vence">MM/AA</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tarjeta__cara tarjeta__reverso">
+            <span class="tarjeta__banda"></span>
+            <div class="tarjeta__firma">
+                <small>CVV</small>
+                <span id="preview-cvv">•••</span>
+            </div>
+        </div>
+    </div>
+</div>

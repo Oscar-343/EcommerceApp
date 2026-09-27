@@ -1,0 +1,158 @@
+@model EcommerceApp.Models.CheckoutViewModel
+@{
+    var totalTexto = PriceFormatter.Format(Model.Resumen.Total);
+
+    // QR de DEMOSTRACIÓN: solo se parece a un QR (tres esquinas + cuadritos al azar con semilla fija).
+    // No codifica nada ni corresponde a ninguna cuenta real.
+    const int modulos = 25;
+    var qr = new System.Text.StringBuilder();
+    var semilla = 20260926u;
+    bool EsEsquina(int x, int y) => (x < 8 && y < 8) || (x >= modulos - 8 && y < 8) || (x < 8 && y >= modulos - 8);
+    for (var y = 0; y < modulos; y++)
+    {
+        for (var x = 0; x < modulos; x++)
+        {
+            semilla = semilla * 1664525u + 1013904223u; // generador pseudoaleatorio simple
+            if (!EsEsquina(x, y) && (semilla >> 16) % 2 == 0) qr.Append($"M{x} {y}h1v1h-1z");
+        }
+    }
+}
+@* Paso 3 "Pago": métodos de pago, paneles y botón final.
+   Empieza oculto: checkout.js lo abre cuando los datos de entrega son válidos. *@
+<section class="checkout-card" id="paso-pago" hidden aria-labelledby="paso-pago-titulo">
+    <h2 class="checkout-card__title" id="paso-pago-titulo"><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Método de pago</h2>
+
+    @* ---------- Selector de métodos (radios ocultos + label estilizado) ---------- *@
+    <fieldset class="checkout-metodos">
+        <legend class="visually-hidden">Elige cómo pagar</legend>
+
+        <input type="radio" asp-for="MetodoPago" value="Tarjeta" id="metodo-tarjeta" class="checkout-metodo__radio" />
+        <label for="metodo-tarjeta" class="checkout-metodo">
+            <i class="fa-regular fa-credit-card checkout-metodo__icono" aria-hidden="true"></i>
+            <span class="checkout-metodo__nombre">Tarjeta de crédito / débito</span>
+            <span class="checkout-metodo__detalle">Visa, Mastercard</span>
+        </label>
+
+        <input type="radio" asp-for="MetodoPago" value="QR" id="metodo-qr" class="checkout-metodo__radio" />
+        <label for="metodo-qr" class="checkout-metodo">
+            <i class="fa-solid fa-qrcode checkout-metodo__icono" aria-hidden="true"></i>
+            <span class="checkout-metodo__nombre">Pago con QR</span>
+            <span class="checkout-metodo__detalle">Escanea desde tu app bancaria</span>
+        </label>
+
+        <input type="radio" asp-for="MetodoPago" value="Transferencia" id="metodo-transferencia" class="checkout-metodo__radio" />
+        <label for="metodo-transferencia" class="checkout-metodo">
+            <i class="fa-solid fa-building-columns checkout-metodo__icono" aria-hidden="true"></i>
+            <span class="checkout-metodo__nombre">Transferencia bancaria</span>
+            <span class="checkout-metodo__detalle">Datos de cuenta de ejemplo</span>
+        </label>
+    </fieldset>
+    <span asp-validation-for="MetodoPago"></span>
+
+    @* Lo único que se envía de la tarjeta: marca y últimos 4 dígitos (los llena checkout.js al pagar). *@
+    <input type="hidden" name="TarjetaMarca" id="TarjetaMarca" value="" />
+    <input type="hidden" name="TarjetaUltimos4" id="TarjetaUltimos4" value="" />
+
+    @* ---------- Panel "Tarjeta" ---------- *@
+    <div class="checkout-panel" data-panel="Tarjeta" hidden>
+        <div class="checkout-tarjeta">
+            <partial name="_TarjetaPreview" />
+
+            @* IMPORTANTE: estos inputs NO tienen atributo name, así el navegador nunca los envía al servidor.
+               data-dictation-processed: dictation.js no les agrega el micrófono (el dictado de Chrome
+               manda el audio a un servicio externo, y los datos de tarjeta no deben salir del navegador). *@
+            <div class="row g-3">
+                <div class="col-12">
+                    <label for="tarjeta-numero" class="form-label">Número de tarjeta</label>
+                    <input type="text" id="tarjeta-numero" class="form-control" data-dictation-processed="true" inputmode="numeric" autocomplete="off"
+                           maxlength="19" placeholder="0000 0000 0000 0000" aria-describedby="tarjeta-numero-error" />
+                    <span class="checkout-error" id="tarjeta-numero-error" role="alert"></span>
+                </div>
+
+                <div class="col-12">
+                    <label for="tarjeta-nombre" class="form-label">Nombre del titular</label>
+                    <input type="text" id="tarjeta-nombre" class="form-control" data-dictation-processed="true" autocomplete="off"
+                           maxlength="26" placeholder="Como figura en la tarjeta" aria-describedby="tarjeta-nombre-error" />
+                    <span class="checkout-error" id="tarjeta-nombre-error" role="alert"></span>
+                </div>
+
+                <div class="col-6">
+                    <label for="tarjeta-vence" class="form-label">Vencimiento</label>
+                    <input type="text" id="tarjeta-vence" class="form-control" data-dictation-processed="true" inputmode="numeric" autocomplete="off"
+                           maxlength="5" placeholder="MM/AA" aria-describedby="tarjeta-vence-error" />
+                    <span class="checkout-error" id="tarjeta-vence-error" role="alert"></span>
+                </div>
+
+                <div class="col-6">
+                    <label for="tarjeta-cvv" class="form-label">CVV</label>
+                    <input type="password" id="tarjeta-cvv" class="form-control" inputmode="numeric" autocomplete="off"
+                           maxlength="3" placeholder="123" aria-describedby="tarjeta-cvv-error" />
+                    <span class="checkout-error" id="tarjeta-cvv-error" role="alert"></span>
+                </div>
+            </div>
+        </div>
+
+        <p class="checkout-hint">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            Tarjeta de prueba: 4242 4242 4242 4242 · cualquier fecha futura · CVV 123
+        </p>
+    </div>
+
+    @* ---------- Panel "QR" ---------- *@
+    <div class="checkout-panel" data-panel="QR" hidden>
+        <div class="checkout-qr">
+            <span class="checkout-badge">QR de demostración</span>
+            <svg class="checkout-qr__codigo" viewBox="-2 -2 29 29" role="img" aria-label="Código QR de demostración">
+                <rect x="-2" y="-2" width="29" height="29" fill="#F1F3F1" />
+                @* Las tres esquinas de un QR: cuadro 7x7, hueco 5x5 y centro 3x3 *@
+                @foreach (var (ex, ey) in new[] { (0, 0), (modulos - 7, 0), (0, modulos - 7) })
+                {
+                    <path fill="#0B100E" fill-rule="evenodd" d="M@(ex) @(ey)h7v7h-7z M@(ex + 1) @(ey + 1)v5h5v-5z M@(ex + 2) @(ey + 2)h3v3h-3z" />
+                }
+                <path fill="#0B100E" d="@qr" />
+            </svg>
+            <p class="checkout-qr__monto">@totalTexto</p>
+            <p class="checkout-qr__texto">Escanea el código desde la app de tu banco.</p>
+        </div>
+
+        <div class="form-check checkout-check">
+            <input class="form-check-input" type="checkbox" id="qr-confirmado" />
+            <label class="form-check-label" for="qr-confirmado">Ya realicé el pago</label>
+        </div>
+    </div>
+
+    @* ---------- Panel "Transferencia" (datos claramente ficticios) ---------- *@
+    <div class="checkout-panel" data-panel="Transferencia" hidden>
+        <span class="checkout-badge">Cuenta de demostración</span>
+        <dl class="checkout-cuenta">
+            @foreach (var (etiqueta, dato) in new[] { ("Banco", "Banco de ejemplo"), ("Cuenta", "000-0000000-0"), ("Titular", "Tren al Sur (demo)"), ("Monto", totalTexto) })
+            {
+                <div class="checkout-cuenta__fila">
+                    <dt>@etiqueta</dt>
+                    <dd>
+                        <span>@dato</span>
+                        <button type="button" class="checkout-copiar" data-copiar="@dato" aria-label="Copiar @etiqueta.ToLower()">
+                            <i class="fa-regular fa-copy" aria-hidden="true"></i> <span class="checkout-copiar__texto">Copiar</span>
+                        </button>
+                    </dd>
+                </div>
+            }
+        </dl>
+
+        <div class="form-check checkout-check">
+            <input class="form-check-input" type="checkbox" id="transferencia-confirmado" />
+            <label class="form-check-label" for="transferencia-confirmado">Ya realicé la transferencia</label>
+        </div>
+    </div>
+
+    @* ---------- Botón final (en móvil queda fijo abajo mientras se ve este paso) ---------- *@
+    <div class="checkout-pagar-barra">
+        <button type="submit" class="checkout-btn checkout-btn--pagar" id="btn-pagar" disabled>
+            <i class="fa-solid fa-lock" aria-hidden="true"></i> Pagar @totalTexto
+        </button>
+        <p class="checkout-seguro">
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Tus datos están protegidos
+            <span class="checkout-seguro__demo">Modo demostración — no se realizan cargos reales.</span>
+        </p>
+    </div>
+</section>

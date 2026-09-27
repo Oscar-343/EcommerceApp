@@ -82,9 +82,15 @@
                     <span>Total estimado</span>
                     <span>@PriceFormatter.Format((decimal)ViewBag.Total)</span>
                 </div>
-                <form asp-controller="Orders" asp-action="Checkout" method="post">
-                    <button type="submit" class="btn-admin btn-admin-primary cart-summary__btn" disabled="@(!puedeConfirmar)">Confirmar pedido</button>
-                </form>
+                @* Lleva al checkout (datos de entrega + pago simulado). *@
+                @if (puedeConfirmar)
+                {
+                    <a asp-controller="Checkout" asp-action="Index" class="cart-btn-primary cart-summary__btn">Continuar con la compra</a>
+                }
+                else
+                {
+                    <button type="button" class="cart-btn-primary cart-summary__btn" disabled>Continuar con la compra</button>
+                }
                 @if (hayProblemaDeStock)
                 {
                     <div class="cart-summary__note">Corrige los productos sin stock suficiente para continuar.</div>

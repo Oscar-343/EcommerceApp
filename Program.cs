@@ -66,6 +66,12 @@ builder.Services.AddHttpClient<IImageStorageService, SupabaseImageStorageService
 // Cálculo de los reportes del panel admin (ingresos, reservas, ventas, inventario).
 builder.Services.AddScoped<ReportService>();
 
+// Pago simulado: para usar una pasarela real solo se cambia la clase que implementa IPagoService.
+builder.Services.AddScoped<IPagoService, PagoSimuladoService>();
+
+// Crea pedidos desde el carrito (lo usan Orders y Checkout).
+builder.Services.AddScoped<PedidoService>();
+
 // Lee enlaces de Google Maps en el admin. AllowAutoRedirect = false:
 // cada redirección se revisa a mano para no salir de los dominios de Google.
 builder.Services.AddHttpClient<MapLinkService>(client =>

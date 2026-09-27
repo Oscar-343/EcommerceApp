@@ -1,0 +1,103 @@
+@model EcommerceApp.Models.Order
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Pedido confirmado";
+
+    // Texto del método de pago. De la tarjeta solo existen la marca y los últimos 4 dígitos.
+    var metodo = Model.MetodoPago switch
+    {
+        "Tarjeta" when Model.TarjetaMarca != null && Model.TarjetaUltimos4 != null => $"Tarjeta {Model.TarjetaMarca} •••• {Model.TarjetaUltimos4}",
+        "Tarjeta" => "Tarjeta",
+        "QR" => "Pago con QR",
+        "Transferencia" => "Transferencia bancaria",
+        _ => null
+    };
+
+    // Datos de entrega que existan (los pedidos confirmados directo desde el carrito no los tienen).
+    var entrega = new[]
+    {
+        ("Nombre", Model.NombreEntrega),
+        ("Teléfono", Model.TelefonoEntrega),
+        ("Email", Model.EmailEntrega),
+        ("Ciudad", Model.CiudadEntrega),
+        ("Dirección", Model.DireccionEntrega),
+        ("Referencia", Model.ReferenciaEntrega)
+    }.Where(d => !string.IsNullOrWhiteSpace(d.Item2)).ToList();
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/checkout.css" asp-append-version="true" />
+}
+
+@* Paso 4 "En camino": cierre de la compra. El estado mostrado es el real del pedido (nace Pendiente). *@
+<div class="checkout-page">
+    <section class="checkout-confirmacion__hero">
+        <div class="checkout-confirmacion__contenido">
+            <svg class="checkout-check-animado" viewBox="0 0 52 52" aria-hidden="true">
+                <circle cx="26" cy="26" r="24" />
+                <path d="M15 27l7 7 15-16" />
+            </svg>
+            <h1 class="checkout-confirmacion__titulo">¡Todo listo para tu próxima aventura!</h1>
+            <p class="checkout-confirmacion__sub">Tu pedido <strong>#@Model.Id</strong> fue registrado.</p>
+            @if (!string.IsNullOrEmpty(Model.CodigoTransaccion))
+            {
+                <p class="checkout-confirmacion__codigo">Código: <span>@Model.CodigoTransaccion</span></p>
+            }
+        </div>
+    </section>
+
+    <div class="checkout-container checkout-confirmacion__cuerpo">
+        <section class="checkout-card" aria-labelledby="resumen-pedido-titulo">
+            <h2 class="checkout-card__title" id="resumen-pedido-titulo"><i class="fa-solid fa-receipt" aria-hidden="true"></i> Resumen del pedido</h2>
+
+            <ul class="checkout-confirmacion__items">
+                @foreach (var item in Model.Items)
+                {
+                    <li>
+                        <span class="checkout-confirmacion__producto">@item.ProductName <span class="checkout-confirmacion__cantidad">x@(item.Quantity)</span></span>
+                        <span>@PriceFormatter.Format(item.UnitPrice * item.Quantity)</span>
+                    </li>
+                }
+            </ul>
+
+            <div class="checkout-summary__total">
+                <span>Total</span>
+                <span>@PriceFormatter.Format(Model.Total)</span>
+            </div>
+
+            <dl class="checkout-confirmacion__datos">
+                @if (metodo != null)
+                {
+                    <div><dt>Método de pago</dt><dd>@metodo</dd></div>
+                }
+                <div>
+                    <dt>Estado</dt>
+                    <dd>
+                        <span class="checkout-estado">@Model.Status</span>
+                        @if (Model.Status == "Pendiente")
+                        {
+                            <span class="checkout-confirmacion__nota">Te avisaremos cuando tu pedido esté en camino.</span>
+                        }
+                    </dd>
+                </div>
+                @foreach (var (etiqueta, valor) in entrega)
+                {
+                    <div><dt>@etiqueta</dt><dd>@valor</dd></div>
+                }
+            </dl>
+        </section>
+
+        <div class="checkout-confirmacion__acciones">
+            <a asp-controller="Orders" asp-action="Index" class="checkout-btn">
+                <i class="fa-solid fa-box" aria-hidden="true"></i> Ver mis pedidos
+            </a>
+            <a asp-controller="Services" asp-action="Index" class="checkout-btn checkout-btn--secundario">
+                <i class="fa-solid fa-route" aria-hidden="true"></i> Explorar rutas
+            </a>
+        </div>
+
+        <p class="checkout-demo-note checkout-confirmacion__demo">
+            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+            Modo demostración — no se realizaron cargos reales.
+        </p>
+    </div>
+</div>
