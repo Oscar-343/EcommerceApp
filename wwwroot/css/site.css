@@ -122,9 +122,6 @@ body {
     cursor: pointer;
 }
 
-/* La navbar es fixed, así que es la referencia de posición de sus hijos:
-   absolute + top: 100% deja el panel justo debajo, mida lo que mida la navbar
-   (antes era top: 73px fijo y no coincidía en todas las páginas). */
 .nav-menu {
     position: absolute;
     top: 100%;

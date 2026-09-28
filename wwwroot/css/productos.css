@@ -1003,3 +1003,8 @@ body.filtros-open {
         background-attachment: fixed;
     }
 }
+
+/* Al llegar con #catalogo en el link (asistente de voz), la sección queda justo debajo del navbar fijo */
+#catalogo {
+    scroll-margin-top: calc(var(--nav-height) + 1rem);
+}

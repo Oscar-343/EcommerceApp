@@ -80,7 +80,31 @@
         return texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 
+    // Números dichos con palabras -> cifras ("menos de mil" -> "menos de 1000").
+    var NUMEROS = {
+        'un': 1, 'uno': 1, 'dos': 2, 'tres': 3, 'cuatro': 4, 'cinco': 5, 'seis': 6, 'siete': 7, 'ocho': 8, 'nueve': 9,
+        'diez': 10, 'veinte': 20, 'treinta': 30, 'cuarenta': 40, 'cincuenta': 50, 'sesenta': 60, 'setenta': 70,
+        'ochenta': 80, 'noventa': 90, 'cien': 100, 'ciento': 100, 'doscientos': 200, 'trescientos': 300,
+        'cuatrocientos': 400, 'quinientos': 500, 'seiscientos': 600, 'setecientos': 700, 'ochocientos': 800,
+        'novecientos': 900
+    };
+
+    function numerosEnPalabras(texto) {
+        return texto.replace(/\b(?:(?:un|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|veinte|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien|ciento|doscientos|trescientos|cuatrocientos|quinientos|seiscientos|setecientos|ochocientos|novecientos|mil|y)\s*)+\b/g, function (frase) {
+            var palabras = frase.trim().split(/\s+/).filter(function (w) { return w !== 'y'; });
+            if (!palabras.length || (palabras.length === 1 && palabras[0] === 'un')) return frase;
+            var total = 0, actual = 0;
+            palabras.forEach(function (w) {
+                if (w === 'mil') { total += (actual || 1) * 1000; actual = 0; }
+                else actual += NUMEROS[w] || 0;
+            });
+            return (total + actual) + ' ';
+        }).replace(/\s+/g, ' ').trim();
+    }
+
     function interpretar(textoOriginal, urls) {
+        // Los números dichos con palabras se pasan a cifras antes de interpretar.
+        textoOriginal = numerosEnPalabras(textoOriginal.toLowerCase());
         var texto = normalizar(textoOriginal);
 
         // Cada palabra guarda su versión normalizada (para comparar)
@@ -93,7 +117,18 @@
             return palabras.some(function (p) { return lista.indexOf(p.norm) !== -1; });
         };
 
-        // 1. Páginas del usuario (frases directas).
+        // 1. Cuenta: se revisa primero para que "iniciar sesión" no se confunda con "inicio".
+        if (/\bregistr\w*/.test(texto) || /\b(crear|crea|abrir|nueva)\s+(una\s+|mi\s+)?cuenta\b/.test(texto)) {
+            return { url: urls.registro, mensaje: 'Abriendo el registro' };
+        }
+        if (/\b(iniciar|inicia|inicio de|abrir|abre)\s+sesion\b/.test(texto) || /\b(login|loguearme|logearme|ingresar|acceder)\b/.test(texto) ||
+            /\b(entrar|ingresar)\s+(a\s+)?mi\s+cuenta\b/.test(texto)) {
+            return { url: urls.login, mensaje: 'Abriendo iniciar sesión' };
+        }
+        if (/\b(nosotros|quienes somos)\b/.test(texto)) return { url: urls.nosotros, mensaje: 'Abriendo Nosotros' };
+        if (/\b(contacto|contactar|contactarme|contactarlos|whatsapp)\b/.test(texto)) return { url: urls.contacto, mensaje: 'Abriendo Contacto' };
+
+        // 2. Páginas del usuario (frases directas).
         if (/\bcarrito\b/.test(texto)) return { url: urls.carrito, mensaje: 'Abriendo tu carrito' };
         if (/\bfavoritos?\b/.test(texto)) return { url: urls.favoritos, mensaje: 'Abriendo tus favoritos' };
         if (/\bpedidos?\b/.test(texto)) return { url: urls.pedidos, mensaje: 'Abriendo tus pedidos' };
@@ -101,7 +136,7 @@
         if (/\breservas?\b/.test(texto)) return { url: urls.reservas, mensaje: 'Abriendo tus reservas' };
         if (/\b(inicio|portada|home)\b/.test(texto)) return { url: urls.inicio, mensaje: 'Volviendo al inicio' };
 
-        // 2. Productos: se revisa antes que rutas porque "botas de senderismo"
+        // 3. Productos: se revisa antes que rutas porque "botas de senderismo"
         //    incluye una palabra de rutas pero se refiere a un producto.
         var categoria = null;
         palabras.forEach(function (p) {
@@ -132,17 +167,19 @@
             }).map(function (p) { return p.orig; }).join(' ');
             if (resto) { filtrosProducto.search = resto; descripcion.push('"' + resto + '"'); }
 
-            return { url: armarUrl(urls.productos, filtrosProducto), mensaje: 'Buscando ' + descripcion.join(' · ') };
+            // #catalogo: la página abre directamente en los productos, sin pasar por el hero.
+            return { url: armarUrl(urls.productos, filtrosProducto) + '#catalogo', mensaje: 'Buscando ' + descripcion.join(' · ') };
         }
 
-        // 3. Rutas.
+        // 4. Rutas.
         var dificultad = null, region = null;
         palabras.forEach(function (p) {
             if (!dificultad && DIFICULTADES[p.norm]) dificultad = DIFICULTADES[p.norm];
             if (!region && REGIONES[p.norm]) region = REGIONES[p.norm];
         });
 
-        if (tiene(PALABRAS_RUTA) || dificultad || region) {
+        // "quiero reservar Corani" también es una búsqueda de rutas.
+        if (tiene(PALABRAS_RUTA) || tiene(['reservar', 'reservo']) || dificultad || region) {
             var filtrosRuta = {};
             var detalle = [];
             if (dificultad) { filtrosRuta.difficulty = dificultad; detalle.push(NOMBRE_DIFICULTAD[dificultad]); }
@@ -155,12 +192,13 @@
             if (restoRuta) { filtrosRuta.search = restoRuta; detalle.push('"' + restoRuta + '"'); }
 
             return {
-                url: armarUrl(urls.rutas, filtrosRuta),
+                // #rutas: abre directamente en los filtros y las tarjetas, sin pasar por el hero.
+                url: armarUrl(urls.rutas, filtrosRuta) + '#rutas',
                 mensaje: detalle.length ? 'Buscando rutas ' + detalle.join(' · ') : 'Abriendo rutas'
             };
         }
 
-        // 4. No se entendió: no se navega.
+        // 5. No se entendió: no se navega.
         return null;
     }
 
@@ -199,7 +237,11 @@
             carrito: raiz.dataset.urlCarrito,
             favoritos: raiz.dataset.urlFavoritos,
             pedidos: raiz.dataset.urlPedidos,
-            reservas: raiz.dataset.urlReservas
+            reservas: raiz.dataset.urlReservas,
+            login: raiz.dataset.urlLogin,
+            registro: raiz.dataset.urlRegistro,
+            nosotros: raiz.dataset.urlNosotros,
+            contacto: raiz.dataset.urlContacto
         };
 
         var reconocimiento = null;
@@ -269,7 +311,7 @@
 
                 var resultado = interpretar(textoFinal, urls);
                 if (!resultado) {
-                    mostrar('No te entendí', 'Prueba: "ir a rutas", "ruta a Corani" o "mochilas en oferta".');
+                    mostrar('No te entendí', 'Prueba: "ruta a Corani", "mochilas en oferta" o "iniciar sesión".');
                     ocultarEn(6000);
                     return;
                 }
