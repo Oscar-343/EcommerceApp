@@ -26,6 +26,12 @@
          1200px escritorio
          1400px escritorio grande                                          */
 
+    /* Foto de árboles al pie de las páginas (carrito, favoritos, pedidos, reservas,
+       productos, rutas y sus detalles). Cambiarla aquí la cambia en todo el sitio. */
+    --fondo-bosque: url("https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/fondo_arboles.png");
+    --fondo-alto: 520px;   /* cuánto sube la foto desde el pie */
+    --fondo-ancho: 100%;   /* ancho de la foto (en móvil se agranda, ver abajo) */
+
     --page-gutter: clamp(1rem, 4vw, 2rem); /* margen lateral de todas las páginas */
     --page-max: 1400px;                     /* ancho máximo del contenido */
     --nav-height: 72px;                     /* alto aproximado de la navbar */
@@ -35,6 +41,14 @@
     --z-nav: 1000;      /* navbar fija */
     --z-drawer: 1100;   /* filtros móviles, barra lateral del admin y su fondo oscuro */
     --z-toast: 1200;    /* mensajes emergentes */
+}
+
+/* En pantallas angostas la foto se agranda para que no quede como una franja fina */
+@media (max-width: 767px) {
+    :root {
+        --fondo-ancho: 220%;
+        --fondo-alto: 380px;
+    }
 }
 
 /* Respeta la preferencia del sistema de reducir animaciones */

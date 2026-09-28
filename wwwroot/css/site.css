@@ -68,7 +68,7 @@ body {
 
 .nav-container {
     max-width: var(--page-max);
-    margin: 0 auto;
+    margin-left:40px;
     padding: 0 var(--page-gutter);
     display: flex;
     align-items: center;
@@ -79,18 +79,35 @@ body {
 .nav-logo {
     display: flex;
     align-items: center;
+    justify-content: center;
     text-decoration: none;
     flex-shrink: 0;
+    padding: 2px;
+    margin-right: 15px; /* Separa el logo suavemente de los ítems de navegación */
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.nav-logo img {
-    height: clamp(36px, 11vw, 44px); /* un poco más chico en teléfonos de 320px */
-    width: auto;
-    object-fit: contain;
-    display: block;
-    border-radius: 6px;
-}
+    .nav-logo:hover img {
+        transform: scale(1.05);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(74, 124, 89, 0.7); /* El aro verde resplandece */
+    }
 
+    /* Estilos de la imagen del logo circular */
+    .nav-logo img {
+        /* Altura óptima para no deformar el alto del navbar */
+        height: 64px;
+        width: 64px;
+        object-fit: cover;
+        border-radius: 50%;
+        /* Resalte retro/outdoor sobre fondo oscuro */
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(74, 124, 89, 0.3); /* Aro verde tenue al borde */
+
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .nav-logo:active {
+        transform: scale(0.98);
+    }
 /* --- Menú: en móvil es un panel que se despliega bajo la navbar --- */
 .nav-toggle {
     display: inline-flex;

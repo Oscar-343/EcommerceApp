@@ -4,98 +4,204 @@
     ViewData["Title"] = "Tu carrito";
     var hayProblemaDeStock = Model.Any(i => i.Product == null || i.Product.Stock <= 0 || i.Quantity > i.Product.Stock);
     var puedeConfirmar = Model.Any() && !hayProblemaDeStock;
+    var cantidadTotal = Model.Sum(i => i.Quantity);
+    var total = (decimal)ViewBag.Total;
 }
-<link rel="stylesheet" href="~/css/carrito.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
 
-<div class="container-fluid cart-page">
-    <section class="cart-hero">
-        <h1 class="cart-title">Tu carrito 🏔</h1>
-        <p class="cart-sub">Productos seleccionados para tu aventura.</p>
+<div class="cuenta-page">
+    <section class="cuenta-hero" style="--hero-img: url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=1600&h=600&fit=crop');">
+        <div class="cuenta-hero__inner">
+            <i class="fa-solid fa-mountain-sun cuenta-hero__icon" aria-hidden="true"></i>
+            <div>
+                <p class="cuenta-hero__eyebrow">Tu equipo, tus aventuras</p>
+                <h1 class="cuenta-hero__title">Tu carrito</h1>
+                <p class="cuenta-hero__sub">Revisa tus productos antes de continuar con la compra.</p>
+            </div>
+        </div>
     </section>
 
-    <div class="cart-layout">
-        <div class="cart-layout__main">
-            @if (!Model.Any())
-            {
-                <div class="cart-empty-state">
-                    <h3 class="cart-empty-state__title">Tu carrito está vacío</h3>
-                    <p>Explora nuestra tienda y agrega productos de senderismo.</p>
-                    <a asp-controller="Products" asp-action="Index" class="cart-btn-primary cart-empty-state__btn">Ver tienda</a>
-                </div>
-            }
-            else
-            {
-                <a asp-controller="Products" asp-action="Index" class="cart-back">&larr; Seguir comprando</a>
-                <div class="cart-list">
-                    @foreach (var item in Model)
+    <div class="cuenta-wrap">
+        <div class="cuenta-layout">
+            @* ---------- Productos ---------- *@
+            <div class="cuenta-panel">
+                <div class="cuenta-panel__head">
+                    <h2 class="cuenta-panel__title">
+                        <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+                        Mis productos (@Model.Count)
+                    </h2>
+                    @if (Model.Any())
                     {
-                        var p = item.Product;
-                        var precioVigente = p?.PromotionalPrice ?? p?.Price ?? item.UnitPrice;
-                        var sinStock = p == null || p.Stock <= 0;
-                        var superaStock = p != null && !sinStock && item.Quantity > p.Stock;
-                        <div class="cart-item">
-                            <img src="@(p?.ImageUrl ?? "/images/default-product.svg")" class="cart-item__img" alt="" />
-                            <div class="cart-item__info">
-                                <h4 class="cart-item__name">@(p?.Name ?? "Producto no disponible")</h4>
-                                <div class="cart-item__meta">@p?.Category</div>
-                                <div class="cart-item__price">@PriceFormatter.Format(precioVigente) c/u &middot; Subtotal: @PriceFormatter.Format(precioVigente * item.Quantity)</div>
-                                @if (sinStock)
-                                {
-                                    <div class="cart-item__warning cart-item__warning--error">Sin stock disponible. Quítalo del carrito para continuar.</div>
-                                }
-                                else if (superaStock)
-                                {
-                                    <div class="cart-item__warning">Solo quedan @p!.Stock unidades. Ajusta la cantidad para continuar.</div>
-                                }
-                            </div>
-                            <div class="cart-item__actions">
-                                <form asp-action="Update" method="post" class="cart-inline-form">
-                                    <input type="hidden" name="productId" value="@item.ProductId" />
-                                    <input type="hidden" name="direction" value="dec" />
-                                    <button type="submit" class="cart-qty-btn" disabled="@(item.Quantity <= 1)">−</button>
-                                </form>
-                                <span class="cart-item__qty">@item.Quantity</span>
-                                <form asp-action="Update" method="post" class="cart-inline-form">
-                                    <input type="hidden" name="productId" value="@item.ProductId" />
-                                    <input type="hidden" name="direction" value="inc" />
-                                    <button type="submit" class="cart-qty-btn" disabled="@(sinStock || (p != null && item.Quantity >= p.Stock))">+</button>
-                                </form>
-                                <form asp-action="Remove" method="post" class="cart-inline-form cart-item__remove-form">
-                                    <input type="hidden" name="productId" value="@item.ProductId" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger cart-item__remove" aria-label="Quitar del carrito">✕</button>
-                                </form>
-                            </div>
-                        </div>
+                        <form asp-action="Clear" method="post" class="m-0">
+                            <button type="submit" class="cuenta-link-sutil cuenta-link-sutil--peligro"
+                                    onclick="return confirm('¿Quitar todos los productos del carrito?')">
+                                <i class="fa-regular fa-trash-can" aria-hidden="true"></i> Vaciar carrito
+                            </button>
+                        </form>
                     }
                 </div>
-            }
-        </div>
-        <div class="cart-layout__aside">
-            <div class="cart-summary">
-                <h3 class="cart-summary__title">Resumen</h3>
-                <div class="cart-summary__line">
-                    <span>Subtotal</span>
-                    <strong>@PriceFormatter.Format((decimal)ViewBag.Total)</strong>
-                </div>
-                <hr class="cart-summary__divider" />
-                <div class="cart-summary__total">
-                    <span>Total estimado</span>
-                    <span>@PriceFormatter.Format((decimal)ViewBag.Total)</span>
-                </div>
-                @* Lleva al checkout (datos de entrega + pago simulado). *@
-                @if (puedeConfirmar)
+
+                @if (!Model.Any())
                 {
-                    <a asp-controller="Checkout" asp-action="Index" class="cart-btn-primary cart-summary__btn">Continuar con la compra</a>
+                    <div class="cuenta-vacio">
+                        <div class="cuenta-vacio__icono"><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i></div>
+                        <div class="cuenta-vacio__titulo">Tu carrito está vacío</div>
+                        <p>Todavía no elegiste tu equipo. Explora la tienda y prepárate para tu próxima ruta.</p>
+                        <a asp-controller="Products" asp-action="Index" class="cuenta-btn cuenta-btn--auto">
+                            Explorar equipamiento <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
                 }
                 else
                 {
-                    <button type="button" class="cart-btn-primary cart-summary__btn" disabled>Continuar con la compra</button>
+                    <div class="cuenta-lista">
+                        @foreach (var item in Model)
+                        {
+                            var p = item.Product;
+                            var precioVigente = p?.PromotionalPrice ?? p?.Price ?? item.UnitPrice;
+                            var sinStock = p == null || p.Stock <= 0;
+                            var superaStock = p != null && !sinStock && item.Quantity > p.Stock;
+
+                            <div class="cuenta-fila @(sinStock || superaStock ? "cuenta-fila--alerta" : "")">
+                                <img src="@(p?.ImageUrl ?? "/images/default-product.svg")" class="cuenta-fila__img" alt="@(p?.Name ?? "")" />
+
+                                <div class="cuenta-fila__info">
+                                    @if (p != null)
+                                    {
+                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@p.Id" class="text-decoration-none">
+                                            <h3 class="cuenta-fila__nombre">@p.Name</h3>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <h3 class="cuenta-fila__nombre">Producto no disponible</h3>
+                                    }
+                                    <div class="cuenta-fila__meta">@p?.Category</div>
+
+                                    @if (sinStock)
+                                    {
+                                        <span class="cuenta-tag cuenta-tag--error">Sin stock</span>
+                                        <div class="cuenta-fila__aviso cuenta-fila__aviso--error">Quítalo del carrito para continuar.</div>
+                                    }
+                                    else if (superaStock)
+                                    {
+                                        <span class="cuenta-tag cuenta-tag--pendiente">Quedan @p!.Stock</span>
+                                        <div class="cuenta-fila__aviso">Ajusta la cantidad para continuar.</div>
+                                    }
+                                    else
+                                    {
+                                        <span class="cuenta-tag">En stock</span>
+                                    }
+
+                                    <div class="cuenta-fila__precio">
+                                        @PriceFormatter.Format(precioVigente) <small>c/u</small>
+                                    </div>
+                                </div>
+
+                                <div class="cuenta-fila__acciones">
+                                    <div class="cuenta-qty">
+                                        <form asp-action="Update" method="post">
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <input type="hidden" name="direction" value="dec" />
+                                            <button type="submit" class="cuenta-qty__btn" disabled="@(item.Quantity <= 1)" aria-label="Quitar una unidad">−</button>
+                                        </form>
+                                        <span class="cuenta-qty__valor">@item.Quantity</span>
+                                        <form asp-action="Update" method="post">
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <input type="hidden" name="direction" value="inc" />
+                                            <button type="submit" class="cuenta-qty__btn" disabled="@(sinStock || (p != null && item.Quantity >= p.Stock))" aria-label="Agregar una unidad">+</button>
+                                        </form>
+                                    </div>
+                                    <div class="cuenta-fila__total">@PriceFormatter.Format(precioVigente * item.Quantity)</div>
+                                </div>
+
+                                <form asp-action="Remove" method="post" class="cuenta-fila__cerrar m-0">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <button type="submit" class="cuenta-btn-x" aria-label="Quitar del carrito">
+                                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
                 }
-                @if (hayProblemaDeStock)
-                {
-                    <div class="cart-summary__note">Corrige los productos sin stock suficiente para continuar.</div>
-                }
+
+                <a asp-controller="Products" asp-action="Index" class="cuenta-volver">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Seguir comprando
+                </a>
             </div>
+
+            @* ---------- Resumen ---------- *@
+            <aside class="cuenta-aside">
+                <div class="cuenta-panel">
+                    <div class="cuenta-panel__head">
+                        <h2 class="cuenta-panel__title">
+                            <i class="fa-solid fa-mountain" aria-hidden="true"></i>
+                            Resumen de compra
+                        </h2>
+                    </div>
+
+                    <div class="cuenta-resumen__linea">
+                        <span>Subtotal (@cantidadTotal @(cantidadTotal == 1 ? "producto" : "productos"))</span>
+                        <strong>@PriceFormatter.Format(total)</strong>
+                    </div>
+                    <div class="cuenta-resumen__linea">
+                        <span>Envío</span>
+                        <strong>@PriceFormatter.Format(0m)</strong>
+                    </div>
+
+                    <div class="cuenta-resumen__total">
+                        <span>Total estimado</span>
+                        <span>@PriceFormatter.Format(total)</span>
+                    </div>
+
+                    @* Lleva al checkout (datos de entrega + pago simulado). *@
+                    @if (puedeConfirmar)
+                    {
+                        <a asp-controller="Checkout" asp-action="Index" class="cuenta-btn">
+                            <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+                            Continuar con la compra
+                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <button type="button" class="cuenta-btn" disabled>
+                            <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+                            Continuar con la compra
+                        </button>
+                    }
+
+                    @if (hayProblemaDeStock)
+                    {
+                        <div class="cuenta-resumen__nota cuenta-resumen__nota--alerta">
+                            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                            Corrige los productos sin stock suficiente para continuar.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="cuenta-resumen__nota">
+                            <i class="fa-solid fa-lock" aria-hidden="true"></i> Compra segura y protegida
+                        </div>
+                    }
+                </div>
+
+                <div class="cuenta-panel cuenta-beneficios">
+                    <div class="cuenta-beneficio">
+                        <i class="fa-solid fa-truck" aria-hidden="true"></i>
+                        Envíos a todo Bolivia
+                    </div>
+                    <div class="cuenta-beneficio">
+                        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                        Pagos seguros
+                    </div>
+                    <div class="cuenta-beneficio">
+                        <i class="fa-solid fa-leaf" aria-hidden="true"></i>
+                        Productos seleccionados
+                    </div>
+                </div>
+            </aside>
         </div>
     </div>
 </div>

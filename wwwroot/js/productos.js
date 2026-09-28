@@ -16,21 +16,27 @@ document.addEventListener('DOMContentLoaded', function () {
  * solo ajusta el número local que se manda al agregar al carrito).
  */
 function initQtyStepper() {
-    document.querySelectorAll('.producto-card__qty').forEach(function (qtyBox) {
-        const maxStock = Math.max(1, Math.min(parseInt(qtyBox.dataset.maxStock, 10) || 1, 99));
+    document.querySelectorAll('.pcard__qty').forEach(function (qtyBox) {
+        // Tope: el stock disponible, y como máximo 100 (el mismo límite que el carrito).
+        const maxStock = Math.max(1, Math.min(parseInt(qtyBox.dataset.maxStock, 10) || 1, 100));
         const valueEl = qtyBox.querySelector('[data-qty-value]');
+        const menos = qtyBox.querySelector('[data-qty-action="dec"]');
+        const mas = qtyBox.querySelector('[data-qty-action="inc"]');
 
-        qtyBox.querySelectorAll('[data-qty-action]').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                let current = parseInt(valueEl.textContent, 10) || 1;
-                if (btn.dataset.qtyAction === 'inc') {
-                    current = Math.min(current + 1, maxStock);
-                } else {
-                    current = Math.max(current - 1, 1);
-                }
-                valueEl.textContent = current;
-            });
+        function pintar(valor) {
+            valueEl.textContent = valor;
+            menos.disabled = valor <= 1;
+            mas.disabled = valor >= maxStock;
+        }
+
+        menos.addEventListener('click', function () {
+            pintar(Math.max((parseInt(valueEl.textContent, 10) || 1) - 1, 1));
         });
+        mas.addEventListener('click', function () {
+            pintar(Math.min((parseInt(valueEl.textContent, 10) || 1) + 1, maxStock));
+        });
+
+        pintar(1);
     });
 }
 
@@ -127,7 +133,12 @@ function initFavorites() {
                 .then(data => {
                     if (!data || !data.success) return;
                     boton.classList.toggle('active', data.isFavorite);
-                    boton.innerHTML = data.isFavorite ? '♥' : '♡';
+                    boton.setAttribute('aria-label', data.isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos');
+                    const icono = boton.querySelector('i');
+                    if (icono) {
+                        icono.classList.toggle('fa-solid', data.isFavorite);
+                        icono.classList.toggle('fa-regular', !data.isFavorite);
+                    }
                 });
         });
     });
@@ -138,7 +149,7 @@ function initFavorites() {
  * con el stepper +/- de la propia tarjeta (por defecto 1 si no hay stepper).
  */
 function agregarAlCarritoConCantidad(btn, productId) {
-    const card = btn.closest('.producto-card');
+    const card = btn.closest('.pcard, .producto-card');
     const qtyEl = card ? card.querySelector('[data-qty-value]') : null;
     const quantity = qtyEl ? (parseInt(qtyEl.textContent, 10) || 1) : 1;
 
@@ -167,12 +178,13 @@ function agregarAlCarritoConCantidad(btn, productId) {
         .then(data => {
             if (!data) return;
             if (data.success && btn) {
+                // Confirmación breve: el ícono del carrito pasa a un check verde.
                 const originalHtml = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> AGREGADO';
-                btn.classList.add('producto-card__btn--added');
+                btn.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>';
+                btn.classList.add('is-added');
                 setTimeout(() => {
                     btn.innerHTML = originalHtml;
-                    btn.classList.remove('producto-card__btn--added');
+                    btn.classList.remove('is-added');
                 }, 1500);
             } else if (!data.success) {
                 alert(data.message || 'No se pudo agregar el producto.');

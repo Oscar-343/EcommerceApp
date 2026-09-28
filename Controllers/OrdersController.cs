@@ -37,6 +37,7 @@ namespace EcommerceApp.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
             var orders = await context.Orders
                 .AsNoTracking()
+                .Include(o => o.Items)
                 .Where(o => o.UserId == userId)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();

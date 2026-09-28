@@ -107,5 +107,19 @@ namespace EcommerceApp.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
+        // Vacía el carrito del usuario actual (botón "Vaciar carrito").
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Clear()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
+            var borrados = await context.CartItems
+                .Where(c => c.UserId == userId)
+                .ExecuteDeleteAsync();
+
+            if (borrados > 0) TempData["Success"] = "Carrito vaciado.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

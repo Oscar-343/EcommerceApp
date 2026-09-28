@@ -2,49 +2,171 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Mis reservas";
-}
-<link rel="stylesheet" href="~/css/carrito.css" asp-append-version="true" />
 
-<div class="container-fluid cart-page">
-    <section class="cart-hero">
-        <h1 class="cart-title">Mis reservas 🥾</h1>
-        <p class="cart-sub">Historial de tus reservas de rutas.</p>
+    var hoy = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(-4)); // hora de Bolivia
+    var activas = Model.Count(r => r.Status == "Pendiente" || r.Status == "Recorrido");
+    var completadas = Model.Count(r => r.Status == "Acabado");
+    var proxima = Model
+        .Where(r => r.Status == "Pendiente" && r.TripDate >= hoy)
+        .OrderBy(r => r.TripDate)
+        .FirstOrDefault();
+    string[] meses = { "ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic" };
+
+    string ClaseEstado(string estado) => estado switch
+    {
+        "Pendiente" => "cuenta-tag--pendiente",
+        "Recorrido" => "cuenta-tag--recorrido",
+        "Cancelado" => "cuenta-tag--cancelado",
+        _ => ""
+    };
+    string IconoEstado(string estado) => estado switch
+    {
+        "Pendiente" => "fa-clock",
+        "Recorrido" => "fa-person-hiking",
+        "Cancelado" => "fa-ban",
+        _ => "fa-flag-checkered"
+    };
+}
+<link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
+
+<div class="cuenta-page">
+    <section class="cuenta-hero" style="--hero-img: url('https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=1600&h=600&fit=crop');">
+        <div class="cuenta-hero__inner">
+            <i class="fa-solid fa-route cuenta-hero__icon" aria-hidden="true"></i>
+            <div>
+                <p class="cuenta-hero__eyebrow">Tus próximas aventuras</p>
+                <h1 class="cuenta-hero__title">Mis reservas</h1>
+                <p class="cuenta-hero__sub">Las rutas que reservaste y el estado de cada salida.</p>
+            </div>
+        </div>
     </section>
 
-    <div class="cart-section">
-        @if (!Model.Any())
-        {
-            <div class="cart-empty-state">
-                <h3 class="cart-empty-state__title">Todavía no tienes reservas</h3>
-                <p>Elige una ruta y reserva tu fecha de salida.</p>
-                <a asp-controller="Services" asp-action="Index" class="cart-btn-primary cart-empty-state__btn">Ver rutas</a>
-            </div>
-        }
-        else
-        {
-            <div class="cart-list">
-                @foreach (var r in Model)
+    <div class="cuenta-wrap">
+        <div class="cuenta-layout">
+            <div class="cuenta-panel">
+                <div class="cuenta-panel__head">
+                    <h2 class="cuenta-panel__title">
+                        <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
+                        Mis rutas (@Model.Count)
+                    </h2>
+                </div>
+
+                @if (!Model.Any())
                 {
-                    <div class="cart-item cart-item--row">
-                        <div class="cart-item__info">
-                            <h4 class="cart-item__name">@(r.Service?.Name ?? "Ruta eliminada")</h4>
-                            <div class="cart-item__meta">
-                                Salida: @r.TripDate.ToString("dd/MM/yyyy") &middot; @r.PeopleCount persona(s)
-                            </div>
-                        </div>
-                        <div class="cart-item__side">
-                            <div class="cart-item__price">@PriceFormatter.Format(r.TotalPrice)</div>
-                            <div class="cart-item__meta">@r.Status</div>
-                            @if (r.Status == "Pendiente")
-                            {
-                                <form asp-action="Cancel" asp-route-id="@r.Id" method="post" class="cart-item__cancel-form">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger cart-item__remove" onclick="return confirm('¿Cancelar esta reserva?')">Cancelar</button>
-                                </form>
-                            }
-                        </div>
+                    <div class="cuenta-vacio">
+                        <div class="cuenta-vacio__icono"><i class="fa-solid fa-person-hiking" aria-hidden="true"></i></div>
+                        <div class="cuenta-vacio__titulo">Todavía no tienes reservas</div>
+                        <p>Elige una ruta, reserva tu fecha de salida y prepárate para caminar.</p>
+                        <a asp-controller="Services" asp-action="Index" class="cuenta-btn cuenta-btn--auto">
+                            Explorar rutas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
                     </div>
                 }
+                else
+                {
+                    <div class="cuenta-lista">
+                        @foreach (var r in Model)
+                        {
+                            <div class="cuenta-fila">
+                                <img src="@(r.Service?.ImageUrl ?? "/images/default-product.svg")" class="cuenta-fila__img" alt="@(r.Service?.Name ?? "")" />
+
+                                <div class="cuenta-fila__info">
+                                    @if (r.Service != null)
+                                    {
+                                        <a asp-controller="Services" asp-action="Details" asp-route-id="@r.ServiceId" class="text-decoration-none">
+                                            <h3 class="cuenta-fila__nombre">@r.Service.Name</h3>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <h3 class="cuenta-fila__nombre">Ruta no disponible</h3>
+                                    }
+                                    <div class="cuenta-fila__meta">
+                                        <span><i class="fa-regular fa-calendar" aria-hidden="true"></i>Salida: @r.TripDate.ToString("dd/MM/yyyy")</span>
+                                        <span><i class="fa-solid fa-user-group" aria-hidden="true"></i>@r.PeopleCount @(r.PeopleCount == 1 ? "persona" : "personas")</span>
+                                        @if (!string.IsNullOrEmpty(r.Service?.Location))
+                                        {
+                                            <span><i class="fa-solid fa-location-dot" aria-hidden="true"></i>@r.Service.Location</span>
+                                        }
+                                    </div>
+                                    <span class="cuenta-tag @ClaseEstado(r.Status)">
+                                        <i class="fa-solid @IconoEstado(r.Status)" aria-hidden="true"></i> @r.Status
+                                    </span>
+                                </div>
+
+                                <div class="cuenta-fila__acciones">
+                                    @if (r.Status == "Pendiente")
+                                    {
+                                        <form asp-action="Cancel" asp-route-id="@r.Id" method="post" class="m-0">
+                                            <button type="submit" class="cuenta-btn cuenta-btn--sm cuenta-btn--auto cuenta-btn--peligro"
+                                                    onclick="return confirm('¿Cancelar esta reserva?')">
+                                                Cancelar
+                                            </button>
+                                        </form>
+                                    }
+                                    <div class="cuenta-fila__total">@PriceFormatter.Format(r.TotalPrice)</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <a asp-controller="Services" asp-action="Index" class="cuenta-volver">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Ver más rutas
+                </a>
             </div>
-        }
+
+            <aside class="cuenta-aside">
+                <div class="cuenta-panel">
+                    <div class="cuenta-panel__head">
+                        <h2 class="cuenta-panel__title">
+                            <i class="fa-solid fa-compass" aria-hidden="true"></i>
+                            Tu próxima salida
+                        </h2>
+                    </div>
+
+                    @if (proxima != null)
+                    {
+                        <div class="cuenta-proxima">
+                            <div class="cuenta-proxima__fecha">
+                                <div class="cuenta-proxima__dia">@proxima.TripDate.Day</div>
+                                <div class="cuenta-proxima__mes">@meses[proxima.TripDate.Month - 1]</div>
+                            </div>
+                            <div>
+                                <div class="cuenta-proxima__label">
+                                    @{ var dias = proxima.TripDate.DayNumber - hoy.DayNumber; }
+                                    @(dias == 0 ? "Hoy" : dias == 1 ? "Mañana" : $"En {dias} días")
+                                </div>
+                                <div class="cuenta-proxima__nombre">@(proxima.Service?.Name ?? "Ruta")</div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-secondary small mb-3">No tienes salidas pendientes. ¡Es un buen momento para planear la siguiente!</p>
+                    }
+
+                    <div class="cuenta-stats">
+                        <div class="cuenta-stat">
+                            <div class="cuenta-stat__valor">@activas</div>
+                            <div class="cuenta-stat__label">Activas</div>
+                        </div>
+                        <div class="cuenta-stat">
+                            <div class="cuenta-stat__valor">@completadas</div>
+                            <div class="cuenta-stat__label">Completadas</div>
+                        </div>
+                    </div>
+
+                    <a asp-controller="Services" asp-action="Index" class="cuenta-btn">
+                        <i class="fa-solid fa-mountain-sun" aria-hidden="true"></i>
+                        Elegir otra aventura
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                    <div class="cuenta-resumen__nota">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i> Puedes cancelar una reserva mientras siga pendiente.
+                    </div>
+                </div>
+            </aside>
+        </div>
     </div>
 </div>

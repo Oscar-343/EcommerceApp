@@ -1,162 +1,148 @@
-﻿@model EcommerceApp.Models.Product
+@model EcommerceApp.Models.Product
 @{
     ViewData["Title"] = Model.Name + " - Equipamiento Outdoor";
-    // No tiene hero a pantalla completa: usa el espaciado normal del layout
-    // para que el navbar fijo no tape el breadcrumb.
+
+    var imagenPrincipal = Model.ImageUrl ?? "/images/default-product.svg";
+    var imagenes = new List<string> { imagenPrincipal };
+    if (!string.IsNullOrWhiteSpace(Model.SecondaryImageUrl)) imagenes.Add(Model.SecondaryImageUrl.Trim());
+    if (!string.IsNullOrWhiteSpace(Model.GalleryImages))
+        imagenes.AddRange(Model.GalleryImages.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
+    var enOferta = Model.PromotionalPrice.HasValue && Model.PromotionalPrice < Model.Price;
+    var descuento = enOferta ? Math.Round((1 - (Model.PromotionalPrice!.Value / Model.Price)) * 100) : 0;
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/productos.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/productos-detalle.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 }
 
-<div class="producto-detalle">
-    <div class="producto-detalle__container">
-        <!-- Breadcrumb -->
-        <nav class="producto-detalle__breadcrumb">
+<div class="cuenta-page">
+    <div class="cuenta-wrap pdet">
+        <!-- Migas de pan -->
+        <nav class="pdet__migas" aria-label="Ruta de navegación">
             <a asp-controller="Products" asp-action="Index">Productos</a>
             @if (!string.IsNullOrEmpty(Model.Category))
             {
-                <span> / </span>
+                <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                 <a asp-controller="Products" asp-action="Index" asp-route-category="@Model.Category">@Model.Category</a>
             }
-            <span> / @Model.Name</span>
+            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+            <span>@Model.Name</span>
         </nav>
 
-        <div class="producto-detalle__content">
+        <div class="pdet__grid">
             <!-- === GALERÍA === -->
-            <div class="producto-galeria">
-                <div class="producto-galeria__main">
-                    <img id="mainImage"
-                         src="@(Model.ImageUrl ?? "/images/default-product.svg")"
-                         alt="@Model.Name" />
+            <div class="pdet-galeria">
+                <div class="pdet-galeria__main">
+                    <img id="mainImage" src="@imagenPrincipal" alt="@Model.Name" />
+                    @if (enOferta)
+                    {
+                        <span class="pdet-galeria__sello">-@(descuento)%</span>
+                    }
                 </div>
 
-                <div class="producto-galeria__thumbs">
-                    <div class="producto-galeria__thumb active" onclick="cambiarImagen('@(Model.ImageUrl ?? "/images/default-product.svg")', this)">
-                        <img src="@(Model.ImageUrl ?? "/images/default-product.svg")" alt="@Model.Name" />
-                    </div>
-
-                    @if (!string.IsNullOrEmpty(Model.SecondaryImageUrl))
-                    {
-                        <div class="producto-galeria__thumb" onclick="cambiarImagen('@Model.SecondaryImageUrl', this)">
-                            <img src="@Model.SecondaryImageUrl" alt="@Model.Name en uso" />
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(Model.GalleryImages))
-                    {
-                        @foreach (var img in Model.GalleryImages.Split('|', StringSplitOptions.RemoveEmptyEntries))
+                @if (imagenes.Count > 1)
+                {
+                    <div class="pdet-galeria__thumbs">
+                        @for (var i = 0; i < imagenes.Count; i++)
                         {
-                            <div class="producto-galeria__thumb" onclick="cambiarImagen('@img.Trim()', this)">
-                                <img src="@img.Trim()" alt="@Model.Name" />
-                            </div>
+                            <button type="button" class="pdet-galeria__thumb @(i == 0 ? "active" : "")"
+                                    onclick="cambiarImagen('@imagenes[i]', this)" aria-label="Ver imagen @(i + 1)">
+                                <img src="@imagenes[i]" alt="" loading="lazy" />
+                            </button>
                         }
-                    }
-                </div>
+                    </div>
+                }
             </div>
 
             <!-- === INFORMACIÓN === -->
-            <div class="producto-info">
+            <div class="cuenta-panel pdet-info">
                 @if (Model.Marca != null)
                 {
-                    <p class="producto-info__brand">@Model.Marca.Nombre</p>
+                    <p class="cuenta-hero__eyebrow">@Model.Marca.Nombre</p>
                 }
 
-                <h1 class="producto-info__title">@Model.Name</h1>
+                <h1 class="pdet-info__titulo">@Model.Name</h1>
 
-                @if (!string.IsNullOrEmpty(Model.Category))
-                {
-                    <span class="producto-info__category">@Model.Category</span>
-                }
-
-                <!-- Badges -->
-                <div class="producto-info__badges">
+                <div class="pdet-info__chips">
+                    @if (!string.IsNullOrEmpty(Model.Category))
+                    {
+                        <span class="pdet-chip">@Model.Category</span>
+                    }
                     @if (Model.IsNew)
                     {
-                        <span class="producto-info__badge producto-info__badge--new">NUEVO</span>
+                        <span class="cuenta-tag">Nuevo</span>
                     }
                     @if (Model.IsBestSeller)
                     {
-                        <span class="producto-info__badge producto-info__badge--bestseller">MÁS VENDIDO</span>
+                        <span class="cuenta-tag cuenta-tag--pendiente">Más vendido</span>
                     }
                 </div>
 
-                <!-- Precio -->
-                <div class="producto-info__price">
-                    @if (Model.PromotionalPrice.HasValue && Model.PromotionalPrice < Model.Price)
+                <div class="pdet-info__precio">
+                    <span class="pdet-info__precio-actual">@PriceFormatter.Format(Model.PromotionalPrice ?? Model.Price)</span>
+                    @if (enOferta)
                     {
-                        var discount = Math.Round((1 - (Model.PromotionalPrice.Value / Model.Price)) * 100);
-                        <span class="producto-info__price-current">@PriceFormatter.Format(Model.PromotionalPrice)</span>
-                        <span class="producto-info__price-original">@PriceFormatter.Format(Model.Price)</span>
-                        <span class="producto-info__price-discount">AHORRAS @(discount)%</span>
-                    }
-                    else
-                    {
-                        <span class="producto-info__price-current">@PriceFormatter.Format(Model.Price)</span>
+                        <s class="pdet-info__precio-antes">@PriceFormatter.Format(Model.Price)</s>
+                        <span class="cuenta-tag cuenta-tag--cancelado">Ahorras @(descuento)%</span>
                     }
                 </div>
 
-                <!-- Descripción -->
-                <div class="producto-info__description">
-                    <p>@Model.Description</p>
-                </div>
+                <p class="pdet-info__desc">@Model.Description</p>
 
-                <!-- Stock -->
-                <div class="producto-info__stock @(Model.Stock > 10 ? "producto-info__stock--available" : Model.Stock > 0 ? "producto-info__stock--low" : "producto-info__stock--out")">
-                    @if (Model.Stock > 10)
+                <div class="pdet-info__stock @(Model.Stock > Model.StockMinimo ? "" : Model.Stock > 0 ? "pdet-info__stock--bajo" : "pdet-info__stock--agotado")">
+                    @if (Model.Stock > Model.StockMinimo)
                     {
-                        <span>✓ En stock (@Model.Stock unidades disponibles)</span>
+                        <i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span>En stock · @Model.Stock disponibles</span>
                     }
                     else if (Model.Stock > 0)
                     {
-                        <span>⚠ Últimas @Model.Stock unidades disponibles</span>
+                        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span>Últimas @Model.Stock unidades</span>
                     }
                     else
                     {
-                        <span>✗ Sin stock</span>
+                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> <span>Sin stock por ahora</span>
                     }
                 </div>
 
-                <!-- Acciones -->
-                @if (Model.Stock > 0)
-                {
-                    <div class="producto-info__actions">
-                        <form asp-controller="Cart" asp-action="Add" method="post" class="producto-info__cart-form">
+                <!-- Acciones: cantidad + agregar + favorito en una sola fila -->
+                <div class="pdet-info__acciones">
+                    @if (Model.Stock > 0)
+                    {
+                        <form asp-controller="Cart" asp-action="Add" method="post" class="pdet-info__carrito">
                             <input type="hidden" name="productId" value="@Model.Id" />
-                            <div class="producto-info__quantity">
-                                <label class="producto-info__quantity-label">Cantidad</label>
-                                <div class="producto-info__quantity-control">
-                                    <button type="button" class="producto-info__quantity-btn" onclick="cambiarCantidad(-1)">−</button>
-                                    <input type="number" id="cantidad" name="quantity" class="producto-info__quantity-input" value="1" min="1" max="@Model.Stock" />
-                                    <button type="button" class="producto-info__quantity-btn" onclick="cambiarCantidad(1)">+</button>
-                                </div>
+                            <div class="cuenta-qty pdet-qty">
+                                <button type="button" class="cuenta-qty__btn" onclick="cambiarCantidad(-1)" aria-label="Quitar una unidad">−</button>
+                                <input type="number" id="cantidad" name="quantity" class="pdet-qty__input" value="1" min="1" max="@Model.Stock" aria-label="Cantidad" />
+                                <button type="button" class="cuenta-qty__btn" onclick="cambiarCantidad(1)" aria-label="Agregar una unidad">+</button>
                             </div>
-                            <button type="submit" class="producto-info__btn producto-info__btn--primary">
-                                <span>🛒</span> AGREGAR AL CARRITO
+                            <button type="submit" class="cuenta-btn">
+                                <i class="fa-solid fa-cart-plus" aria-hidden="true"></i> Agregar al carrito
                             </button>
                         </form>
-                        <form asp-controller="Favorites" asp-action="Toggle" method="post" class="producto-info__fav-form">
-                            <input type="hidden" name="type" value="Product" />
-                            <input type="hidden" name="itemId" value="@Model.Id" />
-                            <button type="submit" class="producto-info__favorite" title="Guardar favorito" aria-label="Guardar favorito">♡</button>
-                        </form>
-                    </div>
-                }
-                else
-                {
-                    <div class="producto-info__actions">
-                        <button class="producto-info__btn producto-info__btn--secondary" disabled>
-                            PRODUCTO AGOTADO
+                    }
+                    else
+                    {
+                        <button type="button" class="cuenta-btn cuenta-btn--borde pdet-info__carrito" disabled>Producto agotado</button>
+                    }
+                    <form asp-controller="Favorites" asp-action="Toggle" method="post" class="m-0">
+                        <input type="hidden" name="type" value="Product" />
+                        <input type="hidden" name="itemId" value="@Model.Id" />
+                        <button type="submit" class="pdet-fav" title="Guardar en favoritos" aria-label="Guardar en favoritos">
+                            <i class="fa-regular fa-heart" aria-hidden="true"></i>
                         </button>
-                    </div>
-                }
+                    </form>
+                </div>
 
-                <!-- Volver -->
-                <a asp-controller="Products" asp-action="Index" class="producto-info__back">
-                    ← Volver al catálogo
+                <div class="pdet-info__beneficios">
+                    <span><i class="fa-solid fa-truck" aria-hidden="true"></i> Envíos a todo Bolivia</span>
+                    <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Pagos seguros</span>
+                    <span><i class="fa-solid fa-leaf" aria-hidden="true"></i> Equipo seleccionado</span>
+                </div>
+
+                <a asp-controller="Products" asp-action="Index" class="cuenta-volver">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Volver al catálogo
                 </a>
             </div>
         </div>
@@ -165,26 +151,18 @@
 
 @section Scripts {
     <script>
-        //Cambiar imagen principal
+        // Cambia la imagen principal al tocar una miniatura.
         function cambiarImagen(src, thumb) {
             document.getElementById('mainImage').src = src;
-
-            // Actualizar thumbnails activos
-            document.querySelectorAll('.producto-galeria__thumb').forEach(t => t.classList.remove('active'));
-            if (thumb) {
-                thumb.classList.add('active');
-            }
+            document.querySelectorAll('.pdet-galeria__thumb').forEach(t => t.classList.remove('active'));
+            if (thumb) thumb.classList.add('active');
         }
 
-        // Control de cantidad
+        // Botones − y + de la cantidad (entre 1 y el stock disponible).
         function cambiarCantidad(delta) {
             const input = document.getElementById('cantidad');
-            const newValue = parseInt(input.value) + delta;
-            const max = parseInt(input.max);
-
-            if (newValue >= 1 && newValue <= max) {
-                input.value = newValue;
-            }
+            const nuevo = (parseInt(input.value) || 1) + delta;
+            if (nuevo >= 1 && nuevo <= parseInt(input.max)) input.value = nuevo;
         }
     </script>
 }

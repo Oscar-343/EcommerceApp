@@ -1,6 +1,8 @@
 @{
     // Controlador actual, para marcar el link activo del menú.
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var esInicio = currentController == "Home" && currentAction != "Nosotros" && currentAction != "Contacto";
 }
 <nav id="mainNav" class="navbar-cinematic">
     <div class="nav-container">
@@ -9,11 +11,11 @@
         </a>
 
         <ul class="nav-menu" id="navMenu">
-            <li><a class="nav-link @(currentController == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a></li>
+            <li><a class="nav-link @(esInicio ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a></li>
             <li><a class="nav-link @(currentController == "Services" ? "active" : "")" asp-controller="Services" asp-action="Index">Rutas</a></li>
             <li><a class="nav-link @(currentController == "Products" ? "active" : "")" asp-controller="Products" asp-action="Index">Productos</a></li>
-            <li><a class="nav-link" href="#">Nosotros</a></li>
-            <li><a class="nav-link" href="#">Contacto</a></li>
+            <li><a class="nav-link @(currentController == "Home" && currentAction == "Nosotros" ? "active" : "")" asp-controller="Home" asp-action="Nosotros">Nosotros</a></li>
+            <li><a class="nav-link @(currentController == "Home" && currentAction == "Contacto" ? "active" : "")" asp-controller="Home" asp-action="Contacto">Contacto</a></li>
             @if (User.Identity?.IsAuthenticated != true)
             {
                 <!-- En móvil "Iniciar sesión" vive dentro del menú; desde 992px se ve el botón de la derecha -->

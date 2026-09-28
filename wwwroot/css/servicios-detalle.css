@@ -1,375 +1,285 @@
 /* =========================================================
-   SERVICIOS / RUTAS — Detalle de Ruta
-   Móvil primero: la base es el teléfono y lo más grande se agrega
-   en la sección RESPONSIVE del final (anchos 768/992).
-   La navbar y el footer viven en site.css.
+   DETALLE DE RUTA (Views/Services/Details.cshtml)
+   Se carga después de cuenta.css: reutiliza fondo, hero, paneles,
+   botones, etiquetas y las tarjetas de producto (.fav-tarjeta).
+   Móvil primero; desde 992px la reserva queda fija a la derecha.
    ========================================================= */
 
-:root {
-    /* Paleta de colores especificada */
-    --sv-bg-primary: #0B100E;
-    --sv-bg-section: #111713;
-    --sv-bg-block: #171E1A;
-    --sv-border: #303832;
-    --sv-text-primary: #F1F3F1;
-    --sv-text-secondary: #A8B0AA;
-    --sv-green-main: #315D45;
-    --sv-green-hover: #557F63;
-    --sv-earth-accent: #7C7058;
-
-    /* Tipografía */
-    --sv-font-display: "Outfit", "Segoe UI", system-ui, sans-serif;
-    --sv-font-body: "Inter", "Segoe UI", system-ui, sans-serif;
-
-    /* Animaciones */
-    --sv-ease: cubic-bezier(0.65, 0, 0.35, 1);
-    --sv-ease-smooth: ease-in-out;
+/* ---------------------------------------------------------
+   HERO
+   --------------------------------------------------------- */
+/* Hero grande: llega hasta arriba (detrás del navbar transparente) y usa la imagen secundaria */
+.rdet-hero {
+    min-height: 460px;
+    min-height: clamp(460px, 72svh, 720px);
+    background-position: center 40%;
 }
 
-/* =========================================================
-   BASE Y RESET
-   ========================================================= */
-
-body {
-    background-color: var(--sv-bg-primary);
-    color: var(--sv-text-primary);
-    font-family: 'Inter', sans-serif;
+/* Oscurece arriba (para leer el navbar) y a la izquierda (para leer el texto) */
+.rdet-hero::before {
+    background:
+        linear-gradient(180deg, rgba(11, 16, 14, 0.75) 0%, rgba(11, 16, 14, 0) 28%),
+        linear-gradient(90deg, rgba(11, 16, 14, 0.92) 0%, rgba(11, 16, 14, 0.6) 45%, rgba(11, 16, 14, 0.15) 100%);
 }
 
-.ruta-detalle {
-    background: var(--sv-bg-primary);
-    color: var(--sv-text-primary);
-    font-family: var(--sv-font-body);
-}
-
-.ruta-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--page-gutter);
-}
-
-/* =========================================================
-   HERO DEL DETALLE
-   ========================================================= */
-
-.ruta-hero {
-    position: relative;
-    min-height: max(400px, 50vh);
-    min-height: max(400px, 50svh);
-    display: flex;
+.rdet-hero .cuenta-hero__inner {
     align-items: flex-end;
-    overflow: hidden;
+    justify-content: space-between;
+    padding-top: calc(var(--nav-height) + 2rem);
+    padding-bottom: 3rem;
+    align-self: stretch;
 }
 
-.ruta-hero__image {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
+.rdet-hero .cuenta-hero__title {
+    font-size: clamp(2.1rem, 6vw, 3.8rem);
 }
 
-.ruta-hero__image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scale(1.04);
+.rdet-hero .cuenta-hero__sub {
+    font-size: 1.05rem;
+    max-width: 560px;
 }
 
-.ruta-hero__overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to top,
-        rgba(11, 16, 14, 0.97) 0%,
-        rgba(11, 16, 14, 0.75) 35%,
-        rgba(11, 16, 14, 0.25) 100%
-    );
-    z-index: 2;
+.rdet-migas {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    margin-bottom: 1.1rem;
+    color: var(--color-text-secondary);
 }
 
-/* El relleno de arriba deja libre la navbar si el título es largo */
-.ruta-hero__content {
-    position: relative;
-    z-index: 3;
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: calc(var(--nav-height) + 1.5rem) var(--page-gutter) 2rem;
-    animation: heroContentFade 0.8s var(--sv-ease) forwards;
-    opacity: 0;
+.rdet-migas a {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
-@keyframes heroContentFade {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.rdet-migas a:hover {
+    color: var(--color-text);
 }
 
-.ruta-hero__back {
+.rdet-hero__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.rdet-fav-form {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.rdet-fav {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(241, 243, 241, 0.25);
+    background: rgba(11, 16, 14, 0.6);
+    color: var(--color-text);
+    font-size: 1.2rem;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: transform 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.rdet-fav:hover {
+    transform: scale(1.08);
+    border-color: rgba(224, 112, 106, 0.6);
+}
+
+.rdet-fav.is-active {
+    color: #e0706a;
+    border-color: rgba(224, 112, 106, 0.6);
+}
+
+/* Etiqueta de dificultad con su color */
+.rdet-dif {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    min-height: 44px;
-    color: var(--sv-text-secondary);
-    text-decoration: none;
-    font-size: 0.85rem;
-    letter-spacing: 0.05em;
+    gap: 0.4rem;
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    margin-bottom: 1.25rem;
-    transition: all 0.2s var(--sv-ease-smooth);
-    cursor: pointer;
+    white-space: nowrap;
+    background: rgba(11, 16, 14, 0.8);
+    color: var(--color-text);
 }
 
-.ruta-hero__back:hover {
-    color: var(--sv-green-hover);
-    transform: translateX(-3px);
+.rdet-dif::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
 }
 
-.ruta-hero__title {
-    font-family: var(--sv-font-display);
-    font-size: clamp(1.4rem, 5vw, 4.25rem);
-    font-weight: 800;
-    letter-spacing: 0.01em;
-    line-height: 1.05;
-    margin: 0 0 1.5rem;
-    text-transform: uppercase;
-    max-width: 900px;
-    overflow-wrap: break-word;
+.rdet-dif--easy { background: rgba(49, 93, 69, 0.92); color: #cfe9d6; }
+.rdet-dif--moderate { background: rgba(146, 110, 38, 0.92); color: #fbe3a8; }
+.rdet-dif--difficult { background: rgba(140, 42, 34, 0.92); color: #ffd0c8; }
+.rdet-dif--extreme { background: rgba(10, 10, 10, 0.92); color: #f1f3f1; }
+
+/* ---------------------------------------------------------
+   DATOS CLAVE (franja bajo el hero)
+   --------------------------------------------------------- */
+.rdet-datos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: -1.5rem;
+    position: relative;
+    z-index: 2;
+    background: rgba(17, 23, 19, 0.94);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    backdrop-filter: blur(6px);
+    overflow: hidden;
 }
 
-/* Datos del hero: uno debajo del otro en móvil, en fila desde 768px */
-.ruta-hero__meta {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--sv-text-secondary);
-}
-
-.ruta-hero__meta-item {
+.rdet-dato {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.5rem 1rem;
-    border-radius: 999px;
-    background: rgba(241, 243, 241, 0.06);
-    border: 1px solid rgba(241, 243, 241, 0.15);
-    backdrop-filter: blur(6px);
-    color: var(--sv-text-primary);
-    font-weight: 500;
-}
-
-/* =========================================================
-   GALERÍA DE IMÁGENES
-   Móvil: foto principal y debajo las demás en una fila deslizable.
-   Desde 768px: foto principal a la izquierda y cuadrícula de 2 x 2.
-   ========================================================= */
-
-.ruta-gallery {
-    background: var(--sv-bg-section);
-    padding: clamp(2rem, 5vw, 3rem) var(--page-gutter);
-}
-
-.ruta-gallery__container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1rem;
-}
-
-.ruta-gallery__main {
-    overflow: hidden;
-    border-radius: 0;
-    aspect-ratio: 16 / 9;
-}
-
-.ruta-gallery__main img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s var(--sv-ease);
-}
-
-.ruta-gallery__grid {
-    display: flex;
     gap: 0.75rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 0.25rem;
+    padding: 0.9rem 1rem;
+    min-width: 0;
 }
 
-.ruta-gallery__item {
-    flex: 0 0 40%;
-    scroll-snap-align: start;
+.rdet-dato:nth-child(odd) {
+    border-right: 1px solid var(--color-border);
+}
+
+.rdet-dato:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.rdet-dato > i {
+    font-size: 1.15rem;
+    color: var(--color-green-accent);
+    width: 1.3rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.rdet-dato strong {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
     overflow: hidden;
-    aspect-ratio: 1;
-    border-radius: 0;
+    text-overflow: ellipsis;
 }
 
-.ruta-gallery__item img {
+.rdet-dato span {
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+}
+
+/* ---------------------------------------------------------
+   GALERÍA
+   --------------------------------------------------------- */
+.rdet-galeria__main {
+    aspect-ratio: 16 / 9;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+}
+
+.rdet-galeria__main img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s var(--sv-ease);
 }
 
-/* =========================================================
-   INFORMACIÓN GENERAL (GRID)
-   ========================================================= */
-
-.ruta-info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
-    gap: clamp(1rem, 3vw, 2rem);
-    margin: clamp(1.5rem, 5vw, 4rem) auto;
-    max-width: 1200px;
-}
-
-.ruta-info-card {
-    background: var(--sv-bg-section);
-    padding: clamp(1.25rem, 4vw, 2rem);
-    border: 1px solid var(--sv-border);
-    border-radius: 0;
-    transition: all 0.3s var(--sv-ease-smooth);
-}
-
-.ruta-info-card:hover {
-    border-color: var(--sv-green-main);
-    background: var(--sv-bg-block);
-}
-
-.ruta-info-card__label {
-    font-family: var(--sv-font-display);
-    font-size: 0.8rem;
-    color: var(--sv-text-secondary);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 0.8rem;
-    font-weight: 600;
-}
-
-.ruta-info-card__value {
-    font-family: var(--sv-font-display);
-    font-size: clamp(1.4rem, 3.5vw, 1.8rem);
-    font-weight: 700;
-    color: var(--sv-green-hover);
-    margin-bottom: 0.8rem;
-    overflow-wrap: break-word;
-}
-
-.ruta-info-card__description {
-    font-size: 0.9rem;
-    color: var(--sv-text-secondary);
-    line-height: 1.5;
-    margin: 0;
-}
-
-/* =========================================================
-   SECCIONES GENERALES
-   ========================================================= */
-
-.ruta-section {
-    padding: clamp(1.5rem, 6vw, 4rem) 0;
-    max-width: 1200px;
-    margin: 0 auto;
-    border-bottom: 1px solid var(--sv-border);
-}
-
-.ruta-section:last-of-type {
-    border-bottom: none;
-}
-
-.ruta-section--cta {
-    background: var(--sv-bg-section);
-    border-top: 1px solid var(--sv-border);
-}
-
-.ruta-section__title {
-    font-family: var(--sv-font-display);
-    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
-    font-weight: 700;
-    margin: 0 0 1.5rem;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: var(--sv-text-primary);
-    overflow-wrap: break-word;
-}
-
-.ruta-section__subtitle {
-    font-size: 0.95rem;
-    color: var(--sv-text-secondary);
-    margin-bottom: 1.5rem;
-}
-
-.ruta-section__text {
-    font-size: 1rem;
-    line-height: 1.8;
-    color: var(--sv-text-secondary);
-    margin: 0;
-}
-
-/* =========================================================
-   MAPA DEL RECORRIDO: mapa arriba y datos debajo; lado a lado desde 992px
-   ========================================================= */
-
-.ruta-map-section {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2rem;
-}
-
-/* isolation: los controles de Leaflet (z-index 1000) no pasan por
-   encima de la navbar al hacer scroll. */
-.ruta-map {
-    background: var(--sv-bg-section);
-    border: 1px solid var(--sv-border);
-    border-radius: 0;
-    overflow: hidden;
-    min-height: 320px;
-    isolation: isolate;
-}
-
-.ruta-map-info {
+.rdet-galeria__thumbs {
     display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    gap: 0.6rem;
+    margin-top: 0.7rem;
+    overflow-x: auto;
+    padding-bottom: 0.2rem;
 }
 
-.ruta-map-info__item {
-    background: var(--sv-bg-section);
-    padding: 1.5rem;
-    border: 1px solid var(--sv-border);
+.rdet-galeria__thumb {
+    flex: 0 0 76px;
+    height: 56px;
+    padding: 0;
+    border-radius: 9px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    background: var(--color-card);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, border-color 0.2s ease;
 }
 
-.ruta-map-info__label {
-    display: block;
-    font-size: 0.8rem;
-    color: var(--sv-text-secondary);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 0.7rem;
-    font-weight: 600;
+.rdet-galeria__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.ruta-map-info__item p {
+.rdet-galeria__thumb:hover,
+.rdet-galeria__thumb.active {
+    opacity: 1;
+    border-color: var(--color-green-accent);
+}
+
+/* ---------------------------------------------------------
+   TEXTOS Y LISTAS
+   --------------------------------------------------------- */
+.rdet-texto {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
     margin: 0;
-    font-size: 1rem;
-    color: var(--sv-text-primary);
+    white-space: pre-line;
 }
 
-/* --- Estilos generados por initRutasMap() (Leaflet) --- */
-.ruta-map .leaflet-control-attribution {
+.rdet-texto--sub {
+    font-size: 0.85rem;
+    margin: -0.25rem 0 1rem;
+}
+
+.rdet-nota {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+    margin-top: 1.1rem;
+    padding: 0.9rem;
+    border-radius: 10px;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+}
+
+.rdet-nota p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+}
+
+/* Recorrido */
+.rdet-mapa {
+    height: 260px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    isolation: isolate;   /* los controles de Leaflet no pasan sobre la navbar */
+    margin-bottom: 1rem;
+}
+
+.rdet-mapa .leaflet-control-attribution {
     background: rgba(11, 16, 14, 0.75) !important;
-    color: var(--sv-text-secondary) !important;
+    color: var(--color-text-secondary) !important;
 }
 
-.ruta-map .leaflet-control-attribution a {
-    color: var(--sv-text-secondary) !important;
+.rdet-mapa .leaflet-control-attribution a {
+    color: var(--color-text-secondary) !important;
 }
 
 .rutas-map-marker span {
@@ -377,429 +287,418 @@ body {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: var(--sv-green-hover);
-    border: 2px solid var(--sv-text-secondary);
-    box-shadow: 0 0 0 6px rgba(85, 127, 99, 0.3);
+    background: var(--color-green-accent);
+    border: 2px solid var(--color-text);
+    box-shadow: 0 0 0 4px rgba(85, 127, 99, 0.35);
 }
 
 .rutas-map-popup {
-    font-family: var(--sv-font-body);
+    font-family: 'Open Sans', sans-serif;
     color: #111;
     font-size: 0.85rem;
-    line-height: 1.4;
 }
 
-.rutas-map-popup a {
-    color: var(--sv-green-main);
-    font-weight: 600;
-    text-decoration: none;
-}
-
-/* =========================================================
-   GUÍA
-   ========================================================= */
-
-.ruta-guide {
-    background: var(--sv-bg-section);
-    padding: clamp(1.25rem, 4vw, 2rem);
-    border: 1px solid var(--sv-border);
-}
-
-.ruta-guide__info {
-    display: flex;
-    flex-direction: column;
-}
-
-.ruta-guide__name {
-    font-family: var(--sv-font-display);
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0 0 0.5rem;
-    color: var(--sv-text-primary);
-}
-
-.ruta-guide__specialty {
-    font-size: 0.95rem;
-    color: var(--sv-green-hover);
-    margin: 0 0 1rem;
-    font-weight: 600;
-}
-
-.ruta-guide__bio {
-    font-size: 0.95rem;
-    line-height: 1.7;
-    color: var(--sv-text-secondary);
-    margin: 0;
-}
-
-/* =========================================================
-   TRANSPORTE
-   ========================================================= */
-
-.ruta-transport {
-    background: var(--sv-bg-section);
-    padding: clamp(1.25rem, 4vw, 2rem);
-    border: 1px solid var(--sv-border);
-}
-
-.ruta-transport__name {
-    font-family: var(--sv-font-display);
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0 0 0.5rem;
-    color: var(--sv-text-primary);
-}
-
-.ruta-transport__type {
-    font-size: 0.95rem;
-    color: var(--sv-green-hover);
-    margin: 0 0 1rem;
-    font-weight: 600;
-}
-
-.ruta-transport__capacity {
-    font-size: 0.95rem;
-    color: var(--sv-text-secondary);
-    margin: 0 0 1rem;
-}
-
-.ruta-transport__description {
-    font-size: 0.95rem;
-    line-height: 1.7;
-    color: var(--sv-text-secondary);
-    margin: 0;
-}
-
-/* =========================================================
-   QUÉ INCLUYE
-   ========================================================= */
-
-.ruta-includes-grid {
+.rdet-trayecto {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
-    gap: clamp(1rem, 3vw, 2rem);
+    gap: 0.75rem;
 }
 
-.ruta-includes-block {
-    background: var(--sv-bg-section);
-    padding: clamp(1.25rem, 4vw, 2rem);
-    border: 1px solid var(--sv-border);
+.rdet-trayecto__punto {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.92rem;
+    color: var(--color-text);
 }
 
-.ruta-includes-block__title {
-    font-family: var(--sv-font-display);
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin: 0 0 1.5rem;
-    letter-spacing: 0.05em;
+.rdet-trayecto__punto small {
+    display: block;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--sv-text-primary);
+    color: var(--color-text-secondary);
 }
 
-.ruta-includes-list {
+.rdet-trayecto__marca {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: 0.3rem;
+    flex-shrink: 0;
+}
+
+.rdet-trayecto__marca--inicio {
+    background: var(--color-green-accent);
+    box-shadow: 0 0 0 4px rgba(85, 127, 99, 0.25);
+}
+
+.rdet-trayecto__marca--fin {
+    background: var(--color-error);
+    box-shadow: 0 0 0 4px rgba(201, 105, 79, 0.25);
+}
+
+/* Qué incluye */
+.rdet-incluye {
+    display: grid;
+    gap: 1rem;
+}
+
+.rdet-lista {
     list-style: none;
-    margin: 0;
     padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.55rem;
 }
 
-.ruta-includes-list__item {
-    font-size: 0.95rem;
-    color: var(--sv-text-secondary);
-    margin-bottom: 0.8rem;
+.rdet-lista li {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    line-height: 1.45;
+}
+
+.rdet-lista i {
+    color: var(--color-green-accent);
+    margin-top: 0.2rem;
+    width: 1rem;
+    flex-shrink: 0;
+}
+
+.rdet-lista--no li {
+    color: var(--color-text-secondary);
+}
+
+.rdet-lista--no i {
+    color: var(--color-error);
+}
+
+/* Antes de salir: pasos numerados */
+.rdet-pasos {
+    list-style: none;
+    counter-reset: paso;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.6rem;
+}
+
+.rdet-pasos li {
+    counter-increment: paso;
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    padding: 0.7rem 0.85rem;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+}
+
+.rdet-pasos li::before {
+    content: counter(paso);
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-text);
+    background: var(--color-green);
+}
+
+/* Equipamiento: tarjetas compactas */
+.rdet-equipo .fav-tarjeta__media {
+    aspect-ratio: 1 / 1;
+}
+
+/* Guía y transporte */
+.rdet-equipo-humano {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.rdet-persona {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.rdet-persona__icono {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    background: rgba(49, 93, 69, 0.3);
+    border: 1px solid rgba(85, 127, 99, 0.35);
+    color: var(--color-green-accent);
+    font-size: 1.2rem;
+}
+
+.rdet-persona small {
+    display: block;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-green-accent);
+    margin-bottom: 0.15rem;
+}
+
+.rdet-persona strong {
+    display: block;
+    font-size: 1rem;
+    color: var(--color-text);
+}
+
+.rdet-persona__extra {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    margin-top: 0.1rem;
+}
+
+.rdet-persona p {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    margin: 0.5rem 0 0;
     line-height: 1.5;
 }
 
-/* =========================================================
-   RECOMENDACIONES
-   ========================================================= */
-
-.ruta-recommendations {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
-    gap: 1.5rem;
+/* ---------------------------------------------------------
+   RESERVA
+   --------------------------------------------------------- */
+.rdet-reserva {
+    scroll-margin-top: calc(var(--nav-height) + 1rem);
 }
 
-.ruta-recommendation-item {
-    background: var(--sv-bg-section);
-    padding: 1.5rem;
-    border: 1px solid var(--sv-border);
-    border-left: 3px solid var(--sv-green-main);
-}
-
-.ruta-recommendation-item p {
-    margin: 0;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--sv-text-secondary);
-}
-
-/* =========================================================
-   EQUIPAMIENTO RECOMENDADO
-   Móvil: fila deslizable. Desde 768px: cuadrícula.
-   ========================================================= */
-
-.ruta-products-grid {
+.rdet-reserva__precio {
     display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 0.5rem;
-}
-
-.ruta-product-card {
-    flex: 0 0 min(220px, 70%);
-    scroll-snap-align: start;
-    background: var(--sv-bg-section);
-    border: 1px solid var(--sv-border);
-    overflow: hidden;
-    transition: all 0.3s var(--sv-ease-smooth);
-}
-
-.ruta-product-card:hover {
-    border-color: var(--sv-green-main);
-}
-
-.ruta-product-card__image {
-    overflow: hidden;
-    aspect-ratio: 1;
-}
-
-.ruta-product-card__image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s var(--sv-ease);
-}
-
-.ruta-product-card__content {
-    padding: 1.2rem;
-}
-
-.ruta-product-card__name {
-    font-family: var(--sv-font-display);
-    font-size: 0.95rem;
-    font-weight: 700;
-    margin: 0 0 0.3rem;
-    color: var(--sv-text-primary);
-    overflow-wrap: break-word;
-}
-
-.ruta-product-card__category {
-    font-size: 0.8rem;
-    color: var(--sv-text-secondary);
-    margin: 0 0 0.8rem;
-}
-
-.ruta-product-card__price {
-    font-family: var(--sv-font-display);
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--sv-green-hover);
-    margin-bottom: 1rem;
-}
-
-.ruta-product-card__link {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    color: var(--sv-green-main);
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.2s var(--sv-ease-smooth);
-}
-
-.ruta-product-card__link:hover {
-    color: var(--sv-green-hover);
-    transform: translateX(3px);
-}
-
-/* =========================================================
-   CTA (RESERVA)
-   Móvil: texto arriba y botón a lo ancho. Desde 992px: lado a lado.
-   ========================================================= */
-
-.ruta-cta-block {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1.5rem;
-    align-items: center;
-    padding: clamp(1.25rem, 4vw, 2rem);
-    background: var(--sv-bg-block);
-    border: 2px solid var(--sv-green-main);
-}
-
-.ruta-cta-title {
-    font-family: var(--sv-font-display);
-    font-size: clamp(1.3rem, 3.5vw, 1.8rem);
-    font-weight: 700;
-    margin: 0 0 0.5rem;
-    color: var(--sv-text-primary);
-}
-
-.ruta-cta-subtitle {
-    font-size: 1rem;
-    color: var(--sv-text-secondary);
-    margin: 0;
-}
-
-.ruta-cta-button {
-    display: inline-block;
-    width: 100%;
-    padding: 1rem 1.5rem;
-    background: linear-gradient(135deg, var(--sv-green-main), var(--sv-green-hover));
-    color: var(--sv-text-primary);
-    border: none;
-    font-family: var(--sv-font-display);
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 0.05em;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.3s var(--sv-ease-smooth);
-}
-
-.ruta-cta-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(49, 93, 69, 0.3);
-    filter: brightness(1.1);
-}
-
-/* Formulario de reserva (solo con sesión): los campos se acomodan en
-   varias líneas. Los campos usan 16px (evita el zoom de iPhone). */
-.ruta-reserva-form {
-    display: flex;
+    align-items: baseline;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    align-items: flex-end;
+    gap: 0.4rem;
+    margin-bottom: 0.25rem;
 }
 
-.ruta-reserva-form__label {
-    display: block;
-    font-size: 0.8rem;
-    margin-bottom: 0.2rem;
+.rdet-reserva__precio small {
+    width: 100%;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
 }
 
-.ruta-reserva-form__input {
-    padding: 0.5rem;
-    font-size: 1rem;
+.rdet-reserva__precio strong {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--color-text);
+    line-height: 1;
 }
 
-.ruta-reserva-form__input--people {
-    width: 80px;
-}
-
-.ruta-reserva-form__total {
+.rdet-reserva__precio span {
+    color: var(--color-text-secondary);
     font-size: 0.9rem;
 }
 
-/* === RESPONSIVE === */
+.rdet-reserva__nota-precio {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    margin: 0.3rem 0 0;
+}
+
+.rdet-reserva__form {
+    margin-top: 1.25rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.rdet-campo {
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.rdet-campo > span {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.45rem;
+}
+
+.rdet-campo > span small {
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+}
+
+.rdet-campo input[type="date"] {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: 0.95rem;
+    color-scheme: dark;
+}
+
+.rdet-campo input[type="date"]:focus {
+    outline: none;
+    border-color: var(--color-green-accent);
+}
+
+.rdet-qty {
+    width: 100%;
+    justify-content: space-between;
+    padding: 0.3rem;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-bg);
+}
+
+.rdet-qty input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    background: transparent;
+    border: 0;
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 600;
+    -moz-appearance: textfield;
+}
+
+.rdet-qty input::-webkit-outer-spin-button,
+.rdet-qty input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.rdet-qty input:focus {
+    outline: none;
+}
+
+.rdet-reserva .cuenta-resumen__total {
+    margin: 0.5rem 0 1.1rem;
+    font-size: 1.1rem;
+}
+
+/* Barra inferior fija con el precio (solo móvil y tablet) */
+.rdet-barra-movil {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-floating);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem var(--page-gutter);
+    padding-bottom: calc(0.7rem + env(safe-area-inset-bottom));
+    background: rgba(11, 16, 14, 0.95);
+    border-top: 1px solid var(--color-border);
+    backdrop-filter: blur(8px);
+}
+
+.rdet-barra-movil small {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+}
+
+.rdet-barra-movil strong {
+    font-size: 1.15rem;
+    color: var(--color-text);
+}
+
+/* Deja espacio para que la barra no tape el final de la página */
+.cuenta-page:has(.rdet-barra-movil) {
+    padding-bottom: 6rem;
+}
+
+/* Sube el micrófono del asistente y el botón "Instalar app" para que no queden tapados por la barra */
+body:has(.rdet-barra-movil) .asistente-voz,
+body:has(.rdet-barra-movil) .tas-install {
+    bottom: calc(4.75rem + env(safe-area-inset-bottom));
+}
+
+/* Aparición progresiva (la activa servicios-detalle.js) */
+.cuenta-main > * {
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.cuenta-main > .rdet-oculto {
+    opacity: 0;
+    transform: translateY(18px);
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+@media (min-width: 576px) {
+    .rdet-incluye {
+        grid-template-columns: 1fr 1fr;
+    }
+}
 
 @media (min-width: 768px) {
-    /* Contenedor y secciones con su margen de escritorio */
-    .ruta-container {
-        padding: 0 1.5rem;
+    .rdet-hero {
+        min-height: clamp(520px, 78svh, 760px);
     }
 
-    .ruta-section,
-    .ruta-info-grid {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
+    .rdet-datos {
+        grid-template-columns: repeat(4, 1fr);
     }
 
-    .ruta-gallery {
-        padding: 3rem 1.5rem;
+    .rdet-dato:nth-child(odd) {
+        border-right: 0;
     }
 
-    /* Hero: más alto, con los datos en fila */
-    .ruta-hero {
-        min-height: max(560px, 80vh);
-        min-height: max(560px, 80svh);
+    .rdet-dato:nth-child(-n + 2) {
+        border-bottom: 0;
     }
 
-    .ruta-hero__content {
-        padding: calc(var(--nav-height) + 1.5rem) 2.5rem 3rem;
+    .rdet-dato + .rdet-dato {
+        border-left: 1px solid var(--color-border);
     }
 
-    .ruta-hero__back {
-        margin-bottom: 2rem;
+    .rdet-mapa {
+        height: 320px;
     }
 
-    .ruta-hero__meta {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-    }
-
-    /* Galería: foto principal a la izquierda y cuadrícula a la derecha */
-    .ruta-gallery__container {
-        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-        gap: 1.5rem;
-    }
-
-    .ruta-gallery__main {
-        grid-row: span 2;
-        aspect-ratio: 4 / 5;
-    }
-
-    .ruta-gallery__grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-        overflow: visible;
-        padding-bottom: 0;
-    }
-
-    /* Mapa del recorrido: más alto */
-    .ruta-map {
-        min-height: 400px;
-    }
-
-    /* Equipamiento: cuadrícula */
-    .ruta-products-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1.5rem;
-        overflow: visible;
-        padding-bottom: 0;
+    .rdet-equipo-humano {
+        grid-template-columns: 1fr 1fr;
     }
 }
 
 @media (min-width: 992px) {
-    /* Mapa y datos del recorrido lado a lado */
-    .ruta-map-section {
-        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    .rdet-barra-movil {
+        display: none;
     }
 
-    /* Reserva: texto y botón lado a lado */
-    .ruta-cta-block {
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 2rem;
+    .cuenta-page:has(.rdet-barra-movil) {
+        padding-bottom: 4rem;
     }
 
-    .ruta-cta-button {
-        width: auto;
-        padding: 1rem 2.5rem;
-        white-space: nowrap;
-    }
-}
-
-/* Zoom de fotos y elevación de tarjetas: solo con mouse */
-@media (hover: hover) and (pointer: fine) {
-    .ruta-gallery:hover .ruta-gallery__main img {
-        transform: scale(1.05);
+    body:has(.rdet-barra-movil) .asistente-voz,
+    body:has(.rdet-barra-movil) .tas-install {
+        bottom: max(1.5rem, env(safe-area-inset-bottom));
     }
 
-    .ruta-gallery__item:hover img {
-        transform: scale(1.08);
-    }
-
-    .ruta-product-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .ruta-product-card:hover .ruta-product-card__image img {
-        transform: scale(1.1);
+    .rdet-galeria__thumb {
+        flex-basis: 96px;
+        height: 64px;
     }
 }

@@ -34,6 +34,9 @@ namespace EcommerceApp.Models
         public string DifficultyColor { get; set; } = string.Empty;
         public string DifficultyEmoji { get; set; } = string.Empty;
 
+        // ¿El usuario actual la tiene en favoritos?
+        public bool IsFavorite { get; set; }
+
         // ¿Tiene transporte?
         public bool HasTransport => Transport != null;
 

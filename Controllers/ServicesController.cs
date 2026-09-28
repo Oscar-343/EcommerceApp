@@ -18,7 +18,9 @@ namespace EcommerceApp.Controllers
             string? category = null,
             double? minDuration = null,
             double? maxDuration = null,
-            string? search = null)
+            string? search = null,
+            string? orderBy = null,
+            int page = 1)
         {
             // Consulta base: todas las rutas activas
             var servicesQuery = context.Services.AsNoTracking()
@@ -64,12 +66,43 @@ namespace EcommerceApp.Controllers
                     (s.Location != null && s.Location.ToLower().Contains(searchLower)));
             }
 
-            // Ordenar: destacadas primero, luego por fecha de creación
-            servicesQuery = servicesQuery
-                .OrderByDescending(s => s.IsFeatured)
-                .ThenByDescending(s => s.CreatedAt);
+            // Orden elegido en "Ordenar por". Por defecto: destacadas primero, luego las más nuevas.
+            servicesQuery = orderBy switch
+            {
+                "price-asc" => servicesQuery.OrderBy(s => s.Price),
+                "price-desc" => servicesQuery.OrderByDescending(s => s.Price),
+                "duration" => servicesQuery.OrderBy(s => s.DurationHours ?? double.MaxValue),
+                "distance" => servicesQuery.OrderBy(s => s.DistanceKm ?? double.MaxValue),
+                _ => servicesQuery.OrderByDescending(s => s.IsFeatured).ThenByDescending(s => s.CreatedAt)
+            };
 
-            var services = await servicesQuery.ToListAsync();
+            // Paginación: 9 rutas por página (3 filas de 3 en escritorio).
+            const int porPagina = 9;
+            var totalFiltradas = await servicesQuery.CountAsync();
+            var totalPaginas = Math.Max(1, (int)Math.Ceiling(totalFiltradas / (double)porPagina));
+            page = Math.Clamp(page, 1, totalPaginas);
+
+            var services = await servicesQuery
+                .Skip((page - 1) * porPagina)
+                .Take(porPagina)
+                .ToListAsync();
+
+            // El mapa muestra todas las rutas filtradas (no solo las de la página actual).
+            var mapRoutes = await servicesQuery
+                .Where(s => s.StartLatitude != null && s.StartLongitude != null)
+                .Select(s => new RutaMapaItem(s.Id, s.Name, s.Location, s.StartLatitude!.Value, s.StartLongitude!.Value))
+                .ToListAsync();
+
+            // Rutas favoritas del usuario (para pintar el corazón lleno).
+            var favoriteServiceIds = new List<int>();
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
+                favoriteServiceIds = await context.FavoriteItems.AsNoTracking()
+                    .Where(f => f.UserId == userId && f.Type == "Service")
+                    .Select(f => f.ItemId)
+                    .ToListAsync();
+            }
 
             // Obtener estadísticas
             var totalRoutes = await context.Services.AsNoTracking()
@@ -114,7 +147,13 @@ namespace EcommerceApp.Controllers
                 TotalDifficulties = totalDifficulties,
                 TotalWithGuide = totalWithGuide,
                 AvailableCategories = availableCategories,
-                AvailableRegions = availableRegions
+                AvailableRegions = availableRegions,
+                OrderBy = orderBy,
+                Page = page,
+                TotalPages = totalPaginas,
+                TotalFiltered = totalFiltradas,
+                MapRoutes = mapRoutes,
+                FavoriteServiceIds = favoriteServiceIds
             };
 
             return View(model);
@@ -200,8 +239,18 @@ namespace EcommerceApp.Controllers
                 .Select(sp => sp.Product!)
                 .ToListAsync();
 
+            // ¿El usuario ya guardó esta ruta en favoritos? (para pintar el corazón)
+            var isFavorite = false;
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
+                isFavorite = await context.FavoriteItems.AnyAsync(f =>
+                    f.UserId == userId && f.Type == "Service" && f.ItemId == id);
+            }
+
             var model = new ServicioDetalleViewModel
             {
+                IsFavorite = isFavorite,
                 Service = service,
                 Guide = service.Guide,
                 Transport = service.Transport,

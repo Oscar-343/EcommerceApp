@@ -1,0 +1,118 @@
+@model EcommerceApp.Models.ContactoViewModel
+@{
+    ViewData["Title"] = "Contacto";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/institucional.css" asp-append-version="true" />
+}
+
+<div class="cuenta-page">
+    <!-- === HERO === -->
+    <section class="cuenta-hero inst-hero inst-hero--bajo" style="--hero-img: url('https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1800&h=800&fit=crop');">
+        <div class="cuenta-hero__inner">
+            <div>
+                <p class="cuenta-hero__eyebrow"><i class="fa-solid fa-compass me-2" aria-hidden="true"></i>Contacto</p>
+                <h1 class="cuenta-hero__title">Hablemos de tu próxima aventura</h1>
+                <p class="cuenta-hero__sub">¿Dudas sobre una ruta, un pedido o una salida en grupo? Escríbenos y te ayudamos.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="cuenta-wrap">
+        <div class="cuenta-layout inst-contacto">
+            <!-- === FORMULARIO === -->
+            <section class="cuenta-panel">
+                <div class="cuenta-panel__head">
+                    <h2 class="cuenta-panel__title"><i class="fa-regular fa-paper-plane" aria-hidden="true"></i> Envíanos un mensaje</h2>
+                </div>
+
+                <form asp-action="Contacto" method="post" class="inst-form" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="inst-form__error-general"></div>
+
+                    <div class="inst-form__fila">
+                        <div class="inst-campo">
+                            <label asp-for="Nombre">Nombre completo</label>
+                            <input asp-for="Nombre" placeholder="¿Cómo te llamas?" autocomplete="name" />
+                            <span asp-validation-for="Nombre" class="inst-campo__error"></span>
+                        </div>
+                        <div class="inst-campo">
+                            <label asp-for="Email">Correo electrónico</label>
+                            <input asp-for="Email" type="email" placeholder="tucorreo@ejemplo.com" autocomplete="email" />
+                            <span asp-validation-for="Email" class="inst-campo__error"></span>
+                        </div>
+                    </div>
+
+                    <div class="inst-form__fila">
+                        <div class="inst-campo">
+                            <label asp-for="Telefono">Teléfono <small>(opcional)</small></label>
+                            <input asp-for="Telefono" type="tel" placeholder="+591 ..." autocomplete="tel" />
+                            <span asp-validation-for="Telefono" class="inst-campo__error"></span>
+                        </div>
+                        <div class="inst-campo">
+                            <label asp-for="Motivo">Motivo</label>
+                            <select asp-for="Motivo" asp-items="@(new SelectList(ContactoViewModel.Motivos))"></select>
+                            <span asp-validation-for="Motivo" class="inst-campo__error"></span>
+                        </div>
+                    </div>
+
+                    <div class="inst-campo">
+                        <label asp-for="Mensaje">Mensaje</label>
+                        <textarea asp-for="Mensaje" rows="6" placeholder="Cuéntanos qué ruta te interesa, tu fecha tentativa o tu duda sobre un pedido..."></textarea>
+                        <span asp-validation-for="Mensaje" class="inst-campo__error"></span>
+                    </div>
+
+                    <div class="inst-form__pie">
+                        <p><i class="fa-solid fa-lock" aria-hidden="true"></i> Solo usamos tus datos para responderte.</p>
+                        <button type="submit" class="cuenta-btn cuenta-btn--auto">
+                            Enviar mensaje <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- === DATOS DE CONTACTO === -->
+            <aside class="cuenta-aside">
+                <div class="cuenta-panel">
+                    <div class="cuenta-panel__head">
+                        <h2 class="cuenta-panel__title"><i class="fa-solid fa-mountain" aria-hidden="true"></i> Encuéntranos</h2>
+                    </div>
+
+                    <a href="https://wa.me/59177697909" target="_blank" rel="noopener" class="inst-canal">
+                        <span class="inst-canal__icono inst-canal__icono--wa"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></span>
+                        <span><small>WhatsApp</small>+591 77697909</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square inst-canal__ir" aria-hidden="true"></i>
+                    </a>
+                    <a href="mailto:trenalsur@gmail.com" class="inst-canal">
+                        <span class="inst-canal__icono"><i class="fa-solid fa-envelope" aria-hidden="true"></i></span>
+                        <span><small>Correo</small>trenalsur@gmail.com</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square inst-canal__ir" aria-hidden="true"></i>
+                    </a>
+                    <a href="https://maps.app.goo.gl/YJSTmHr98TLC1do3A" target="_blank" rel="noopener" class="inst-canal">
+                        <span class="inst-canal__icono"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></span>
+                        <span><small>Oficina</small>Edificio EOS, Cochabamba, Bolivia</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square inst-canal__ir" aria-hidden="true"></i>
+                    </a>
+
+                    <div class="inst-redes">
+                        <span>Síguenos</span>
+                        <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                        <a href="https://tiktok.com" target="_blank" rel="noopener" aria-label="TikTok"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+
+                <div class="cuenta-panel inst-atajos">
+                    <p class="inst-eyebrow">¿Ya tienes una compra o reserva?</p>
+                    <a asp-controller="Orders" asp-action="Index" class="cuenta-link-sutil"><i class="fa-solid fa-box" aria-hidden="true"></i> Ver mis pedidos</a>
+                    <a asp-controller="Reservations" asp-action="Index" class="cuenta-link-sutil"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Ver mis reservas</a>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

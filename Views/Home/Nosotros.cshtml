@@ -1,0 +1,140 @@
+@model EcommerceApp.Models.NosotrosViewModel
+@{
+    ViewData["Title"] = "Nosotros";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/institucional.css" asp-append-version="true" />
+}
+
+<div class="cuenta-page">
+    <!-- === HERO === -->
+    <section class="cuenta-hero inst-hero" style="--hero-img: url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=1800&h=900&fit=crop');">
+        <div class="cuenta-hero__inner">
+            <div>
+                <p class="cuenta-hero__eyebrow"><i class="fa-solid fa-mountain-sun me-2" aria-hidden="true"></i>Nuestra historia</p>
+                <h1 class="cuenta-hero__title">Somos Tren al Sur</h1>
+                <p class="cuenta-hero__sub">
+                    Una plataforma hecha por gente que camina: rutas reales de Bolivia y el equipo
+                    para vivirlas con seguridad.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="cuenta-wrap">
+        <!-- Cifras reales del catálogo -->
+        <div class="inst-cifras">
+            <div class="inst-cifra"><strong>@Model.TotalRutas</strong><span>Rutas activas</span></div>
+            <div class="inst-cifra"><strong>@Model.TotalProductos</strong><span>Productos de equipo</span></div>
+            <div class="inst-cifra"><strong>@Model.TotalGuias</strong><span>Guías en el equipo</span></div>
+            <div class="inst-cifra"><strong>@Model.TotalRegiones</strong><span>Regiones para explorar</span></div>
+        </div>
+
+        <!-- === HISTORIA === -->
+        <section class="inst-historia">
+            <div class="inst-historia__texto">
+                <p class="inst-eyebrow">Cómo empezó</p>
+                <h2 class="inst-titulo">Del primer sendero a una comunidad</h2>
+                <p>
+                    Tren al Sur nació en Cochabamba con una idea simple: que salir a la montaña sea más fácil.
+                    Cada vez que alguien quería hacer una ruta tenía que buscar información en un lugar,
+                    el equipo en otro y un guía en otro más.
+                </p>
+                <p>
+                    Por eso juntamos todo en un solo camino: eliges la ruta, ves qué necesitas llevar
+                    y reservas tu salida. Nosotros nos ocupamos de que llegues preparado.
+                </p>
+                <div class="inst-historia__acciones">
+                    <a asp-controller="Services" asp-action="Index" class="cuenta-btn cuenta-btn--auto">
+                        Ver rutas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                    <a asp-controller="Home" asp-action="Contacto" class="cuenta-btn cuenta-btn--auto cuenta-btn--borde">Escríbenos</a>
+                </div>
+            </div>
+
+            <div class="inst-collage" aria-hidden="true">
+                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&h=1100&fit=crop" alt="" class="inst-collage__a" loading="lazy" />
+                <img src="https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=700&h=500&fit=crop" alt="" class="inst-collage__b" loading="lazy" />
+                <p class="inst-collage__firma">Cochabamba · Bolivia</p>
+            </div>
+        </section>
+
+        <!-- === FRASE === -->
+        <blockquote class="inst-frase">
+            <i class="fa-solid fa-quote-left" aria-hidden="true"></i>
+            <p>No vendemos solo mochilas o botas. Te ayudamos a prepararte para tu próxima ruta.</p>
+        </blockquote>
+
+        <!-- === VALORES === -->
+        <section class="inst-seccion">
+            <div class="inst-seccion__cabecera">
+                <p class="inst-eyebrow">Lo que nos mueve</p>
+                <h2 class="inst-titulo">Nuestros valores</h2>
+            </div>
+            <div class="inst-valores">
+                <article class="inst-valor">
+                    <div class="inst-valor__icono"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
+                    <h3>Seguridad primero</h3>
+                    <p>Cada ruta indica su dificultad real, qué incluye y qué debes llevar antes de salir.</p>
+                </article>
+                <article class="inst-valor">
+                    <div class="inst-valor__icono"><i class="fa-solid fa-user-check" aria-hidden="true"></i></div>
+                    <h3>Guías locales</h3>
+                    <p>Caminamos con personas que conocen el terreno, el clima y la historia de cada lugar.</p>
+                </article>
+                <article class="inst-valor">
+                    <div class="inst-valor__icono"><i class="fa-solid fa-person-hiking" aria-hidden="true"></i></div>
+                    <h3>Equipo que funciona</h3>
+                    <p>Elegimos productos pensados para la montaña, no para la vitrina.</p>
+                </article>
+                <article class="inst-valor">
+                    <div class="inst-valor__icono"><i class="fa-solid fa-leaf" aria-hidden="true"></i></div>
+                    <h3>Respeto por la naturaleza</h3>
+                    <p>Dejamos cada sendero igual o mejor de como lo encontramos.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- === CÓMO FUNCIONA === -->
+        <section class="inst-seccion">
+            <div class="inst-seccion__cabecera">
+                <p class="inst-eyebrow">Tu aventura en tres pasos</p>
+                <h2 class="inst-titulo">Así funciona Tren al Sur</h2>
+            </div>
+            <ol class="inst-pasos">
+                <li class="inst-paso">
+                    <span class="inst-paso__num">01</span>
+                    <i class="fa-solid fa-route" aria-hidden="true"></i>
+                    <h3>Elige tu ruta</h3>
+                    <p>Filtra por dificultad, duración o región y encuentra la salida que va contigo.</p>
+                </li>
+                <li class="inst-paso">
+                    <span class="inst-paso__num">02</span>
+                    <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+                    <h3>Equípate</h3>
+                    <p>Cada ruta te muestra el equipo recomendado para que no te falte nada.</p>
+                </li>
+                <li class="inst-paso">
+                    <span class="inst-paso__num">03</span>
+                    <i class="fa-solid fa-mountain-sun" aria-hidden="true"></i>
+                    <h3>Vive la experiencia</h3>
+                    <p>Reserva tu fecha, prepara la mochila y sal a caminar.</p>
+                </li>
+            </ol>
+        </section>
+
+        <!-- === LLAMADO FINAL === -->
+        <section class="inst-cta" style="--cta-img: url('https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=1600&h=600&fit=crop');">
+            <div>
+                <h2>¿Listo para tu próxima ruta?</h2>
+                <p>Encuentra la aventura y el equipo para vivirla.</p>
+            </div>
+            <div class="inst-cta__botones">
+                <a asp-controller="Services" asp-action="Index" class="cuenta-btn cuenta-btn--auto">Explorar rutas</a>
+                <a asp-controller="Products" asp-action="Index" class="cuenta-btn cuenta-btn--auto cuenta-btn--borde">Ver equipamiento</a>
+            </div>
+        </section>
+    </div>
+</div>

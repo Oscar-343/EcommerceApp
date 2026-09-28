@@ -34,5 +34,22 @@ namespace EcommerceApp.Models
 
         // Regiones disponibles
         public List<string> AvailableRegions { get; set; } = new();
+
+        // Orden elegido: null (destacadas), price-asc, price-desc, duration, distance
+        public string? OrderBy { get; set; }
+
+        // Paginación
+        public int Page { get; set; } = 1;
+        public int TotalPages { get; set; } = 1;
+        public int TotalFiltered { get; set; }
+
+        // Todas las rutas filtradas que tienen coordenadas (para el mapa)
+        public List<RutaMapaItem> MapRoutes { get; set; } = new();
+
+        // Rutas que el usuario ya guardó en favoritos
+        public List<int> FavoriteServiceIds { get; set; } = new();
     }
+
+    // Punto del mapa de rutas: solo lo necesario para el marcador y su popup.
+    public record RutaMapaItem(int Id, string Name, string? Location, double Lat, double Lng);
 }

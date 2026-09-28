@@ -2,41 +2,143 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Mis pedidos";
-}
-<link rel="stylesheet" href="~/css/carrito.css" asp-append-version="true" />
 
-<div class="container-fluid cart-page">
-    <section class="cart-hero">
-        <h1 class="cart-title">Mis pedidos 📦</h1>
-        <p class="cart-sub">Historial de tus pedidos confirmados.</p>
+    var pendientes = Model.Count(o => o.Status == "Pendiente");
+    var entregados = Model.Count(o => o.Status == "Entregado");
+    var totalInvertido = Model.Where(o => o.Status != "Cancelado").Sum(o => o.Total);
+
+    string ClaseEstado(string estado) => estado switch
+    {
+        "Pendiente" => "cuenta-tag--pendiente",
+        "Cancelado" => "cuenta-tag--cancelado",
+        _ => ""
+    };
+    string IconoEstado(string estado) => estado switch
+    {
+        "Pendiente" => "fa-clock",
+        "Cancelado" => "fa-ban",
+        _ => "fa-circle-check"
+    };
+}
+<link rel="stylesheet" href="~/css/cuenta.css" asp-append-version="true" />
+
+<div class="cuenta-page">
+    <section class="cuenta-hero" style="--hero-img: url('https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1600&h=600&fit=crop');">
+        <div class="cuenta-hero__inner">
+            <i class="fa-solid fa-box-open cuenta-hero__icon" aria-hidden="true"></i>
+            <div>
+                <p class="cuenta-hero__eyebrow">Tu equipo en camino</p>
+                <h1 class="cuenta-hero__title">Mis pedidos</h1>
+                <p class="cuenta-hero__sub">Revisa el estado de tus compras y el detalle de cada pedido.</p>
+            </div>
+        </div>
     </section>
 
-    <div class="cart-section">
-        @if (!Model.Any())
-        {
-            <div class="cart-empty-state">
-                <h3 class="cart-empty-state__title">Todavía no tienes pedidos</h3>
-                <p>Cuando confirmes tu carrito, aparecerán aquí.</p>
-                <a asp-controller="Products" asp-action="Index" class="cart-btn-primary cart-empty-state__btn">Ver tienda</a>
-            </div>
-        }
-        else
-        {
-            <div class="cart-list">
-                @foreach (var order in Model)
+    <div class="cuenta-wrap">
+        <div class="cuenta-layout">
+            <div class="cuenta-panel">
+                <div class="cuenta-panel__head">
+                    <h2 class="cuenta-panel__title">
+                        <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+                        Historial (@Model.Count)
+                    </h2>
+                </div>
+
+                @if (!Model.Any())
                 {
-                    <a asp-action="Details" asp-route-id="@order.Id" class="cart-item cart-item--row cart-item--link">
-                        <div class="cart-item__info">
-                            <h4 class="cart-item__name">Pedido #@order.Id</h4>
-                            <div class="cart-item__meta">@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
-                        </div>
-                        <div class="cart-item__side">
-                            <div class="cart-item__price">@PriceFormatter.Format(order.Total)</div>
-                            <div class="cart-item__meta">@order.Status</div>
-                        </div>
-                    </a>
+                    <div class="cuenta-vacio">
+                        <div class="cuenta-vacio__icono"><i class="fa-solid fa-box-open" aria-hidden="true"></i></div>
+                        <div class="cuenta-vacio__titulo">Todavía no tienes pedidos</div>
+                        <p>Cuando completes una compra, podrás seguirla desde aquí.</p>
+                        <a asp-controller="Products" asp-action="Index" class="cuenta-btn cuenta-btn--auto">
+                            Explorar equipamiento <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
                 }
+                else
+                {
+                    <div class="cuenta-lista">
+                        @foreach (var order in Model)
+                        {
+                            var unidades = order.Items.Sum(i => i.Quantity);
+                            var nombres = string.Join(", ", order.Items.Take(2).Select(i => i.ProductName));
+                            if (order.Items.Count > 2) nombres += $" y {order.Items.Count - 2} más";
+
+                            <a asp-action="Details" asp-route-id="@order.Id" class="cuenta-fila">
+                                <div class="cuenta-fila__icono"><i class="fa-solid fa-box" aria-hidden="true"></i></div>
+
+                                <div class="cuenta-fila__info">
+                                    <h3 class="cuenta-fila__nombre">Pedido #@order.Id</h3>
+                                    <div class="cuenta-fila__meta">
+                                        <span><i class="fa-regular fa-calendar" aria-hidden="true"></i>@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                        <span><i class="fa-solid fa-cubes" aria-hidden="true"></i>@unidades @(unidades == 1 ? "producto" : "productos")</span>
+                                    </div>
+                                    <div class="cuenta-fila__meta">@nombres</div>
+                                    <span class="cuenta-tag @ClaseEstado(order.Status)">
+                                        <i class="fa-solid @IconoEstado(order.Status)" aria-hidden="true"></i> @order.Status
+                                    </span>
+                                </div>
+
+                                <div class="cuenta-fila__acciones">
+                                    <div class="cuenta-fila__total">@PriceFormatter.Format(order.Total)</div>
+                                </div>
+
+                                <div class="cuenta-fila__cerrar cuenta-btn-x" aria-hidden="true">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                }
+
+                <a asp-controller="Products" asp-action="Index" class="cuenta-volver">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Volver a la tienda
+                </a>
             </div>
-        }
+
+            <aside class="cuenta-aside">
+                <div class="cuenta-panel">
+                    <div class="cuenta-panel__head">
+                        <h2 class="cuenta-panel__title">
+                            <i class="fa-solid fa-mountain" aria-hidden="true"></i>
+                            Resumen
+                        </h2>
+                    </div>
+
+                    <div class="cuenta-stats">
+                        <div class="cuenta-stat">
+                            <div class="cuenta-stat__valor">@Model.Count</div>
+                            <div class="cuenta-stat__label">Pedidos</div>
+                        </div>
+                        <div class="cuenta-stat">
+                            <div class="cuenta-stat__valor">@pendientes</div>
+                            <div class="cuenta-stat__label">Pendientes</div>
+                        </div>
+                        <div class="cuenta-stat">
+                            <div class="cuenta-stat__valor">@entregados</div>
+                            <div class="cuenta-stat__label">Entregados</div>
+                        </div>
+                        <div class="cuenta-stat">
+                            <div class="cuenta-stat__valor">@Model.Count(o => o.Status == "Cancelado")</div>
+                            <div class="cuenta-stat__label">Cancelados</div>
+                        </div>
+                    </div>
+
+                    <div class="cuenta-resumen__total">
+                        <span>Total en equipo</span>
+                        <span>@PriceFormatter.Format(totalInvertido)</span>
+                    </div>
+
+                    <a asp-controller="Products" asp-action="Index" class="cuenta-btn">
+                        <i class="fa-solid fa-person-hiking" aria-hidden="true"></i>
+                        Seguir equipándome
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                    <div class="cuenta-resumen__nota">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i> Puedes cancelar un pedido mientras siga pendiente.
+                    </div>
+                </div>
+            </aside>
+        </div>
     </div>
 </div>

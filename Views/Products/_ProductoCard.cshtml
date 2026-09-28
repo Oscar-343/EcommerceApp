@@ -1,96 +1,80 @@
 @model EcommerceApp.Models.Product
 @{
     var esFavorito = ViewData["IsFavorite"] as bool? ?? false;
+    var enOferta = Model.PromotionalPrice.HasValue && Model.PromotionalPrice < Model.Price;
+    var descuento = enOferta ? Math.Round((1 - (Model.PromotionalPrice!.Value / Model.Price)) * 100) : 0;
+    var agotado = Model.Stock <= 0;
 }
 
-<div class="producto-card">
-    <!-- Imagen del producto -->
-    <div class="producto-card__image-container">
-        <img src="@(Model.ImageUrl ?? "/images/default-product.svg")"
-             alt="@Model.Name" 
-             class="producto-card__image producto-card__image--primary"
-             loading="lazy" />
-        
+<article class="pcard @(agotado ? "pcard--agotado" : "")">
+    <!-- Foto: al pasar el mouse aparece la foto "en uso" (si existe) -->
+    <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id" class="pcard__media" aria-label="Ver @Model.Name">
+        <img src="@(Model.ImageUrl ?? "/images/default-product.svg")" alt="@Model.Name"
+             class="pcard__img pcard__img--principal" loading="lazy" />
         @if (!string.IsNullOrEmpty(Model.SecondaryImageUrl))
         {
-            <img src="@Model.SecondaryImageUrl" 
-                 alt="@Model.Name en uso" 
-                 class="producto-card__image producto-card__image--secondary"
-                 loading="lazy" />
+            <img src="@Model.SecondaryImageUrl" alt="" class="pcard__img pcard__img--uso" loading="lazy" />
         }
+    </a>
 
-        <!-- Badges -->
-        <div class="producto-card__badges">
-            @if (Model.IsNew)
+    <!-- Etiquetas: solo una a la vez para no saturar (agotado > oferta > nuevo > más vendido) -->
+    @if (agotado)
+    {
+        <span class="pcard__tag pcard__tag--agotado">Agotado</span>
+    }
+    else if (enOferta)
+    {
+        <span class="pcard__tag pcard__tag--oferta">-@(descuento)%</span>
+    }
+    else if (Model.IsNew)
+    {
+        <span class="pcard__tag">Nuevo</span>
+    }
+    else if (Model.IsBestSeller)
+    {
+        <span class="pcard__tag pcard__tag--top">Más vendido</span>
+    }
+
+    <button type="button" class="pcard__fav producto-card__favorite @(esFavorito ? "active" : "")"
+            data-product-id="@Model.Id"
+            aria-label="@(esFavorito ? "Quitar de favoritos" : "Guardar en favoritos")">
+        <i class="@(esFavorito ? "fa-solid" : "fa-regular") fa-heart" aria-hidden="true"></i>
+    </button>
+
+    <div class="pcard__body">
+        <p class="pcard__meta">
+            @Model.Category
+            @if (Model.Marca != null)
             {
-                <span class="producto-card__badge producto-card__badge--new">NUEVO</span>
+                <span>· @Model.Marca.Nombre</span>
             }
-            @if (Model.IsBestSeller)
+        </p>
+
+        <h3 class="pcard__nombre">
+            <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id">@Model.Name</a>
+        </h3>
+
+        <div class="pcard__precio">
+            <strong>@PriceFormatter.Format(Model.PromotionalPrice ?? Model.Price)</strong>
+            @if (enOferta)
             {
-                <span class="producto-card__badge producto-card__badge--bestseller">MÁS VENDIDO</span>
-            }
-            @if (Model.PromotionalPrice.HasValue && Model.PromotionalPrice < Model.Price)
-            {
-                var discount = Math.Round((1 - (Model.PromotionalPrice.Value / Model.Price)) * 100);
-                <span class="producto-card__badge producto-card__badge--offer">-@(discount)%</span>
+                <s>@PriceFormatter.Format(Model.Price)</s>
             }
         </div>
 
-        <!-- Favorito -->
-        <button class="producto-card__favorite @(esFavorito ? "active" : "")"
-                data-product-id="@Model.Id"
-                aria-label="Agregar a favoritos">
-            @(esFavorito ? "♥" : "♡")
-        </button>
-    </div>
-
-    <!-- Información del producto -->
-    <div class="producto-card__info">
-        @if (!string.IsNullOrEmpty(Model.Category))
-        {
-            <p class="producto-card__category">@Model.Category</p>
-        }
-
-        @if (Model.Marca != null)
-        {
-            <p class="producto-card__brand">@Model.Marca.Nombre</p>
-        }
-
-        <h3 class="producto-card__name">@Model.Name</h3>
-
-        <div class="producto-card__price">
-            @if (Model.PromotionalPrice.HasValue && Model.PromotionalPrice < Model.Price)
-            {
-                <span class="producto-card__price-current">@PriceFormatter.Format(Model.PromotionalPrice)</span>
-                <span class="producto-card__price-original">@PriceFormatter.Format(Model.Price)</span>
-            }
-            else
-            {
-                <span class="producto-card__price-current">@PriceFormatter.Format(Model.Price)</span>
-            }
-        </div>
-
-        <!-- Cantidad + acciones -->
-        <div class="producto-card__qty" data-product-id="@Model.Id" data-max-stock="@Model.Stock">
-            <button type="button" class="producto-card__qty-btn" data-qty-action="dec" aria-label="Restar cantidad">−</button>
-            <span class="producto-card__qty-value" data-qty-value>1</span>
-            <button type="button" class="producto-card__qty-btn" data-qty-action="inc" aria-label="Sumar cantidad">+</button>
-        </div>
-
-        <div class="producto-card__actions">
-            <a asp-controller="Products"
-               asp-action="Details"
-               asp-route-id="@Model.Id"
-               class="producto-card__btn producto-card__btn--secondary">
-                VER
-            </a>
-            <button class="producto-card__btn producto-card__btn--primary"
-                    data-product-id="@Model.Id"
-                    onclick="agregarAlCarritoConCantidad(this, @Model.Id)">
-                <i class="fas fa-shopping-bag"></i> AGREGAR
+        <!-- Cantidad + carrito: la cantidad elegida se envía al agregar (productos.js) -->
+        <div class="pcard__acciones">
+            <div class="pcard__qty" data-max-stock="@Model.Stock">
+                <button type="button" class="pcard__qty-btn" data-qty-action="dec" aria-label="Restar una unidad" disabled="@agotado">−</button>
+                <span class="pcard__qty-valor" data-qty-value aria-live="polite">1</span>
+                <button type="button" class="pcard__qty-btn" data-qty-action="inc" aria-label="Sumar una unidad" disabled="@(agotado || Model.Stock <= 1)">+</button>
+            </div>
+            <button type="button" class="pcard__carrito"
+                    onclick="agregarAlCarritoConCantidad(this, @Model.Id)"
+                    disabled="@agotado"
+                    aria-label="Agregar @Model.Name al carrito" title="Agregar al carrito">
+                <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
             </button>
         </div>
     </div>
-</div>
-
-
+</article>
