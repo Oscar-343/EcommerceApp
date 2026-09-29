@@ -14,14 +14,22 @@
 }
 
 @* ============================================================
-   HERO DE MARCA
+   HERO DE MARCA — Home v2
+   El video queda "clavado" en pantalla (position: sticky en el CSS)
+   mientras el resto del contenido pasa por encima, igual que el
+   efecto de fondo fijo que ya usamos en Productos.
    ============================================================ *@
 <section class="hero-brand">
 
     <div class="hero-brand__media">
-        <video class="hero-brand__video" autoplay muted loop playsinline preload="metadata" disablepictureinpicture>
-            <source src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/Video%20Project.mp4" type="video/mp4">
-        </video>
+        @* Celular y tablet: solo la foto (liviana, sin tirones).
+           Laptop/escritorio (992px o más): home.js carga el video encima de la foto.
+           Para cambiar la foto del celular, reemplaza la URL de src. *@
+        <img class="hero-brand__img"
+             src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/fondo-login.jpg"
+             alt="" fetchpriority="high" decoding="async" />
+        <video class="hero-brand__video" muted loop playsinline preload="none" disablepictureinpicture aria-hidden="true"
+               data-src="https://viaymveoxuafmtqhfvri.supabase.co/storage/v1/object/public/product-image/Video%20Project.mp4"></video>
         <div class="hero-brand__overlay"></div>
 
         <svg class="hero-brand__contours" viewBox="0 0 400 420" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

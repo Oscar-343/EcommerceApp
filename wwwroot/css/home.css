@@ -89,11 +89,24 @@ p, .section-subtitle {
     top: 0;
     width: 100%;
     height: 100vh;
+    height: 100svh; /* en celular no "salta" al esconderse la barra del navegador */
     z-index: 0;
 }
 
+/* Foto de fondo: la que se ve en celular y tablet (y mientras carga el video en laptop) */
+.hero-brand__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Video: oculto en pantallas chicas; se muestra desde 992px (ver RESPONSIVE) */
 .hero-brand__video {
-    display: block;
+    position: relative;
+    display: none;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -837,6 +850,11 @@ p, .section-subtitle {
 }
 
 @media (min-width: 992px) {
+    /* Laptop y escritorio: video encima de la foto */
+    .hero-brand__video {
+        display: block;
+    }
+
     /* Hero: adorno lateral */
     .hero-brand__flourish {
         display: flex;
