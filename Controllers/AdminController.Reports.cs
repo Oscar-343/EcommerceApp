@@ -1,5 +1,6 @@
 using System.Globalization;
 using EcommerceApp.Helpers;
+using EcommerceApp.Models.Reports;
 using EcommerceApp.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,6 +28,31 @@ namespace EcommerceApp.Controllers
             var bytes = CsvHelper.ToUtf8Bytes(CsvHelper.BuildCsv(rows));
             return File(bytes, "text/csv", fileName);
         }
+
+        // ---------------------------------------------------------------
+        // EXPORTACIÓN CON DISEÑO (Excel y PDF) — misma plantilla para todos los reportes.
+        // Cada reporte arma un ReporteDocumento y estos dos helpers lo dibujan.
+        // ---------------------------------------------------------------
+
+        // Logo del reporte: wwwroot/images/logo-reporte.png si existe; si no, el ícono de la app.
+        private static byte[]? LogoReporte(IWebHostEnvironment env)
+        {
+            foreach (var ruta in new[] { "images/logo-reporte.png", "images/logo-reporte.jpg", "icons/icon-192.png" })
+            {
+                var archivo = Path.Combine(env.WebRootPath, ruta);
+                if (System.IO.File.Exists(archivo)) return System.IO.File.ReadAllBytes(archivo);
+            }
+            return null;
+        }
+
+        private FileContentResult ExcelFile(string nombre, ReporteDocumento doc, IWebHostEnvironment env) =>
+            File(ReporteExcel.Generar(doc, LogoReporte(env)),
+                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", nombre + ".xlsx");
+
+        private FileContentResult PdfFile(string nombre, ReporteDocumento doc, IWebHostEnvironment env) =>
+            File(ReportePdf.Generar(doc, LogoReporte(env)), "application/pdf", nombre + ".pdf");
+
+        private static string Periodo(DateOnly d, DateOnly h) => $"{d:dd/MM/yyyy} al {h:dd/MM/yyyy}";
 
         // Índice con una tarjeta por reporte.
         public IActionResult Reports()
@@ -71,6 +97,64 @@ namespace EcommerceApp.Controllers
             rows.Add(new[] { "Pedidos (Pendiente)", Money(vm.PorConfirmarPedidos) });
 
             return CsvFile($"reporte-ingresos_{d:yyyy-MM-dd}_{h:yyyy-MM-dd}.csv", rows);
+        }
+
+        // Reporte de ingresos con diseño: los mismos datos que el CSV, organizados en resumen + tablas.
+        private static ReporteDocumento DocumentoIngresos(IncomeReportViewModel vm)
+        {
+            var porMes = new ReporteTabla
+            {
+                Titulo = "Ingresos por mes",
+                Columnas = new[] { "Mes", "Reservas", "Productos", "Total" },
+                ColumnasMoneda = new() { 1, 2, 3 },
+                UltimaFilaEsTotal = true
+            };
+            porMes.Filas.AddRange(vm.PorMes.Select(m => new object?[] { MesNombre(m.Year, m.Month), m.Reservas, m.Productos, m.Total }));
+            porMes.Filas.Add(new object?[] { "Total", vm.TotalReservas, vm.TotalProductos, vm.TotalGeneral });
+
+            var porConfirmar = new ReporteTabla
+            {
+                Titulo = "Por confirmar (todavía no cuenta como ingreso)",
+                Columnas = new[] { "Origen", "Monto" },
+                ColumnasMoneda = new() { 1 },
+                UltimaFilaEsTotal = true,
+                Filas =
+                {
+                    new object?[] { "Reservas (Pendiente / Recorrido)", vm.PorConfirmarReservas },
+                    new object?[] { "Pedidos (Pendiente)", vm.PorConfirmarPedidos },
+                    new object?[] { "Total por confirmar", vm.PorConfirmarTotal }
+                }
+            };
+
+            return new ReporteDocumento
+            {
+                Titulo = "Reporte de ingresos",
+                Descripcion = "Solo cuentan reservas Acabado y pedidos Entregado, por su fecha de finalización.",
+                Periodo = Periodo(vm.Desde, vm.Hasta),
+                Resumen =
+                {
+                    new("Ingresos por reservas", PriceFormatter.Format(vm.TotalReservas)),
+                    new("Ingresos por productos", PriceFormatter.Format(vm.TotalProductos)),
+                    new("Total general", PriceFormatter.Format(vm.TotalGeneral))
+                },
+                Tablas = { porMes, porConfirmar }
+            };
+        }
+
+        public async Task<IActionResult> ReportIncomeExcel([FromServices] ReportService reportService, [FromServices] IWebHostEnvironment env,
+            DateOnly? desde, DateOnly? hasta)
+        {
+            var (d, h) = ReportService.DefaultRange(desde, hasta);
+            var vm = await reportService.GetIncomeReportAsync(d, h);
+            return ExcelFile($"reporte-ingresos_{d:yyyy-MM-dd}_{h:yyyy-MM-dd}", DocumentoIngresos(vm), env);
+        }
+
+        public async Task<IActionResult> ReportIncomePdf([FromServices] ReportService reportService, [FromServices] IWebHostEnvironment env,
+            DateOnly? desde, DateOnly? hasta)
+        {
+            var (d, h) = ReportService.DefaultRange(desde, hasta);
+            var vm = await reportService.GetIncomeReportAsync(d, h);
+            return PdfFile($"reporte-ingresos_{d:yyyy-MM-dd}_{h:yyyy-MM-dd}", DocumentoIngresos(vm), env);
         }
 
         public async Task<IActionResult> ReportReservations(

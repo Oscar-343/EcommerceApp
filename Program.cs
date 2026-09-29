@@ -8,6 +8,9 @@ using EcommerceApp.Data;
 using EcommerceApp.Models;
 using EcommerceApp.Services;
 
+// QuestPDF (reportes en PDF): licencia Community, gratuita para proyectos académicos y pequeños.
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("postgresql")));
