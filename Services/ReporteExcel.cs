@@ -153,7 +153,11 @@ namespace EcommerceApp.Services
 
                 // Filtros en el encabezado de cada tabla (flechitas para ordenar/filtrar en Excel).
                 if (doc.Tablas.Count == 1)
-                    hoja.Range(filaEncabezado, 1, fila - 1, tabla.Columnas.Length).SetAutoFilter();
+                {
+                    var ultimaFila = tabla.UltimaFilaEsTotal ? fila - 2 : fila - 1;   // el total queda fuera del filtro
+                    if (ultimaFila > filaEncabezado)
+                        hoja.Range(filaEncabezado, 1, ultimaFila, tabla.Columnas.Length).SetAutoFilter();
+                }
 
                 fila++;
             }

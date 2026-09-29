@@ -20,10 +20,12 @@
         <p>Filtrado por fecha de salida (TripDate), estado y ruta.</p>
     </div>
     <div class="no-print admin-export-actions">
-        <a class="btn-admin btn-admin-outline btn-admin-sm" asp-action="ReportReservationsCsv"
-           asp-route-desde="@Model.Desde.ToString("yyyy-MM-dd")" asp-route-hasta="@Model.Hasta.ToString("yyyy-MM-dd")"
-           asp-route-estado="@Model.Estado" asp-route-serviceId="@Model.ServiceId">Exportar CSV</a>
-        <button type="button" class="btn-admin btn-admin-outline btn-admin-sm" onclick="window.print()">Imprimir / Guardar como PDF</button>
+        <a class="btn-admin btn-admin-outline btn-admin-sm" asp-action="ReportReservationsExport" asp-route-desde="@Model.Desde.ToString("yyyy-MM-dd")" asp-route-hasta="@Model.Hasta.ToString("yyyy-MM-dd")" asp-route-estado="@Model.Estado" asp-route-serviceId="@Model.ServiceId" asp-route-formato="excel">
+            <i class="fas fa-file-excel"></i> Exportar Excel
+        </a>
+        <a class="btn-admin btn-admin-outline btn-admin-sm" asp-action="ReportReservationsExport" asp-route-desde="@Model.Desde.ToString("yyyy-MM-dd")" asp-route-hasta="@Model.Hasta.ToString("yyyy-MM-dd")" asp-route-estado="@Model.Estado" asp-route-serviceId="@Model.ServiceId" asp-route-formato="pdf">
+            <i class="fas fa-file-pdf"></i> Exportar PDF
+        </a>
     </div>
 </div>
 

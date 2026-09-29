@@ -10,8 +10,12 @@
         <p>Foto actual de favoritos y carritos, sin filtro de fecha.</p>
     </div>
     <div class="no-print admin-export-actions">
-        <a class="btn-admin btn-admin-outline btn-admin-sm" asp-action="ReportDemandCsv">Exportar CSV</a>
-        <button type="button" class="btn-admin btn-admin-outline btn-admin-sm" onclick="window.print()">Imprimir / Guardar como PDF</button>
+        <a class="btn-admin btn-admin-outline btn-admin-sm" asp-action="ReportDemandExport" asp-route-formato="excel">
+            <i class="fas fa-file-excel"></i> Exportar Excel
+        </a>
+        <a class="btn-admin btn-admin-outline btn-admin-sm" asp-action="ReportDemandExport" asp-route-formato="pdf">
+            <i class="fas fa-file-pdf"></i> Exportar PDF
+        </a>
     </div>
 </div>
 

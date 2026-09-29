@@ -17,6 +17,7 @@ namespace EcommerceApp.Services
         private const string FilaAlterna = "#EEF3EF";
         private const string Borde = "#D5DDD7";
         private const string FondoTarjeta = "#F5F7F5";
+        private const string Blanco = "#FFFFFF";
 
         public static byte[] Generar(ReporteDocumento doc, byte[]? logo)
         {
@@ -110,9 +111,9 @@ namespace EcommerceApp.Services
                 {
                     tabla.ColumnsDefinition(c =>
                     {
-                        // La primera columna (nombres) más ancha que las numéricas.
+                        // Columnas de texto (nombres) más anchas; las numéricas, angostas.
                         for (var i = 0; i < t.Columnas.Length; i++)
-                            if (i == 0) c.RelativeColumn(2.2f); else c.RelativeColumn();
+                            c.RelativeColumn(EsNumerica(t, i) ? 1 : 2.4f);
                     });
 
                     tabla.Header(h =>
@@ -128,7 +129,7 @@ namespace EcommerceApp.Services
                     for (var f = 0; f < t.Filas.Count; f++)
                     {
                         var esTotal = t.UltimaFilaEsTotal && f == t.Filas.Count - 1;
-                        var fondo = esTotal ? FondoTarjeta : (f % 2 == 1 ? FilaAlterna : Colors.White);
+                        var fondo = esTotal ? FondoTarjeta : (f % 2 == 1 ? FilaAlterna : Blanco);
 
                         for (var i = 0; i < t.Columnas.Length; i++)
                         {
